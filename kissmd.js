@@ -1,53 +1,44 @@
 (function(kissmdName) {
 
-  var waiting;
-
-  if (!window.kissmd__global) {
-    waiting = {};
-    window.kissmd__global = {
-      modules: {},
-      on: function(id, callback) {
-        (waiting[id] = waiting[id] || []).push(callback);
-      },
-      trigger: function(id) {
-        (waiting[id] || []).forEach(function(w) { w(); });
-      }
-    };
-  }
+  var waiting = {},
+      modules = {};
 
   function makeDefine() {
 
-    var global = window.kissmd__global,
-        modules = global.modules,
-        definitions = {},
-        missingErr = {};
+    function define(id, defn) {
+      try {
+        kissmd.set(id, defn(require));
+      } catch (e) {
+        if (e !== require) throw e;
+        kissmd.on(require.id, function() { define(id, defn); });
+      }
+    }
+    define.on = function(id, callback) {
+      (waiting[id] = waiting[id] || []).push(callback);
+    };
+    define.get = function(id) {
+      return modules[id];
+    };
+    define.set = function(id, val) {
+      modules[id] = val;
+      (waiting[id] || []).forEach(function(w) { w(); });
+    };
 
     function require(id) {
-      if (!modules[id]) {
-        missingErr.id = id;
-        throw missingErr;
+      var mod = define.get(id);
+      if (!mod) {
+        require.id = id;
+        throw require;  // Throw require, to ensure correct error gets handled
       }
-      return modules[id];
-    }
-
-    function define(id, defn) {
-      var waitId;
-      definitions[id] = defn;
-      try {
-        modules[id] = defn(require);
-        global.trigger(id);
-      } catch (e) {
-        if (e !== missingErr) throw e;
-        waitId = missingErr.id;
-        global.on(waitId, function() { define(id, defn); });
-      }
+      return mod;
     }
     define.require = require;
 
     return define;
   }
 
-  window[kissmdName] = makeDefine();
+  var localKissmd = makeDefine();
+  if (!window.kissmd) window.kissmd = localKissmd;
 
-}('kissmd'));
+}());
 
