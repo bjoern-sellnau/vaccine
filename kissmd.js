@@ -1,0 +1,42 @@
+(function(kissmdName) {
+
+  function makeDefine() {
+
+    var modules = window.kissmd__modules,
+        definitions = {},
+        waiting = {},
+        missingErr = {};
+
+    function require(id) {
+      if (!modules[id]) {
+        missingErr.id = id;
+        throw missingErr;
+      }
+      return modules[id];
+    }
+
+    function define(id, defn) {
+      var waitId;
+      defn = defn || definitions[id];
+      definitions[id] = defn;
+      try {
+        modules[id] = defn(require);
+        (waiting[id] || []).forEach(define);
+      } catch (e) {
+        if (e !== missingErr) throw e;
+        waitId = missingErr.id;
+        (waiting[waitId] = waiting[waitId] || []).push(id);
+      }
+    }
+    define.require = require;
+
+    return define;
+  }
+
+  if (!window.kissmd__modules) {
+    window.kissmd__modules = {};
+    window[kissmdName] = makeDefine();
+  }
+
+}('kissmd'));
+
