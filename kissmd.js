@@ -17,18 +17,22 @@
 
     function define(id, defn) {
       var waitId;
-      defn = defn || definitions[id];
       definitions[id] = defn;
+      defineKnown(id);
+    }
+    define.require = require;
+
+    function defineKnown(id) {
+      var defn = definitions[id];
       try {
         modules[id] = defn(require);
-        (waiting[id] || []).forEach(define);
+        (waiting[id] || []).forEach(defineKnown);
       } catch (e) {
         if (e !== missingErr) throw e;
         waitId = missingErr.id;
         (waiting[waitId] = waiting[waitId] || []).push(id);
       }
     }
-    define.require = require;
 
     return define;
   }
