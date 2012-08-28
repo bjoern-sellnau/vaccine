@@ -80,6 +80,9 @@ kissmd('defined below', function() {
 });
 
 
+//////////////////////////////////////////////////
+// More complex out of order test
+
 // Called three or four times.
 // Current implementation gets called 4 times
 kissmd('out of order 1', verifyCount(3, 4, function(require) {
@@ -118,6 +121,29 @@ kissmd('ooo5', function(require) {
   return {phrase: 'is a dive'};
 });
 assert.equal(window.ooo1, true);
+
+
+//////////////////////////////////////////////////
+// Test catching exceptions
+
+try {
+  kissmd('exceptional 1', function(require) {
+    require('exceptional 2');
+    return true;
+  });
+} catch (e) {
+  assert(false, 'Should never throw not defined exceptions');
+}
+kissmd('exceptional 2', function() { return true; });
+
+try {
+  kissmd('exceptional 3', function(require) {
+    throw 'My bad...';
+  });
+  assert(false, 'Should rethrow other exceptions');
+} catch (e) {
+  assert.equal(e, 'My bad...', 'Should not modify rethrown exceptions');
+}
 
 
 console.log('--------------------');
