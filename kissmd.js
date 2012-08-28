@@ -1,10 +1,25 @@
 (function(kissmdName) {
 
+  var waiting;
+
+  if (!window.kissmd__global) {
+    waiting = {};
+    window.kissmd__global = {
+      modules: {},
+      on: function(id, callback) {
+        (waiting[id] = waiting[id] || []).push(callback);
+      },
+      trigger: function(id) {
+        (waiting[id] || []).forEach(function(w) { w(); });
+      }
+    };
+  }
+
   function makeDefine() {
 
-    var modules = window.kissmd__modules,
+    var global = window.kissmd__global,
+        modules = global.modules,
         definitions = {},
-        waiting = {},
         missingErr = {};
 
     function require(id) {
@@ -18,29 +33,21 @@
     function define(id, defn) {
       var waitId;
       definitions[id] = defn;
-      defineKnown(id);
-    }
-    define.require = require;
-
-    function defineKnown(id) {
-      var defn = definitions[id];
       try {
         modules[id] = defn(require);
-        (waiting[id] || []).forEach(defineKnown);
+        global.trigger(id);
       } catch (e) {
         if (e !== missingErr) throw e;
         waitId = missingErr.id;
-        (waiting[waitId] = waiting[waitId] || []).push(id);
+        global.on(waitId, function() { define(id, defn); });
       }
     }
+    define.require = require;
 
     return define;
   }
 
-  if (!window.kissmd__modules) {
-    window.kissmd__modules = {};
-    window[kissmdName] = makeDefine();
-  }
+  window[kissmdName] = makeDefine();
 
 }('kissmd'));
 
