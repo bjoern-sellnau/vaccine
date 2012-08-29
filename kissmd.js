@@ -1,7 +1,10 @@
 (function() {
+  // Remove the above "(function() {" line if you are wrapping all the code
+  // from your app or library inside a single function.
 
   var waiting = {},
-      modules = {};
+      modules = {},
+      globalKissmd;
 
   function makeDefine(prefix) {
 
@@ -29,10 +32,10 @@
       }
 
       try {
-        kissmd.set(id, defn(require));
+        globalKissmd.set(id, defn(require));
       } catch (e) {
         if (e != require) throw e;
-        kissmd.on(require.id, function() { define(originalId, defn); });
+        globalKissmd.on(require.id, function() { define(originalId, defn); });
       }
     }
 
@@ -56,7 +59,23 @@
     return define;
   }
 
-  if (!window.kissmd) window.kissmd = makeDefine('');
+  var kissmd = makeDefine('');
+  globalKissmd = window.kissmd || (window.kissmd = kissmd);
+
+
+
+  // If you are using a globally available "kissmd" function then
+  // uncomment and change the assignment below.
+  //
+  //    myApp.define = kissmd;
+  //
+  // If you are wrapping your app inside a single (function() { ... }())
+  // then you can delete the ending "}());" line and uncomment
+  // and change the assignment below. Alternatively, just use the
+  // kissmd name directly (but make sure you never use the global version).
+  //
+  //    var myKissmd = kissmd;
+  //
 
 }());
 
