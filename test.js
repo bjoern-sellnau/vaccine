@@ -51,6 +51,25 @@ function verifyCount(lower, upper, func) {
 }
 
 
+//////////////////////////////////////////////////
+// Testing on, get, and set
+
+assert.equal(kissmd.get('undef'), undefined);
+
+kissmd.set('set test', 'set test passed?');
+assert.equal(kissmd.get('set test'), 'set test passed?');
+
+kissmd.on('pancake', function() { window.syrup = true; });
+
+kissmd.set('waffle', 'hmm');
+assert(!window.syrup);
+kissmd.set('pancake');
+assert(window.syrup);
+
+
+//////////////////////////////////////////////////
+// Simple dependencies
+
 kissmd('no dependencies', function() {
   window.cool = 'yep';
   return {returns: 'an object'};
@@ -144,6 +163,35 @@ try {
 } catch (e) {
   assert.equal(e, 'My bad...', 'Should not modify rethrown exceptions');
 }
+
+
+//////////////////////////////////////////////////
+// Testing prefixes
+
+kissmd('base/one', function() { return 'pajamas'; });
+
+kissmd('base/two', function(require) {
+  var one = require('./one');
+  assert.equal(one, 'pajamas');
+});
+
+
+kissmd('base/sub/one', function() { return 'night gown'; });
+
+kissmd('base/sub/two', function(require) {
+  var one = require('./one');
+  assert.equal(one, 'night gown');
+});
+
+
+var base = kissmd.prefix('base');
+base('three', function() { return window.base3 = 'base 3 rocks'; });
+assert.equal(window.base3, 'base 3 rocks');
+assert.equal(kissmd.get('base/three'), 'base 3 rocks');
+
+base('four', function(require) {
+  assert(require('./one'), 'pajamas');
+});
 
 
 console.log('--------------------');
