@@ -7,12 +7,19 @@
 
     function define(originalId, defn) {
       var id = prefix + originalId,
-          parts = id.split('/'),
-          base = parts.slice(0, parts.length - 1).join('/');
-      if (base) base += '/';
+          parts = id.split('/');
 
       function require(reqId) {
-        if (reqId.slice(0, 2) == './') reqId = base + reqId.slice(2, reqId.length);
+        var matching = /(\.?\.\/?)*/.exec(reqId)[0],
+            // Some code golf to get the number of "directories" back we want to go
+            back = Math.floor(matching.replace(/\//g, '').length / 1.9 + 0.99),
+            base;
+        if (back) {
+          base = parts.slice(0, parts.length - back).join('/');
+          if (base) base += '/';
+          reqId = base + reqId.slice(matching.length);
+        }
+        reqId = reqId.replace(/\/$/, '');
         var mod = define.get(reqId);
         if (!mod) {
           require.id = reqId;
@@ -49,8 +56,7 @@
     return define;
   }
 
-  var localKissmd = makeDefine('');
-  if (!window.kissmd) window.kissmd = localKissmd;
+  if (!window.kissmd) window.kissmd = makeDefine('');
 
 }());
 

@@ -182,6 +182,12 @@ kissmd('base/sub/two', function(require) {
   var one = require('./one');
   assert.equal(one, 'night gown');
 });
+kissmd('base/sub/three', function(require) {
+  var one = require('./one/');  // Also works with trailing slash?
+  window.basicEndSlashWorks = true;
+  assert.equal(one, 'night gown');
+});
+assert(window.basicEndSlashWorks);
 
 
 var base = kissmd.prefix('base');
@@ -193,6 +199,45 @@ base('four', function(require) {
   assert(require('./one'), 'pajamas');
 });
 
+
+// Require relative further up
+
+kissmd('not_root', function() { return 'not root'; });
+kissmd('root', function() { return 'root'; });
+kissmd('root/package', function() { return 'root package'; });
+kissmd('root/one', function() { return 'root one'; });
+kissmd('root/one/package', function() { return 'root one package'; });
+kissmd('root/one/two', function() { return 'root .. two'; });
+kissmd('root/one/two/three', function() { return 'root .. three'; });
+
+kissmd('root/one/two/test1', function(require) {
+  var three = require('./three'),
+      two = require('./'),
+      alsoTwo = require('.'),
+      one = require('../'),
+      alsoOne = require('..'),
+      onePkg = require('../package'),
+      root = require('../../'),
+      rootPkg = require('../../package'),
+      notRoot = require('../../../not_root');
+
+  assert.equal(three, 'root .. three');
+  assert.equal(two, 'root .. two');
+  assert.equal(alsoTwo, 'root .. two');
+  assert.equal(one, 'root one');
+  assert.equal(alsoOne, 'root one');
+  assert.equal(onePkg, 'root one package');
+  assert.equal(root, 'root');
+  assert.equal(rootPkg, 'root package');
+  assert.equal(notRoot, 'not root');
+  window.test1Complete = true;
+});
+
+assert(window.test1Complete);
+
+
+
+//////////////////////////////////////////////////
 
 console.log('--------------------');
 console.log('Passed: ' + passedAssertions);
