@@ -53,6 +53,11 @@ function verifyCount(lower, upper, func) {
 //////////////////////////////////////////////////
 // Testing on, get, and set
 
+// Call a single define, as this is needed to set the
+// global _vaccine
+
+define('make the global _vaccine', function() { return true; });
+
 assert.equal(_vaccine.get('undef'), undefined);
 
 _vaccine.set('set test', 'set test passed?');

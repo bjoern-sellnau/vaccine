@@ -22,7 +22,7 @@ function define(id, defn) {
     // Set your library with _vaccine.set('mylib', mylib);
   }
 
-  var parts = id.split('/');
+  var parts = id.split('/'),
       globalVaccine = window._vaccine;
 
   function require(reqId) {
