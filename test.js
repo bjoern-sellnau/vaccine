@@ -168,7 +168,7 @@ try {
 
 
 //////////////////////////////////////////////////
-// Testing prefixes
+// Testing relative requires.
 
 define('base/one', function() { return 'pajamas'; });
 
@@ -190,16 +190,6 @@ define('base/sub/three', function(require) {
   assert.equal(one, 'night gown');
 });
 assert(window.basicEndSlashWorks);
-
-
-var base = define.prefix('base');
-base('three', function() { return window.base3 = 'base 3 rocks'; });
-assert.equal(window.base3, 'base 3 rocks');
-assert.equal(define.get('base/three'), 'base 3 rocks');
-
-base('four', function(require) {
-  assert(require('./one'), 'pajamas');
-});
 
 
 // Require relative further up
