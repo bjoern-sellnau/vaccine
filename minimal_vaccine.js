@@ -1,7 +1,7 @@
 (function() {
   var waiting = {}, modules = {};
-  if (!window.kissmd) {
-    window.kissmd = {
+  if (!window._vaccine) {
+    window._vaccine = {
       on: function(id, callback) {
         (waiting[id] = waiting[id] || []).push(callback);
       },
