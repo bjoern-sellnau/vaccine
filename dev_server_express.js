@@ -2,7 +2,7 @@
 var express = require('express'),
     exec = require('child_process').exec,
     app = express(),
-    outputFile = 'test_built.js';   // change this to your app file name
+    outputFile = 'test_built.js';   // Change this to your app file name.
 
 app.get('/' + outputFile, function(req, res) {
   exec('./build', function(err, stdout) {
