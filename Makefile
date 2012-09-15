@@ -4,10 +4,10 @@
 all: | build minimal size
 
 build:
-	sh build.sh
+	./build > test_built.js
 
 minimal:
-	cat vaccine.js | sed -e '1,/MINIMAL-VACCINE-START/d' -e '/MINIMAL-VACCINE-END/,$$d' -e 's/^  //' > minimal-vaccine.js
+	cat vaccine.js | sed -e '1,/MINIMAL-VACCINE-START/d' -e '/MINIMAL-VACCINE-END/,$$d' -e 's/^  //' > vaccine_minimal.js
 
 size:
-	sh size-test.sh
+	sh size_test.sh

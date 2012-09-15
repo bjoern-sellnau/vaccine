@@ -1,6 +1,4 @@
 
-"use strict";
-
 var passedAssertions = 0,
     failedAssertions = 0;
 
