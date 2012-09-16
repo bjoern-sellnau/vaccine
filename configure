@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Configure the dev server and build scripts for the test sources
+# Configure the dev server, build scripts, and loader for the test sources
 
 # Plain build script
 source_dir=test_src
@@ -19,6 +19,7 @@ sed "s#source_dir=src#source_dir=$source_dir#" build_node |
 chmod +x test/build_node
 
 
+# Dev server
 server() {
   server_script=$1
   app_name=$2
@@ -28,11 +29,20 @@ server() {
 }
 
 server dev_server_standalone.js test_built.js ./build > test/dev_server_standalone.js
-
 server dev_server_express.js test_built.js ./build > test/dev_server_express.js
 
-
 server dev_server_standalone.js test_built_node.js ./build_node > test/dev_server_standalone_node.js
-
 server dev_server_express.js test_built_node.js ./build_node > test/dev_server_express_node.js
+
+
+# vaccine loader
+source_dir=test_src
+lib_dir=test_lib
+app_name=test_app
+main=main
+
+sed "s#sourceDir = 'src'#sourceDir = '$source_dir'#" vaccine_loader.js |
+    sed "s#libDir = 'lib'#libDir = '$lib_dir'#" |
+    sed "s#appName = 'my_app'#appName = '$app_name'#" |
+    sed "s#main = 'my_app_main'#main = '$main'#" > test/vaccine_loader.js
 
