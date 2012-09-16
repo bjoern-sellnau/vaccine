@@ -74,6 +74,9 @@
           src,
           script;
       if (root === appName) {
+        if (!split.length) {
+          split.push(main);
+        }
         src = sourceDir + '/' + split.join('/');
       } else {
         src = libDir + '/' + root;
@@ -93,7 +96,7 @@
   // VACCINE_LOADER_START
 
   window.define = define;
-  define('vaccine_loader', function(require) { require(appName + '/' + main); });
+  define('vaccine_loader', function(require) { require(appName); });
 
 }());
 // VACCINE_LOADER_END

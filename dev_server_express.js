@@ -1,7 +1,6 @@
 
 var outputFile = 'my_app.js',   // Change this to your app file name.
-    buildScript = './build';    // Change this to your app's build script
-
+    buildScript = './build';    // Change this to your app's build script.
 
 
 var express = require('express'),
@@ -14,6 +13,7 @@ app.get('/' + outputFile, function(req, res) {
     res.send(stdout);
   });
 });
+
 
 app.use(express.static(__dirname));
 

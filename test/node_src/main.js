@@ -1,8 +1,10 @@
 
-var other = require('./other'),
-    util = require('./util');
+var util = require('test_app/util'),
+    execute = require('test_app/execute'),
+    results;
 
-exports.execute = function() {
-  return 'app: 2+1=' + util.addOne(2) + ';' + other('cool');
-};
+results = execute.execute();
+util.log(results);
+
+util.log(results === 'app: 2+1=3;other gets cool' ? 'PASS' : 'FAIL');
 

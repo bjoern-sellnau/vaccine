@@ -1,6 +1,11 @@
 
 var outputFile = 'my_app.js',   // Change this to your app file name.
-    buildScript = './build';    // Change this to your app's build script
+    buildScript = './build',    // Change this to your app's build script
+
+    // If You are using CommonJS modules (implicit defines),
+    // set isNode to true, and set your source directory.
+    isNode = false,
+    sourceDir = 'src';    // You only need to configure this if isNode == true.
 
 
 
