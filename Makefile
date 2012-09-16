@@ -1,7 +1,17 @@
 
-.PHONY: all configure build minimal size
+.PHONY: all test test-node pre-test configure build minimal size
 
 all: | configure build minimal size
+
+test: pre-test
+	cd test; node dev_server_standalone.js
+
+test-node: pre-test
+	cd test; node dev_server_standalone_node.js
+
+pre-test:
+	./configure
+	printf '\n\n!!!\nOpen localhost:3000 in a browser.\n!!!\n\n'
 
 configure:
 	./configure
