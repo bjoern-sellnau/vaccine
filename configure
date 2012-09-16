@@ -31,8 +31,10 @@ server() {
   build_script=$3
   source_dir=$4
   app_name=$5
+  main=$6
   sed "s#outputFile = 'my_app.js'#outputFile = '$output_file'#" $server_script |
       sed "s#sourceDir = 'src'#sourceDir = '$source_dir'#" |
+      sed "s#main = 'my_app_main'#main = '$main'#" |
       sed "s#appName = .*;#appName = '$app_name';#" |
       sed "s#buildScript = './build'#buildScript = '$build_script'#"
 }
@@ -40,8 +42,8 @@ server() {
 server dev_server_standalone.js test_built.js ./build > test/dev_server_standalone.js
 server dev_server_express.js test_built.js ./build > test/dev_server_express.js
 
-server dev_server_standalone.js test_built_node.js ./build_node node_src test_app > test/dev_server_standalone_node.js
-server dev_server_express_node.js test_built_node.js ./build_node node_src test_app > test/dev_server_express_node.js
+server dev_server_standalone.js test_built_node.js ./build_node node_src test_app main > test/dev_server_standalone_node.js
+server dev_server_express_node.js test_built_node.js ./build_node node_src test_app main > test/dev_server_express_node.js
 
 
 # vaccine loader

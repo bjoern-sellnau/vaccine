@@ -4,7 +4,8 @@ var outputFile = 'my_app.js',   // Change this to your app file name.
 
 // DEV_SERVER_EXPRESS_NODE_START
 
-var sourceDir = 'src';
+var sourceDir = 'src',
+    main = 'my_app_main';
 
 
 var fs = require('fs'),
@@ -27,12 +28,17 @@ app.get(new RegExp('^/' + sourceDir + '/.*'), function(req, res) {
   fs.readFile('.' + req.path, 'utf8', function(err, rawFileData) {
     if (err) throw err;
     var prefix = new RegExp('^' + sourceDir + '/'),
-        pathPart = req.path.slice(1).replace(prefix, ''),
-        module = appName + '/' + pathPart.replace(/\.js$/, ''),
+        module = req.path.slice(1).replace(prefix, '').replace(/\.js$/, ''),
+        fullModule = appName + '/' + module,
         compiled;
-    compiled = 'define("' + module + '", function(require, exports, module) {';
+    compiled = 'define("' + fullModule + '", function(require, exports, module) {';
     compiled += rawFileData;
     compiled += '});';
+    if (module === main) {
+      compiled += 'define("' + appName + '", function(require, exports, module) {';
+      compiled += '  module.exports = require("' + fullModule + '");';
+      compiled += '});';
+    }
     res.type('application/javascript');
     res.send(compiled);
   });

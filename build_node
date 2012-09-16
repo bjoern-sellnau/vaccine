@@ -21,7 +21,7 @@ do
 done
 
 # Define the app module as the main/index file's exports.
-echo "define('$app_name', function(require, e, module) {"
+echo "define('$app_name', function(require, exports, module) {"
 echo "  module.exports = require('$app_name/$main');"
 echo '});'
 
