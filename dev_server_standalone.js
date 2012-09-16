@@ -1,9 +1,12 @@
 
+var outputFile = 'my_app.js',   // Change this to your app file name.
+    buildScript = './build';    // Change this to your app's build script
+
+
+
 var http = require('http'),
     fs = require('fs'),
     exec = require('child_process').exec,
-    outputFile = 'my_app.js',   // Change this to your app file name.
-    buildScript = './build',    // Change this to your app's build script
     types;
 
 types = {
