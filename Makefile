@@ -1,5 +1,5 @@
 
-.PHONY: all test test-node pre-test configure strip-loader build minimal size
+.PHONY: test configure build size
 
 all: | configure strip-loader build minimal size
 
@@ -9,16 +9,18 @@ test: pre-test
 test-node: pre-test
 	cd test; node dev_server_standalone_node.js
 
-pre-test:
-	./configure
+pre-test: | configure build-util
 	printf '\n\n!!!\nOpen localhost:3000 in a browser.\n!!!\n\n'
 
 configure:
 	./configure
 
-build:
+build: build-util
 	cd test; ./build > test_built.js
 	cd test; ./build_node > test_built_node.js
+
+build-util:
+	cd test; ./build_util > test_lib/util.js
 
 strip-loader:
 	cat vaccine_loader.js | sed -e '/VACCINE_LOADER_START/,/VACCINE_LOADER_END/d' -e 's/^  //' > vaccine.js

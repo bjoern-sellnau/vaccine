@@ -1,7 +1,7 @@
 
 define('test_app/out_of_order', function(require, e, module) {
 
-  var util = require('./util'),
+  var util = require('util'),
       assert = util.assert,
       verifyCount =  util.verifyCount;
 

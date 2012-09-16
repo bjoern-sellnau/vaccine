@@ -1,29 +1,10 @@
 
-define('test_app/counter', function(require, exports) {
-
-  var passed,
-      failed;
-
-  exports.reset = function() {
-    passed = failed = 0;
-  };
-
-  exports.passed = function() {
-    passed += 1;
-  };
-
-  exports.failed = function() {
-    failed += 1;
-  };
-
-  exports.counts = function() {
-    return {passed: passed, failed: failed};
-  };
-
+define('util', function(require, e, module) {
+  module.exports = require('util/main');
 });
 
 
-define('test_app/util', function(require, e, module) {
+define('util/main', function(require, e, module) {
 
   var counter = require('./counter');
 

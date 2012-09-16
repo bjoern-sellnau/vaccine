@@ -7,6 +7,11 @@ source_dir=test_src
 sed "s#cat src/\*#cat $source_dir/*#" build > test/build
 chmod +x test/build
 
+# Util build script
+source_dir=util_src
+sed "s#cat src/\*#cat $source_dir/*#" build > test/build_util
+chmod +x test/build_util
+
 # Node build script
 source_dir=node_src
 app_name=test_app

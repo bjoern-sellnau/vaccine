@@ -1,7 +1,7 @@
 
 define('test_app/main', function(require) {
 
-  var counter = require('./util').counter,
+  var counter = require('util/counter'),
       simple = require('./simple'),
       complex = require('./complex');
 
