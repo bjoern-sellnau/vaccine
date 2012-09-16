@@ -2,11 +2,22 @@
 
 # Configure the dev server and build scripts for the test sources
 
-cp build test/build   # conveniently, no change here
+# Plain build script
+source_dir=test_src
+sed "s#cat src/\*#cat $source_dir/*#" build > test/build
+chmod +x test/build
 
-src_dir=node_src
-sed "s#cat src/\*#cat $src_dir/*#" build > test/build_node
+# Node build script
+source_dir=node_src
+app_name=test_app
+main=main
+vaccine=../vaccine.js
+sed "s#source_dir=src#source_dir=$source_dir#" build_node |
+    sed "s#app_name=my_app#app_name=$app_name#" |
+    sed "s#vaccine=vaccine.js#vaccine=$vaccine#" |
+    sed "s#main=my_app_main#main=$main#" > test/build_node
 chmod +x test/build_node
+
 
 server() {
   server_script=$1

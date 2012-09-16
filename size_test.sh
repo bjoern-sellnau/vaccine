@@ -1,9 +1,9 @@
 
 echo "(function() {var define = window.define;" > test_without_vaccine.js
-cat test/src/test.js >> test_without_vaccine.js
+cat test/test_src/test.js >> test_without_vaccine.js
 echo "}());" >> test_without_vaccine.js
 echo "(function() {var define = window.define;" > test_with_minimal_vaccine.js
-cat test/src/test.js >> test_with_minimal_vaccine.js
+cat test/test_src/test.js >> test_with_minimal_vaccine.js
 cat vaccine_minimal.js >> test_with_minimal_vaccine.js
 echo "}());" >> test_with_minimal_vaccine.js
 

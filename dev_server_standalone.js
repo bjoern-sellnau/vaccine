@@ -20,7 +20,7 @@ types = {
 
 http.createServer(function (req, res) {
   if (req.url === '/' + outputFile) {
-    exec('./build', function(err, stdout) {
+    exec(buildScript, function(err, stdout) {
       if (err) return notFound(req.url, res);
       res.writeHead(200, {'Content-Type': 'application/javascript'});
       res.end(stdout);
