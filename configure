@@ -1,0 +1,27 @@
+#!/bin/sh
+
+# Configure the dev server and build scripts for the test sources
+
+cp build test/build   # conveniently, no change here
+
+src_dir=node_src
+sed "s#cat src/\*#cat $src_dir/*#" build > test/build_node
+chmod +x test/build_node
+
+server() {
+  server_script=$1
+  app_name=$2
+  build_script=$3
+  sed "s#outputFile = 'my_app.js'#outputFile = '$app_name'#" $server_script |
+      sed "s#buildScript = './build'#buildScript = '$build_script'#"
+}
+
+server dev_server_standalone.js test_built.js ./build > test/dev_server_standalone.js
+
+server dev_server_express.js test_built.js ./build > test/dev_server_express.js
+
+
+server dev_server_standalone.js test_built_node.js ./build_node > test/dev_server_standalone_node.js
+
+server dev_server_express.js test_built_node.js ./build_node > test/dev_server_express_node.js
+

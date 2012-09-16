@@ -1,2 +1,4 @@
 node_modules
-test_built.js
+test/test_built*
+test/dev_server*
+test/build*

@@ -1,6 +1,6 @@
 #!/bin/sh
 
 echo '(function() {"use strict";' # You can remove "use strict" if you like
-cat test/*                        # Note that vaccine.js is in the source list.
+cat src/*                   # Note that vaccine.js must be in the source list.
 echo '}());'
 
