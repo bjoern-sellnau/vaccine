@@ -9,6 +9,8 @@ rm -r vaccines
 cd test
 ../configure --app test_app --main main --output test_built.js --src test_src --lib test_lib
 mv vaccines/* .
+cp vaccine.js test_src
+cp vaccine.js util_src
 
 ../configure --app test_app --main main --output test_built_node.js --src node_src --lib test_lib --build ./build_node
 cd vaccines

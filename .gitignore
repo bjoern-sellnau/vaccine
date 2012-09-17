@@ -3,3 +3,5 @@ test/test_built*
 test/dev_server*
 test/build*
 test/vaccine*
+test/test_src/vaccine.js
+test/util_src/vaccine.js

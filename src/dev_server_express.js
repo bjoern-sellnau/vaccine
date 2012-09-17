@@ -4,12 +4,12 @@ var outputFile = '{{{ OUTPUT_FILE }}}',   // Change this to your app file name.
 
 <<<<<<<<<<<<<<<<<<<<<<< NODE START <<<<<<<<<<<<<<<<<<<<<<<
 
-var sourceDir = '{{{ SOURCE_DIR }}}',
-    main = '{{{ APP_MAIN }}}';
+var appName = '{{{ APP_NAME }}}',
+    main = '{{{ APP_MAIN }}}',
+    sourceDir = '{{{ SOURCE_DIR }}}';
 
 
-var fs = require('fs'),
-    appName = outputFile.split('.').shift();
+var fs = require('fs');
 ------------------------ NODE END ------------------------
 
 var express = require('express'),

@@ -1,28 +1,25 @@
 
-// VACCINE_LOADER_START
 (function() {
 
   // Replace sourceDir with the directory of your source files relative to the
   // server location.
   var sourceDir = 'src',
 
-  // Replace libDir with the directory of your (pre-built) dependencies.
-      libDir = 'lib',
+      // Replace libraryDir with the directory of your (pre-built) dependencies.
+      libraryDir = 'lib',
       appName = 'my_app',
-      main = 'my_app_main';   // The main (index) file for you app.
+      main = 'index';   // The main (index) file for you app.
 
 
   var loading = {};
 
-  // VACCINE_LOADER_END
   function define(id, defn) {
 
-    // VACCINE_MINIMAL_START
-    if (!window._vaccine) {
+    if (!window.vaccine) {
       // The minimal code required to be vaccine compliant.
       (function() {
         var waiting = {}, modules = {};
-        window._vaccine = {
+        window.vaccine = {
           on: function(id, callback) {
             (waiting[id] = waiting[id] || []).push(callback);
           },
@@ -36,11 +33,10 @@
         };
       }());
     }
-    // Set your library with _vaccine.set('mylib', mylib);
-    // VACCINE_MINIMAL_END
+    // Set your library with vaccine.set('mylib', mylib);
 
     var parts = id.split('/'),
-        globalVaccine = window._vaccine,
+        globalVaccine = window.vaccine,
         module = {exports: {}};
 
     function require(reqId) {
@@ -67,7 +63,6 @@
       globalVaccine.set(id, module.exports);
     } catch (e) {
       if (e != require) throw e;
-      // VACCINE_LOADER_START
 
       var split = require.id.split('/'),
           root = split.shift(),
@@ -79,7 +74,7 @@
         }
         src = sourceDir + '/' + split.join('/');
       } else {
-        src = libDir + '/' + root;
+        src = libraryDir + '/' + root;
       }
       src += '.js';
       if (!loading[src]) {
@@ -89,15 +84,12 @@
         document.head.appendChild(script);
       }
 
-      // VACCINE_LOADER_END
       globalVaccine.on(require.id, function() { define(id, defn); });
     }
   }
-  // VACCINE_LOADER_START
 
   window.define = define;
   define('vaccine_loader', function(require) { require(appName); });
 
 }());
-// VACCINE_LOADER_END
 

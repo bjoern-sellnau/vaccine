@@ -1,8 +1,8 @@
-if (!window._vaccine) {
+if (!window.vaccine) {
   // The minimal code required to be vaccine compliant.
   (function() {
     var waiting = {}, modules = {};
-    window._vaccine = {
+    window.vaccine = {
       on: function(id, callback) {
         (waiting[id] = waiting[id] || []).push(callback);
       },
@@ -16,4 +16,4 @@ if (!window._vaccine) {
     };
   }());
 }
-// Set your library with _vaccine.set('mylib', mylib);
+// Set your library with vaccine.set('mylib', mylib);

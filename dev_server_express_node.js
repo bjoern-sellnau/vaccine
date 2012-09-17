@@ -2,15 +2,13 @@
 var outputFile = 'my_app.js',   // Change this to your app file name.
     buildScript = './build';    // Change this to your app's build script.
 
-// DEV_SERVER_EXPRESS_NODE_START
 
-var sourceDir = 'src',
-    main = 'my_app_main';
+var appName = 'my_app',
+    main = 'index',
+    sourceDir = 'src';
 
 
-var fs = require('fs'),
-    appName = outputFile.split('.').shift();
-// DEV_SERVER_EXPRESS_NODE_END
+var fs = require('fs');
 
 var express = require('express'),
     exec = require('child_process').exec,
@@ -23,7 +21,6 @@ app.get('/' + outputFile, function(req, res) {
   });
 });
 
-// DEV_SERVER_EXPRESS_NODE_START
 app.get(new RegExp('^/' + sourceDir + '/.*'), function(req, res) {
   fs.readFile('.' + req.path, 'utf8', function(err, rawFileData) {
     if (err) throw err;
@@ -43,7 +40,6 @@ app.get(new RegExp('^/' + sourceDir + '/.*'), function(req, res) {
     res.send(compiled);
   });
 });
-// DEV_SERVER_EXPRESS_NODE_END
 
 app.use(express.static(__dirname));
 

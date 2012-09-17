@@ -12,20 +12,20 @@ define('test_app/simple', function(require, e, module) {
     // Testing on, get, and set
 
     // Call a single define, as this is needed to set the
-    // global _vaccine
+    // global vaccine
 
-    define('make the global _vaccine', function() {});
+    define('make the global vaccine', function() {});
 
-    assert.equal(_vaccine.get('undef'), undefined);
+    assert.equal(vaccine.get('undef'), undefined);
 
-    _vaccine.set('set test', 'set test passed?');
-    assert.equal(_vaccine.get('set test'), 'set test passed?');
+    vaccine.set('set test', 'set test passed?');
+    assert.equal(vaccine.get('set test'), 'set test passed?');
 
-    _vaccine.on('pancake', function() { window.syrup = true; });
+    vaccine.on('pancake', function() { window.syrup = true; });
 
-    _vaccine.set('waffle', 'hmm');
+    vaccine.set('waffle', 'hmm');
     assert(!window.syrup);
-    _vaccine.set('pancake');
+    vaccine.set('pancake');
     assert(window.syrup);
 
 

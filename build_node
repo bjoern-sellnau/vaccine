@@ -1,10 +1,10 @@
 #!/bin/sh
 
 # vaccine.js must NOT be in the source list.
-source_dir=src
-app_name=my_app
-main=my_app_main    # the main file (my_app_main.js; don't add .js, though)
-vaccine=vaccine.js  # the location and name of the vaccine script
+source_dir='src'
+app_name='my_app'
+main='index'    # the main file (my_app_main.js; don't add .js, though)
+vaccine='vaccine.js'  # the location and name of the vaccine script
 
 
 
