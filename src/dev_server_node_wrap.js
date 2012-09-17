@@ -6,7 +6,7 @@ function nodeWrap(path, rawFileText) {
   compiled = 'define("' + fullModule + '", function(require, exports, module) {';
   compiled += rawFileText;
   compiled += '});';
-  if (module === main) {
+  if (module === appMainModule) {
     compiled += 'define("' + appName + '", function(require, exports, module) {';
     compiled += '  module.exports = require("' + fullModule + '");';
     compiled += '});';

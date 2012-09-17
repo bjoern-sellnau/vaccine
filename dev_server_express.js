@@ -1,6 +1,6 @@
 
-var outputFile = 'my_app.js',   // Change this to your app file name.
-    buildScript = './build';    // Change this to your app's build script.
+var outputFile = 'my_app.js';   // Change this to your app file name.
+var buildScript = './build';   // Change this to your app's build script.
 
 
 var express = require('express'),

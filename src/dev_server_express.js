@@ -1,13 +1,19 @@
 
-var outputFile = '{{{ OUTPUT_FILE }}}',   // Change this to your app file name.
-    buildScript = '{{{ BUILD_SCRIPT }}}';    // Change this to your app's build script.
+var outputFile = '{{{ OUTPUT_FILE }}}';   // Change this to your app file name.
+var buildScript = '{{{ BUILD_SCRIPT }}}';   // Change this to your app's build script.
 
 ####################### NODE START #######################
 
-var appName = '{{{ APP_NAME }}}',
-    main = '{{{ APP_MAIN }}}',
-    sourceDir = '{{{ SOURCE_DIR }}}';
+var appName = '{{{ APP_NAME }}}';   // Change this to your app name.
 
+// Change appMain to the location of your app's main/index file,
+// but without .js at the end.
+var appMain = '{{{ APP_MAIN }}}';
+
+
+var appMainSplit = appMain.split('/'),
+    appMainModule = appMainSplit.pop(),
+    sourceDir = appMainSplit.join('/') || '.';
 
 var fs = require('fs');
 >>>>>>>>>>>>>>>>>>>>>>>> NODE END >>>>>>>>>>>>>>>>>>>>>>>>

@@ -11,14 +11,13 @@ build_node_src=$vaccine_src_dir/build_node
 
 # Variables
 app_name=
-app_main=index
+app_main=src/index
 output_file=
 library_dir=lib
-source_dir=src
 build_script=./build
 vaccine_path=vaccine.js    # The path to vaccine.js relative to build_node
 
-vars_list='app_name app_main output_file library_dir source_dir build_script vaccine_path'
+vars_list='app_name app_main app_main_module output_file source_dir library_dir build_script vaccine_path'
 
 
 fail() {
@@ -45,10 +44,6 @@ do
       shift
       library_dir=$1
       ;;
-    --src | -s)
-      shift
-      source_dir=$1
-      ;;
     --build | -b)
       shift
       build_script=$1
@@ -64,6 +59,13 @@ done
 test "X$app_name" = X && fail 'Must provide the name of app (option --app)'
 
 test "X$output_file" = X && output_file=$app_name.js
+
+app_main=$(echo $app_main | sed 's/\.js$//')
+
+app_main_module=$(echo $app_main | sed 's#.*/##')
+
+source_dir=$(echo $app_main | sed 's#/[^/]*$##')
+test "X$source_dir" = "X$app_main" && source_dir=.
 
 
 unindent() {

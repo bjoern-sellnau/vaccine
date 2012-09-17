@@ -1,15 +1,19 @@
 
 (function() {
 
-  // Replace sourceDir with the directory of your source files relative to the
-  // server location.
-  var sourceDir = 'src',
+  var appName = 'my_app';   // Change this to your app name.
 
-      // Replace libraryDir with the directory of your (pre-built) dependencies.
-      libraryDir = 'lib',
-      appName = 'my_app',
-      main = 'index';   // The main (index) file for you app.
+  // Change appMain to the location of your app's main/index file,
+  // but without .js at the end.
+  var appMain = 'src/index';
 
+  // Change libraryDir to the directory of your pre-built library dependencies.
+  var libraryDir = 'lib';
+
+
+  var appMainSplit = appMain.split('/'),
+      appMainModule = appMainSplit.pop(),
+      sourceDir = appMainSplit.join('/') || '.';
 
   var loading = {};
 
@@ -70,7 +74,7 @@
           script;
       if (root === appName) {
         if (!split.length) {
-          split.push(main);
+          split.push(appMainModule);
         }
         src = sourceDir + '/' + split.join('/');
       } else {

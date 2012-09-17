@@ -3,7 +3,7 @@
 # vaccine.js must NOT be in the source list.
 source_dir='{{{ SOURCE_DIR }}}'
 app_name='{{{ APP_NAME }}}'
-main='{{{ APP_MAIN }}}'    # the main file (my_app_main.js; don't add .js, though)
+app_main_module='{{{ APP_MAIN_MODULE }}}'  # the main/index module name (don't add .js)
 vaccine='{{{ VACCINE_PATH }}}'  # the location and name of the vaccine script
 
 
@@ -22,7 +22,7 @@ done
 
 # Define the app module as the main/index file's exports.
 echo "define('$app_name', function(require, exports, module) {"
-echo "  module.exports = require('$app_name/$main');"
+echo "  module.exports = require('$app_name/$app_main_module');"
 echo '});'
 
 

@@ -1,13 +1,18 @@
 
-var outputFile = 'my_app.js',   // Change this to your app file name.
-    buildScript = './build';    // Change this to your app's build script
+var outputFile = 'my_app.js';   // Change this to your app file name.
+var buildScript = './build';   // Change this to your app's build script.
 
 
-var appName = 'my_app',
-    main = 'index',
-    sourceDir = 'src';
+var appName = 'my_app';   // Change this to your app name.
+
+// Change appMain to the location of your app's main/index file,
+// but without .js at the end.
+var appMain = 'src/index';
 
 
+var appMainSplit = appMain.split('/'),
+    appMainModule = appMainSplit.pop(),
+    sourceDir = appMainSplit.join('/') || '.';
 
 var http = require('http'),
     fs = require('fs'),
@@ -68,7 +73,7 @@ function nodeWrap(path, rawFileText) {
   compiled = 'define("' + fullModule + '", function(require, exports, module) {';
   compiled += rawFileText;
   compiled += '});';
-  if (module === main) {
+  if (module === appMainModule) {
     compiled += 'define("' + appName + '", function(require, exports, module) {';
     compiled += '  module.exports = require("' + fullModule + '");';
     compiled += '});';
