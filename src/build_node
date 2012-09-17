@@ -1,0 +1,30 @@
+#!/bin/sh
+
+# vaccine.js must NOT be in the source list.
+source_dir='{{{ SOURCE_DIR }}}'
+app_name='{{{ APP_NAME }}}'
+main='{{{ APP_MAIN }}}'    # the main file (my_app_main.js; don't add .js, though)
+vaccine='{{{ VACCINE_PATH }}}'  # the location and name of the vaccine script
+
+
+
+echo '(function() {"use strict";' # You can remove "use strict" if you like
+cat $vaccine   # Output vaccine.js separately
+
+
+for file in $(find $source_dir -type f)
+do
+  name="$app_name/$(echo "$file" | sed -e "s#^$source_dir/##" -e 's/\.js//')"
+  echo "define('$name', function(require, exports, module) {"
+  cat $file
+  echo '});'
+done
+
+# Define the app module as the main/index file's exports.
+echo "define('$app_name', function(require, exports, module) {"
+echo "  module.exports = require('$app_name/$main');"
+echo '});'
+
+
+echo '}());'
+

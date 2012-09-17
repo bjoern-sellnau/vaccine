@@ -27,14 +27,5 @@ build-util:
 	cd test; ./build_util > test_lib/util.js
 
 
-strip-node:
-	sed '/DEV_SERVER_EXPRESS_NODE_START/,/DEV_SERVER_EXPRESS_NODE_END/d' dev_server_express_node.js > dev_server_express.js
-
-strip-loader:
-	sed -e '/VACCINE_LOADER_START/,/VACCINE_LOADER_END/d' -e 's/^  //' vaccine_loader.js > vaccine.js
-
-minimal:
-	sed -e '1,/VACCINE_MINIMAL_START/d' -e '/VACCINE_MINIMAL_END/,$$d' -e 's/^  //' vaccine.js > vaccine_minimal.js
-
 size:
 	sh size_test.sh

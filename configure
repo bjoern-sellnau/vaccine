@@ -1,64 +1,121 @@
 #!/bin/sh
 
-# Configure the dev server, build scripts, and loader for the test sources
+# Inputs
+vaccine_src_dir="$(dirname $0)/src"
+vaccine_src=$vaccine_src_dir/vaccine.js
+standalone_server_src=$vaccine_src_dir/dev_server_standalone.js
+express_server_src=$vaccine_src_dir/dev_server_express.js
+build_src=$vaccine_src_dir/build
+build_node_src=$vaccine_src_dir/build_node
 
-# Plain build script
-source_dir=test_src
-sed "s#cat src/\*#cat $source_dir/*#" build > test/build
-chmod +x test/build
+# Variables
+app_name=
+app_main=index
+output_file=
+library_dir=lib
+source_dir=src
+build_script=./build
+vaccine_path=vaccine.js    # The path to vaccine.js relative to build_node
 
-# Util build script
-source_dir=util_src
-sed "s#cat src/\*#cat $source_dir/*#" build > test/build_util
-chmod +x test/build_util
-
-# Node build script
-source_dir=node_src
-app_name=test_app
-main=main
-vaccine=../vaccine.js
-sed "s#source_dir=src#source_dir=$source_dir#" build_node |
-    sed "s#app_name=my_app#app_name=$app_name#" |
-    sed "s#vaccine=vaccine.js#vaccine=$vaccine#" |
-    sed "s#main=my_app_main#main=$main#" > test/build_node
-chmod +x test/build_node
+vars_list='app_name app_main output_file library_dir source_dir build_script vaccine_path'
 
 
-# Dev server
-server() {
-  server_script=$1
-  output_file=$2
-  build_script=$3
-  source_dir=$4
-  app_name=$5
-  main=$6
-  sed "s#outputFile = 'my_app.js'#outputFile = '$output_file'#" $server_script |
-      sed "s#sourceDir = 'src'#sourceDir = '$source_dir'#" |
-      sed "s#main = 'my_app_main'#main = '$main'#" |
-      sed "s#appName = .*;#appName = '$app_name';#" |
-      sed "s#buildScript = './build'#buildScript = '$build_script'#"
+fail() {
+  echo $1 >&2
+  exit 1
 }
 
-server dev_server_standalone.js test_built.js ./build > test/dev_server_standalone.js
-server dev_server_express.js test_built.js ./build > test/dev_server_express.js
+while test $# -gt 0
+do
+  case $1 in
+    --app | -a)
+      shift
+      app_name=$1
+      ;;
+    --main | -m)
+      shift
+      app_main=$1
+      ;;
+    --output | -o)
+      shift
+      output_file=$1
+      ;;
+    --lib | -l)
+      shift
+      library_dir=$1
+      ;;
+    --src | -s)
+      shift
+      source_dir=$1
+      ;;
+    --build | -b)
+      shift
+      build_script=$1
+      ;;
+    *)
+      fail "Unrecognized option: $1"
+      ;;
+  esac
 
-server dev_server_standalone.js test_built_node.js ./build_node node_src test_app main > test/dev_server_standalone_node.js
-server dev_server_express_node.js test_built_node.js ./build_node node_src test_app main > test/dev_server_express_node.js
+  shift
+done
+
+test "X$app_name" = X && fail 'Must provide the name of app (option --app)'
+
+test "X$output_file" = X && output_file=$app_name.js
 
 
-# vaccine loader
-loader() {
-  source_dir=$1
-  lib_dir=$2
-  app_name=$3
-  main=$4
-
-  sed "s#sourceDir = 'src'#sourceDir = '$source_dir'#" vaccine_loader.js |
-      sed "s#libDir = 'lib'#libDir = '$lib_dir'#" |
-      sed "s#appName = 'my_app'#appName = '$app_name'#" |
-      sed "s#main = 'my_app_main'#main = '$main'#"
+unindent() {
+  sed 's/^  //'
 }
 
-loader test_src test_lib test_app main > test/vaccine_loader.js
-loader node_src test_lib test_app main > test/vaccine_loader_node.js
+remove_sections() {
+  sed "/<<< $1 START <<</,/--- $1 END ---/d"
+}
+
+choose_section() {
+  sed -e "1,/<<< $1 START <<</d" -e "/--- $1 END ---/,\$d"
+}
+
+clean_section_tags() {
+  sed -e '/<<< .* START <<</d' -e '/--- .* END ---/d'
+}
+
+replace_vars() {
+  sed_string=''
+  for var in $vars_list
+  do
+    eval value=\$$var
+    name=$(echo $var | tr '[a-z]' '[A-Z]')
+    sed_string="$sed_string -e 's#{{{ $name }}}#$value#'"
+  done
+  eval sed $sed_string
+}
+
+start() {
+  cat $1 | replace_vars
+}
+
+
+dir=vaccines
+test -d $dir || mkdir $dir
+
+make_vaccine_intermediate() {
+  start $vaccine_src | remove_sections LOADER | unindent
+}
+
+start $vaccine_src | clean_section_tags > $dir/vaccine_loader.js
+make_vaccine_intermediate | clean_section_tags > $dir/vaccine.js
+make_vaccine_intermediate | choose_section MINIMAL |
+    unindent > $dir/vaccine_minimal.js
+
+start $express_server_src | remove_sections NODE > $dir/dev_server_express.js
+start $express_server_src | clean_section_tags > $dir/dev_server_express_node.js
+start $standalone_server_src > $dir/dev_server_standalone.js
+
+start $build_src > $dir/build
+chmod +x $dir/build
+
+start $build_node_src > $dir/build_node
+chmod +x $dir/build_node
 
