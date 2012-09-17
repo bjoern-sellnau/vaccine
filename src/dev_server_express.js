@@ -2,7 +2,7 @@
 var outputFile = '{{{ OUTPUT_FILE }}}',   // Change this to your app file name.
     buildScript = '{{{ BUILD_SCRIPT }}}';    // Change this to your app's build script.
 
-<<<<<<<<<<<<<<<<<<<<<<< NODE START <<<<<<<<<<<<<<<<<<<<<<<
+####################### NODE START #######################
 
 var appName = '{{{ APP_NAME }}}',
     main = '{{{ APP_MAIN }}}',
@@ -10,7 +10,7 @@ var appName = '{{{ APP_NAME }}}',
 
 
 var fs = require('fs');
------------------------- NODE END ------------------------
+>>>>>>>>>>>>>>>>>>>>>>>> NODE END >>>>>>>>>>>>>>>>>>>>>>>>
 
 var express = require('express'),
     exec = require('child_process').exec,
@@ -23,7 +23,7 @@ app.get('/' + outputFile, function(req, res) {
   });
 });
 
-<<<<<<<<<<<<<<<<<<<<<<< NODE START <<<<<<<<<<<<<<<<<<<<<<<
+####################### NODE START #######################
 app.get(new RegExp('^/' + sourceDir + '/.*'), function(req, res) {
   fs.readFile('.' + req.path, 'utf8', function(err, rawFileText) {
     if (err) throw err;
@@ -32,9 +32,9 @@ app.get(new RegExp('^/' + sourceDir + '/.*'), function(req, res) {
   });
 });
 
-#################### NODE_WRAP INSERT ####################
+-------------------- NODE_WRAP INSERT --------------------
 
------------------------- NODE END ------------------------
+>>>>>>>>>>>>>>>>>>>>>>>> NODE END >>>>>>>>>>>>>>>>>>>>>>>>
 
 app.use(express.static(__dirname));
 

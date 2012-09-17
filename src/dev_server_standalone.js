@@ -2,14 +2,14 @@
 var outputFile = '{{{ OUTPUT_FILE }}}',   // Change this to your app file name.
     buildScript = '{{{ BUILD_SCRIPT }}}';    // Change this to your app's build script
 
-<<<<<<<<<<<<<<<<<<<<<<< NODE START <<<<<<<<<<<<<<<<<<<<<<<
+####################### NODE START #######################
 
 var appName = '{{{ APP_NAME }}}',
     main = '{{{ APP_MAIN }}}',
     sourceDir = '{{{ SOURCE_DIR }}}';
 
 
------------------------- NODE END ------------------------
+>>>>>>>>>>>>>>>>>>>>>>>> NODE END >>>>>>>>>>>>>>>>>>>>>>>>
 
 var http = require('http'),
     fs = require('fs'),
@@ -53,18 +53,18 @@ function findFile(path, res) {
       if (err) throw err;
       var type = types[path.split('.').pop()];
       if (!type) type = 'text/plain';
-<<<<<<<<<<<<<<<<<<<<<<< NODE START <<<<<<<<<<<<<<<<<<<<<<<
+####################### NODE START #######################
       if (path.match(new RegExp('^.' + sourceDir + '/'))) {
         fileText = nodeWrap(path, fileText);
       }
------------------------- NODE END ------------------------
+>>>>>>>>>>>>>>>>>>>>>>>> NODE END >>>>>>>>>>>>>>>>>>>>>>>>
       res.writeHead(200, {'Content-Type': type});
       res.end(fileText);
     });
   });
 }
 
-#################### NODE_WRAP INSERT ####################
+-------------------- NODE_WRAP INSERT --------------------
 
 function notFound(path, res) {
   console.log('404: ' + path);

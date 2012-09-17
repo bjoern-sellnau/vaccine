@@ -1,5 +1,5 @@
 
-<<<<<<<<<<<<<<<<<<<<<<< LOADER START <<<<<<<<<<<<<<<<<<<<<<<
+####################### LOADER START #######################
 (function() {
 
   // Replace sourceDir with the directory of your source files relative to the
@@ -14,10 +14,10 @@
 
   var loading = {};
 
------------------------- LOADER END ------------------------
+>>>>>>>>>>>>>>>>>>>>>>>> LOADER END >>>>>>>>>>>>>>>>>>>>>>>>
   function define(id, defn) {
 
-<<<<<<<<<<<<<<<<<<<<<<< MINIMAL START <<<<<<<<<<<<<<<<<<<<<<<
+####################### MINIMAL START #######################
     if (!window.vaccine) {
       // The minimal code required to be vaccine compliant.
       (function() {
@@ -37,7 +37,7 @@
       }());
     }
     // Set your library with vaccine.set('mylib', mylib);
------------------------- MINIMAL END ------------------------
+>>>>>>>>>>>>>>>>>>>>>>>> MINIMAL END >>>>>>>>>>>>>>>>>>>>>>>>
 
     var parts = id.split('/'),
         globalVaccine = window.vaccine,
@@ -67,7 +67,7 @@
       globalVaccine.set(id, module.exports);
     } catch (e) {
       if (e != require) throw e;
-<<<<<<<<<<<<<<<<<<<<<<< LOADER START <<<<<<<<<<<<<<<<<<<<<<<
+####################### LOADER START #######################
 
       var split = require.id.split('/'),
           root = split.shift(),
@@ -89,15 +89,15 @@
         document.head.appendChild(script);
       }
 
------------------------- LOADER END ------------------------
+>>>>>>>>>>>>>>>>>>>>>>>> LOADER END >>>>>>>>>>>>>>>>>>>>>>>>
       globalVaccine.on(require.id, function() { define(id, defn); });
     }
   }
-<<<<<<<<<<<<<<<<<<<<<<< LOADER START <<<<<<<<<<<<<<<<<<<<<<<
+####################### LOADER START #######################
 
   window.define = define;
   define('vaccine_loader', function(require) { require(appName); });
 
 }());
------------------------- LOADER END ------------------------
+>>>>>>>>>>>>>>>>>>>>>>>> LOADER END >>>>>>>>>>>>>>>>>>>>>>>>
 
