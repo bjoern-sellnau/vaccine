@@ -2,7 +2,14 @@
 var outputFile = '{{{ OUTPUT_FILE }}}',   // Change this to your app file name.
     buildScript = '{{{ BUILD_SCRIPT }}}';    // Change this to your app's build script
 
+<<<<<<<<<<<<<<<<<<<<<<< NODE START <<<<<<<<<<<<<<<<<<<<<<<
 
+var appName = '{{{ APP_NAME }}}',
+    main = '{{{ APP_MAIN }}}',
+    sourceDir = '{{{ SOURCE_DIR }}}';
+
+
+------------------------ NODE END ------------------------
 
 var http = require('http'),
     fs = require('fs'),
@@ -29,12 +36,12 @@ http.createServer(function (req, res) {
       res.end(stdout);
     });
   } else {
-    findFile('.' + req.url, res);
+    findFile(req.url, res);
   }
 }).listen(3000, 'localhost');
 
 function findFile(path, res) {
-  fs.stat(path, function(err, stats) {
+  fs.stat('.' + path, function(err, stats) {
     if (err) return notFound(path, res);
     if (stats.isDirectory()) {
       findFile(path + '/index.html', res);
@@ -42,15 +49,22 @@ function findFile(path, res) {
     }
     if (!stats.isFile()) return notFound(path, res);
 
-    fs.readFile(path, 'utf8', function(err, data) {
+    fs.readFile('.' + path, 'utf8', function(err, fileText) {
       if (err) throw err;
       var type = types[path.split('.').pop()];
       if (!type) type = 'text/plain';
+<<<<<<<<<<<<<<<<<<<<<<< NODE START <<<<<<<<<<<<<<<<<<<<<<<
+      if (path.match(new RegExp('^.' + sourceDir + '/'))) {
+        fileText = nodeWrap(path, fileText);
+      }
+------------------------ NODE END ------------------------
       res.writeHead(200, {'Content-Type': type});
-      res.end(data);
+      res.end(fileText);
     });
   });
 }
+
+#################### NODE_WRAP INSERT ####################
 
 function notFound(path, res) {
   console.log('404: ' + path);

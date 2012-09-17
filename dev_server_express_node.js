@@ -22,24 +22,29 @@ app.get('/' + outputFile, function(req, res) {
 });
 
 app.get(new RegExp('^/' + sourceDir + '/.*'), function(req, res) {
-  fs.readFile('.' + req.path, 'utf8', function(err, rawFileData) {
+  fs.readFile('.' + req.path, 'utf8', function(err, rawFileText) {
     if (err) throw err;
-    var prefix = new RegExp('^' + sourceDir + '/'),
-        module = req.path.slice(1).replace(prefix, '').replace(/\.js$/, ''),
-        fullModule = appName + '/' + module,
-        compiled;
-    compiled = 'define("' + fullModule + '", function(require, exports, module) {';
-    compiled += rawFileData;
-    compiled += '});';
-    if (module === main) {
-      compiled += 'define("' + appName + '", function(require, exports, module) {';
-      compiled += '  module.exports = require("' + fullModule + '");';
-      compiled += '});';
-    }
     res.type('application/javascript');
-    res.send(compiled);
+    res.send(nodeWrap(req.path, rawFileText));
   });
 });
+
+function nodeWrap(path, rawFileText) {
+  var prefix = new RegExp('^' + sourceDir + '/'),
+      module = path.slice(1).replace(prefix, '').replace(/\.js$/, ''),
+      fullModule = appName + '/' + module,
+      compiled;
+  compiled = 'define("' + fullModule + '", function(require, exports, module) {';
+  compiled += rawFileText;
+  compiled += '});';
+  if (module === main) {
+    compiled += 'define("' + appName + '", function(require, exports, module) {';
+    compiled += '  module.exports = require("' + fullModule + '");';
+    compiled += '});';
+  }
+  return compiled;
+}
+
 
 app.use(express.static(__dirname));
 

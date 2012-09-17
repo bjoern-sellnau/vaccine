@@ -16,7 +16,7 @@ cp vaccine.js util_src
 cd vaccines
 mv build_node ..
 mv dev_server_express_node.js ..
-#mv dev_server_standalone_node.js ..
+mv dev_server_standalone_node.js ..
 mv vaccine_loader.js ../vaccine_loader_node.js
 cd ..
 

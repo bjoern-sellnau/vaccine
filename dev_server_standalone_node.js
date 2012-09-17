@@ -3,6 +3,12 @@ var outputFile = 'my_app.js',   // Change this to your app file name.
     buildScript = './build';    // Change this to your app's build script
 
 
+var appName = 'my_app',
+    main = 'index',
+    sourceDir = 'src';
+
+
+
 var http = require('http'),
     fs = require('fs'),
     exec = require('child_process').exec,
@@ -45,12 +51,30 @@ function findFile(path, res) {
       if (err) throw err;
       var type = types[path.split('.').pop()];
       if (!type) type = 'text/plain';
+      if (path.match(new RegExp('^.' + sourceDir + '/'))) {
+        fileText = nodeWrap(path, fileText);
+      }
       res.writeHead(200, {'Content-Type': type});
       res.end(fileText);
     });
   });
 }
 
+function nodeWrap(path, rawFileText) {
+  var prefix = new RegExp('^' + sourceDir + '/'),
+      module = path.slice(1).replace(prefix, '').replace(/\.js$/, ''),
+      fullModule = appName + '/' + module,
+      compiled;
+  compiled = 'define("' + fullModule + '", function(require, exports, module) {';
+  compiled += rawFileText;
+  compiled += '});';
+  if (module === main) {
+    compiled += 'define("' + appName + '", function(require, exports, module) {';
+    compiled += '  module.exports = require("' + fullModule + '");';
+    compiled += '});';
+  }
+  return compiled;
+}
 
 function notFound(path, res) {
   console.log('404: ' + path);
