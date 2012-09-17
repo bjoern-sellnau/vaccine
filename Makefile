@@ -1,9 +1,10 @@
 
-.PHONY: test configure build size
+.PHONY: configure test build size
 
-all: | build size
+all: | configure size
 
-build: | configure build-test
+configure:
+	src/configure_all
 
 test: pre-test
 	cd test; node dev_server_standalone.js
@@ -14,11 +15,6 @@ test-node: pre-test
 pre-test: | configure build-util
 	printf '\n\n!!!\nOpen localhost:3000 in a browser.\n!!!\n\n'
 
-sources: strip-node strip-loader minimal
-
-configure: | sources
-	./configure
-
 build-test: build-util
 	cd test; ./build > test_built.js
 	cd test; ./build_node > test_built_node.js
@@ -26,6 +22,6 @@ build-test: build-util
 build-util:
 	cd test; ./build_util > test_lib/util.js
 
-
 size:
 	sh size_test.sh
+
