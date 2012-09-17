@@ -85,7 +85,7 @@
       } else {
         src = libraryDir + '/' + root;
       }
-      src += '.js';
+      src = '/' + src + '.js';
       if (!loading[src]) {
         loading[src] = src;
         script = document.createElement('script');
