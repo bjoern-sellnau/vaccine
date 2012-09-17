@@ -3,6 +3,9 @@
 
 all: | configure size
 
+release:
+	src/configure_all --release
+
 configure:
 	src/configure_all
 

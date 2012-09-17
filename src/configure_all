@@ -2,9 +2,12 @@
 
 # Configure the dev server, build scripts, and loader for the test sources
 
-./configure -a my_app
-mv vaccines/* .
-rm -r vaccines
+if test "X$1" = 'X--release'
+then
+  ./configure -a my_app
+  mv vaccines/* .
+  rm -r vaccines
+fi
 
 cd test
 ../configure --app test_app --main test_src/main --output test_built.js --lib test_lib
