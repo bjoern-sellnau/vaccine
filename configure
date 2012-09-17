@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Inputs
-vaccine_src_dir="$(dirname $0)/src"
+vaccine_src_dir="$(cd "$(dirname $0)" && pwd)/src"
 vaccine_src=$vaccine_src_dir/vaccine.js
 standalone_server_src=$vaccine_src_dir/dev_server_standalone.js
 express_server_src=$vaccine_src_dir/dev_server_express.js
@@ -97,25 +97,25 @@ start() {
 }
 
 
-dir=vaccines
-test -d $dir || mkdir $dir
+test -d vaccines || mkdir vaccines
+cd vaccines
 
 make_vaccine_intermediate() {
   start $vaccine_src | remove_sections LOADER | unindent
 }
 
-start $vaccine_src | clean_section_tags > $dir/vaccine_loader.js
-make_vaccine_intermediate | clean_section_tags > $dir/vaccine.js
+start $vaccine_src | clean_section_tags > vaccine_loader.js
+make_vaccine_intermediate | clean_section_tags > vaccine.js
 make_vaccine_intermediate | choose_section MINIMAL |
-    unindent > $dir/vaccine_minimal.js
+    unindent > vaccine_minimal.js
 
-start $express_server_src | remove_sections NODE > $dir/dev_server_express.js
-start $express_server_src | clean_section_tags > $dir/dev_server_express_node.js
-start $standalone_server_src > $dir/dev_server_standalone.js
+start $express_server_src | remove_sections NODE > dev_server_express.js
+start $express_server_src | clean_section_tags > dev_server_express_node.js
+start $standalone_server_src > dev_server_standalone.js
 
-start $build_src > $dir/build
-chmod +x $dir/build
+start $build_src > build
+chmod +x build
 
-start $build_node_src > $dir/build_node
-chmod +x $dir/build_node
+start $build_node_src > build_node
+chmod +x build_node
 
