@@ -12,11 +12,24 @@
   var libraryDir = '{{{ LIBRARY_DIR }}}';
 
 
+  // Figure out your app's main module based on the path to it (appMain).
+  // Also determine the source directory.
   var appMainSplit = appMain.split('/'),
       appMainModule = appMainSplit.pop(),
       sourceDir = appMainSplit.join('/') || '.';
 
+  // The scripts that are currently loading. Don't touch this.
   var loading = {};
+
+  // The first define, which will trigger the loading of your app.
+  define('initial_scripts', function(require) {
+    require(appName);   // Pull in your app and all it's dependencies.
+
+    // If you need to load any other scripts, do so here.
+    // Example:
+    //    require('test_my_app');
+  });
+
 
 >>>>>>>>>>>>>>>>>>>>>>>> LOADER END >>>>>>>>>>>>>>>>>>>>>>>>
   function define(id, defn) {
@@ -99,8 +112,8 @@
   }
 ####################### LOADER START #######################
 
+
   window.define = define;
-  define('vaccine_loader', function(require) { require(appName); });
 
 }());
 >>>>>>>>>>>>>>>>>>>>>>>> LOADER END >>>>>>>>>>>>>>>>>>>>>>>>
