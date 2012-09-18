@@ -1,17 +1,12 @@
 
-var util = require('./util'),
-    execute = require('test_app/execute'),
-    results;
+var other = require('./other'),
+    util = require('./util');
 
-results = execute.execute();
-util.log(results);
+exports.execute = function() {
+  return 'app: 2+1=' + util.addOne(2) + ';' + other('cool');
+};
 
-util.log(results === 'app: 2+1=3;other gets cool' ? 'PASS' : 'FAIL');
-
-exports.isA = 'success';
-
-window.setTimeout(function() {
-  util.log('Require test_app test:');
-  util.log(require('test_app').isA === 'success' ? 'PASS' : 'FAIL');
-}, 60);
+// Do this so we can use vaccine in node_test/test.js, without needing
+// to explicitly add vaccine.js.
+window.node_define = define;
 
