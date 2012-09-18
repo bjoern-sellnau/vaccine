@@ -1,7 +1,10 @@
 
 .PHONY: configure test build size
 
-all: | configure size
+all: configure size
+
+size:
+	sh size_test.sh
 
 release:
 	src/configure_all --release
@@ -24,7 +27,4 @@ build-test: build-util
 
 build-util:
 	cd test; ./build_util > test_lib/util.js
-
-size:
-	sh size_test.sh
 
