@@ -18,18 +18,9 @@
       appMainModule = appMainSplit.pop(),
       sourceDir = appMainSplit.join('/') || '.';
 
+
   // The scripts that are currently loading. Don't touch this.
   var loading = {};
-
-  // The first define, which will trigger the loading of your app.
-  define('initial_scripts', function(require) {
-    require(appName);   // Pull in your app and all it's dependencies.
-
-    // If you need to load any other scripts, do so here.
-    // Example:
-    //    require('test_my_app');
-  });
-
 
 >>>>>>>>>>>>>>>>>>>>>>>> LOADER END >>>>>>>>>>>>>>>>>>>>>>>>
   function define(id, defn) {
@@ -98,14 +89,7 @@
       } else {
         src = libraryDir + '/' + root;
       }
-      src = '/' + src + '.js';
-      if (!loading[src]) {
-        loading[src] = src;
-        script = document.createElement('script');
-        script.src = src;
-        document.head.appendChild(script);
-      }
-
+      loadScript('/' + src + '.js');
 >>>>>>>>>>>>>>>>>>>>>>>> LOADER END >>>>>>>>>>>>>>>>>>>>>>>>
       globalVaccine.on(require.id, function() { define(id, defn); });
     }
@@ -113,7 +97,41 @@
 ####################### LOADER START #######################
 
 
+  function loadScript(src) {
+    if (!loading[src]) {
+      loading[src] = src;
+      script = document.createElement('script');
+      script.src = src;
+      document.head.appendChild(script);
+    }
+  }
+
   window.define = define;
+
+
+  var initialScripts = [],
+      loaded = false;
+
+  // The first define, which will trigger the loading of your app,
+  // and any other initial scripts.
+  define('initial_scripts', function(require) {
+
+    // Pull in your app and all it's dependencies.
+    require(appName);
+
+    loaded = true;
+
+    // Load initial scripts after the main app is loaded.
+    initialScripts.forEach(function(src) { loadScript(src); });
+  });
+
+  window.vaccine_load = function(src) {
+    if (loaded) {
+      loadScript(src);
+    } else {
+      initialScripts.push(src);
+    }
+  };
 
 }());
 >>>>>>>>>>>>>>>>>>>>>>>> LOADER END >>>>>>>>>>>>>>>>>>>>>>>>
