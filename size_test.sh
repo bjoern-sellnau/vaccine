@@ -1,7 +1,7 @@
 
 ./configure --app test_app --main ../test/test_src/main
 cd vaccines
-./build > test_built.js
+./build > test_with_vaccine.js
 
 files=$(ls ../test/test_src/* | grep -v vaccine.js)
 echo "(function() {var define = window.define;" > test_without_vaccine.js
@@ -27,7 +27,7 @@ echo Full standalone:
 
 echo ''
 echo Full integrated:
-../size.sh test_built.js test_without_vaccine.js
+../size.sh test_with_vaccine.js test_without_vaccine.js
 
 cd ..
 rm -r vaccines

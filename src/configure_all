@@ -10,12 +10,12 @@ then
 fi
 
 cd test
-../configure --app test_app --main test_src/main --output test_built.js --lib test_lib
+../configure --app test_app --main test_src/main --output test_auto_built.js --lib test_lib
 mv vaccines/* .
 cp vaccine.js test_src
 cp vaccine.js util_src
 
-../configure --app test_app --main node_src/main --output test_built_node.js --lib test_lib --build ./build_node
+../configure --app test_app --main node_src/main --output test_auto_built_node.js --lib test_lib --build ./build_node
 cd vaccines
 mv build_node ..
 mv dev_server_express_node.js ..

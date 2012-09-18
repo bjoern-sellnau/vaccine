@@ -1,5 +1,5 @@
 node_modules
-test/test_built*
+test/test_already_built*
 test/dev_server*
 test/build*
 test/vaccine*
