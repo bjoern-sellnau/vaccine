@@ -11,10 +11,14 @@
   var libraryDir = 'lib';
 
 
+  // Figure out your app's main module based on the path to it (appMain).
+  // Also determine the source directory.
   var appMainSplit = appMain.split('/'),
       appMainModule = appMainSplit.pop(),
       sourceDir = appMainSplit.join('/') || '.';
 
+
+  // The scripts that are currently loading. Don't touch this.
   var loading = {};
 
   function define(id, defn) {
@@ -80,20 +84,47 @@
       } else {
         src = libraryDir + '/' + root;
       }
-      src += '.js';
-      if (!loading[src]) {
-        loading[src] = src;
-        script = document.createElement('script');
-        script.src = src;
-        document.head.appendChild(script);
-      }
-
+      loadScript('/' + src + '.js');
       globalVaccine.on(require.id, function() { define(id, defn); });
     }
   }
 
+
+  function loadScript(src) {
+    if (!loading[src]) {
+      loading[src] = src;
+      script = document.createElement('script');
+      script.src = src;
+      document.head.appendChild(script);
+    }
+  }
+
   window.define = define;
-  define('vaccine_loader', function(require) { require(appName); });
+
+
+  var initialScripts = [],
+      loaded = false;
+
+  // The first define, which will trigger the loading of your app,
+  // and any other initial scripts.
+  define('initial_scripts', function(require) {
+
+    // Pull in your app and all it's dependencies.
+    require(appName);
+
+    loaded = true;
+
+    // Load initial scripts after the main app is loaded.
+    initialScripts.forEach(function(src) { loadScript(src); });
+  });
+
+  window.vaccine_load = function(src) {
+    if (loaded) {
+      loadScript(src);
+    } else {
+      initialScripts.push(src);
+    }
+  };
 
 }());
 
