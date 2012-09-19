@@ -4,18 +4,18 @@
 
 if test "X$1" = 'X--release'
 then
-  ./configure -a my_app
+  bin/vaccine -a my_app
   mv vaccines/* .
   rm -r vaccines
 fi
 
 cd test
-../configure --app test_app --main test_src/main --output test_auto_built.js --lib test_lib
+../bin/vaccine --app test_app --main test_src/main --output test_auto_built.js --lib test_lib
 mv vaccines/* .
 cp vaccine.js test_src
 cp vaccine.js util_src
 
-../configure --app test_app --main node_src/main --output test_auto_built_node.js --lib test_lib --build ./build_node
+../bin/vaccine --app test_app --main node_src/main --output test_auto_built_node.js --lib test_lib --build ./build_node
 cd vaccines
 mv build_node ..
 mv dev_server_express_node.js ..
@@ -23,7 +23,7 @@ mv dev_server_standalone_node.js ..
 mv vaccine_loader.js ../vaccine_loader_node.js
 cd ..
 
-../configure --app util --main util_src/util
+../bin/vaccine --app util --main util_src/util
 mv vaccines/build build_util
 
 rm -r vaccines

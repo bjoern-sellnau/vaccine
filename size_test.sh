@@ -1,5 +1,5 @@
 
-./configure --app test_app --main ../test/test_src/main
+bin/vaccine --app test_app --main ../test/test_src/main
 cd vaccines
 ./build > test_with_vaccine.js
 
