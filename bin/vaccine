@@ -138,20 +138,22 @@ clean() {
 test -d vaccines || mkdir vaccines
 cd vaccines
 
-make_vaccine_intermediate() {
+vaccine_intermediate() {
   start $vaccine_src | remove_sections LOADER | unindent
 }
 
 ordered_intermediate() {
-  make_vaccine_intermediate | remove_sections OUT_OF_ORDER
+  vaccine_intermediate | remove_sections OUT_OF_ORDER
 }
 
 start $vaccine_src | clean > vaccine_loader.js
-make_vaccine_intermediate | clean > vaccine.js
-make_vaccine_intermediate | choose_section MINIMAL |
+vaccine_intermediate | clean > vaccine.js
+vaccine_intermediate | choose_section MINIMAL |
     unindent | clean > vaccine_minimal.js
 ordered_intermediate | clean > vaccine_already_ordered.js
 ordered_intermediate | remove_sections RELATIVE |
+    clean > vaccine_absolute_require_already_ordered.js
+vaccine_intermediate | remove_sections RELATIVE |
     clean > vaccine_absolute_require.js
 
 insert_node_wrap() {
