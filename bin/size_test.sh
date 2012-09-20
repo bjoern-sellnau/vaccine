@@ -29,7 +29,8 @@ build() {
 }
 
 build vaccine.js > $v/with_vaccine.js
-build vaccine_minimal.js define > $v/with_minimal_vaccine.js
+build vaccine_already_ordered.js > $v/with_ordered.js
+build vaccine_minimal.js define > $v/with_minimal.js
 build without define > $v/without_vaccine.js
 
 
@@ -47,8 +48,10 @@ cd $v
 out sizes text mini gzip
 out 'vaccine.js' $($vaccine --size-built vaccine.js)
 out 'vaccine.js integrated' $($vaccine --size-built with_vaccine.js without_vaccine.js)
+out 'already_ordered' $($vaccine --size-built vaccine_already_ordered.js)
+out 'already_ordered integrated' $($vaccine --size-built with_ordered.js without_vaccine.js)
 out 'minimal' $($vaccine --size-built vaccine_minimal.js)
-out 'minimal integrated' $($vaccine --size-built with_minimal_vaccine.js without_vaccine.js)
+out 'minimal integrated' $($vaccine --size-built with_minimal.js without_vaccine.js)
 
 cd ..
 

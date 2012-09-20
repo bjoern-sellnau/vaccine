@@ -141,6 +141,8 @@ start $vaccine_src | clean > vaccine_loader.js
 make_vaccine_intermediate | clean > vaccine.js
 make_vaccine_intermediate | choose_section MINIMAL |
     unindent | clean > vaccine_minimal.js
+make_vaccine_intermediate | remove_sections OUT_OF_ORDER |
+    clean > vaccine_already_ordered.js
 
 insert_node_wrap() {
   insert_section NODE_WRAP $node_wrap_src

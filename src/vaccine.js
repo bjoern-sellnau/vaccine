@@ -70,12 +70,15 @@
       return mod;
     }
 
+#################### OUT_OF_ORDER START ####################
     try {
+>>>>>>>>>>>>>>>>>>>>> OUT_OF_ORDER END >>>>>>>>>>>>>>>>>>>>>
       defn(require, module.exports, module);
       globalVaccine.set(id, module.exports);
+#################### OUT_OF_ORDER START ####################
     } catch (e) {
       if (e != require) throw e;
-####################### LOADER START #######################
+  ##################### LOADER START #####################
 
       var split = require.id.split('/'),
           root = split.shift(),
@@ -90,9 +93,10 @@
         src = libraryDir + '/' + root;
       }
       loadScript('/' + src + '.js');
->>>>>>>>>>>>>>>>>>>>>>>> LOADER END >>>>>>>>>>>>>>>>>>>>>>>>
+  >>>>>>>>>>>>>>>>>>>>>> LOADER END >>>>>>>>>>>>>>>>>>>>>>
       globalVaccine.on(require.id, function() { define(id, defn); });
     }
+>>>>>>>>>>>>>>>>>>>>> OUT_OF_ORDER END >>>>>>>>>>>>>>>>>>>>>
   }
 ####################### LOADER START #######################
 
