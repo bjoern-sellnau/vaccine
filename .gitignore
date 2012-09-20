@@ -1,4 +1,5 @@
 node_modules
+test/simple/
 test/test_already_built*
 test/dev_server*
 test/build*

@@ -28,3 +28,18 @@ mv vaccines/build build_util
 
 rm -r vaccines
 
+
+mkdir -p simple
+
+make_simple() {
+  type=$1
+  sed "s/{{{VACCINE_TYPE}}}/$type/g" simple.html |
+      sed "s/{{{EXPECTED_FAILURES}}}/$2/g" > "simple/test_$type.html"
+}
+
+make_simple vaccine 0
+make_simple vaccine_loader 0
+make_simple vaccine_already_ordered 2
+make_simple vaccine_absolute_require 1
+make_simple vaccine_absolute_require_already_ordered 3
+

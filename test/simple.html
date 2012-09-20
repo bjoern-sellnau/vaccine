@@ -1,0 +1,14 @@
+
+<script src="/{{{VACCINE_TYPE}}}.js"></script>
+<script src="/simple.js"></script>
+<script>
+  console.log("Passed: " + passed);
+  console.log("Failed: " + failed);
+  console.log("Expected Failures: " + {{{EXPECTED_FAILURES}}});
+  console.log('--------------------');
+  console.log(failed === {{{EXPECTED_FAILURES}}} ? 'PASS' : 'FAIL');
+</script>
+
+<h1>Simple {{{VACCINE_TYPE}}} Test</h1>
+<a href="/">Index</a>
+
