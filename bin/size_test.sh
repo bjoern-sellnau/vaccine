@@ -1,7 +1,6 @@
 
-vaccine_bin_dir=$1
 vaccine=$vaccine_bin_dir/vaccine
-source_dir=$2
+source_dir=$1
 
 if test -d "$source_dir"
 then

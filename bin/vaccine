@@ -66,11 +66,20 @@ do
       ;;
     --size | -s)
       shift
-      size_source=$1
+      $vaccine_bin_dir/size_test.sh $1
+      exit 0
+      ;;
+    --inject | -i)
+      shift
+      inject_file=$1
+      ;;
+    --global | -g)
+      shift
+      global_var=$1
       ;;
     --size-built)
       shift
-      $vaccine_bin_dir/size.sh "$@"
+      $vaccine_bin_dir/size.sh $@
       exit 0
       ;;
     *)
@@ -81,22 +90,21 @@ do
   shift
 done
 
-if test "X$size_source" != X
+
+if test "X$inject_file" = X
 then
-  $vaccine_bin_dir/size_test.sh $vaccine_bin_dir $size_source
-  exit 0
+  test "X$app_name" = X && fail 'Must provide the name of app (option --app)'
+
+  test "X$output_file" = X && output_file=$app_name.js
+
+  app_main=$(echo $app_main | sed 's/\.js$//')
+
+  app_main_module=$(echo $app_main | sed 's#.*/##')
+
+  source_dir=$(echo $app_main | sed 's#/[^/]*$##')
+  test "X$source_dir" = "X$app_main" && source_dir=.
+
 fi
-
-test "X$app_name" = X && fail 'Must provide the name of app (option --app)'
-
-test "X$output_file" = X && output_file=$app_name.js
-
-app_main=$(echo $app_main | sed 's/\.js$//')
-
-app_main_module=$(echo $app_main | sed 's#.*/##')
-
-source_dir=$(echo $app_main | sed 's#/[^/]*$##')
-test "X$source_dir" = "X$app_main" && source_dir=.
 
 
 unindent() {
@@ -135,9 +143,6 @@ clean() {
   sed -e '/### .* START ###/d' -e '/>>> .* END >>>/d' -e '/--- .* INSERT ---/d'
 }
 
-test -d vaccines || mkdir vaccines
-cd vaccines
-
 vaccine_intermediate() {
   start $vaccine_src | remove_sections LOADER | unindent
 }
@@ -146,11 +151,41 @@ ordered_intermediate() {
   vaccine_intermediate | remove_sections OUT_OF_ORDER
 }
 
+vaccine_minimal() {
+  vaccine_intermediate | choose_section MINIMAL |
+      unindent | clean
+}
+
+
+if test "X$inject_file" != X
+then
+  if test "X$global_var" = X
+  then
+    global_var=$(echo "$inject_file" | sed -e 's#.*/##' -e 's/\..*$//')
+  fi
+  if test "X$app_name" = X
+  then
+    app_name=$global_var
+  fi
+
+  if grep -q "window\.vaccine *=" $inject_file
+  then
+    echo 'vaccine already found'
+  else
+    vaccine_minimal >> $inject_file
+    echo "vaccine.set('$app_name', $global_var);" >> $inject_file
+  fi
+  exit 0
+fi
+
+
+test -d vaccines || mkdir vaccines
+cd vaccines
+
 start $vaccine_src | clean > vaccine_loader.js
 vaccine_intermediate | clean > vaccine.js
-vaccine_intermediate | choose_section MINIMAL |
-    unindent | clean > vaccine_minimal.js
 ordered_intermediate | clean > vaccine_already_ordered.js
+vaccine_minimal > vaccine_minimal.js
 ordered_intermediate | remove_sections RELATIVE |
     clean > vaccine_absolute_require_already_ordered.js
 vaccine_intermediate | remove_sections RELATIVE |
