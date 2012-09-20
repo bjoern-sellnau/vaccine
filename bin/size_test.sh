@@ -30,6 +30,7 @@ build() {
 
 build vaccine.js > $v/with_vaccine.js
 build vaccine_already_ordered.js > $v/with_ordered.js
+build vaccine_absolute_require.js > $v/with_absolute_require.js
 build vaccine_minimal.js define > $v/with_minimal.js
 build without define > $v/without_vaccine.js
 
@@ -52,6 +53,7 @@ compare() {
 without=$($vaccine --size-built without_vaccine.js)
 with=$($vaccine --size-built with_vaccine.js)
 with_already_ordered=$($vaccine --size-built with_ordered.js)
+with_absolute_require=$($vaccine --size-built with_absolute_require.js)
 with_minimal=$($vaccine --size-built with_minimal.js)
 
 out 'size types' text mini gzip
@@ -62,11 +64,14 @@ echo ''
 out 'already_ordered' $($vaccine --size-built vaccine_already_ordered.js)
 out '(integrated) already_ordered' $(compare $with_already_ordered $without)
 echo ''
+out 'absolute_require' $($vaccine --size-built vaccine_absolute_require.js)
+out '(integrated) absolute_require' $(compare $with_absolute_require $without)
+echo ''
 out 'minimal' $($vaccine --size-built vaccine_minimal.js)
 out '(integrated) minimal' $(compare $with_minimal $without)
 
 cd ..
 
-rm -r $v
+#rm -r $v
 test -d old_vaccines && mv old_vaccines $v
 

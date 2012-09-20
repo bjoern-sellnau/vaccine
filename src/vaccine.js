@@ -47,11 +47,16 @@
     // Set your library with vaccine.set('mylib', mylib);
 >>>>>>>>>>>>>>>>>>>>>>>> MINIMAL END >>>>>>>>>>>>>>>>>>>>>>>>
 
-    var parts = id.split('/'),
-        globalVaccine = window.vaccine,
+###################### RELATIVE START ######################
+    var parts = id.split('/');
+>>>>>>>>>>>>>>>>>>>>>>> RELATIVE END >>>>>>>>>>>>>>>>>>>>>>>
+
+    var globalVaccine = window.vaccine,
         module = {exports: {}};
 
     function require(reqId) {
+
+###################### RELATIVE START ######################
       var matching = /(\.?\.\/?)*/.exec(reqId)[0],
           // Some code golf to get the number of "directories" back we want to go
           back = Math.floor(matching.replace(/\//g, '').length / 1.9 + 0.99),
@@ -62,11 +67,15 @@
         reqId = base + reqId.slice(matching.length);
       }
       reqId = reqId.replace(/\/$/, '');
+>>>>>>>>>>>>>>>>>>>>>>> RELATIVE END >>>>>>>>>>>>>>>>>>>>>>>
       var mod = globalVaccine.get(reqId);
+#################### OUT_OF_ORDER START ####################
       if (!mod) {
         require.id = reqId;
         throw require;  // Throw require, to ensure correct error gets handled
       }
+>>>>>>>>>>>>>>>>>>>>> OUT_OF_ORDER END >>>>>>>>>>>>>>>>>>>>>
+
       return mod;
     }
 
