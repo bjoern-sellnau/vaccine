@@ -4,7 +4,7 @@
 all: configure size
 
 size:
-	sh size_test.sh
+	bin/vaccine --size test/test_src
 
 release:
 	src/configure_all --release

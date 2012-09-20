@@ -28,9 +28,10 @@ then
   make_min $compare
 fi
 
-printf '%10s %s\n' $(size '') plaintext
-printf '%10s %s\n' $(size .min) minified
-printf '%10s %s\n' $(size .min.gz) gzipped
+plaintext=$(size '')
+minified=$(size .min)
+gzipped=$(size .min.gz)
+echo $plaintext $minified $gzipped
 
 rm $file.min
 rm $file.min.gz
