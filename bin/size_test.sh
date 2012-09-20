@@ -45,13 +45,25 @@ out() {
 
 cd $v
 
-out sizes text mini gzip
+compare() {
+  echo $(($1 - $4)) $(($2 - $5)) $(($3 - $6))
+}
+
+without=$($vaccine --size-built without_vaccine.js)
+with=$($vaccine --size-built with_vaccine.js)
+with_already_ordered=$($vaccine --size-built with_ordered.js)
+with_minimal=$($vaccine --size-built with_minimal.js)
+
+out 'size types' text mini gzip
+echo ''
 out 'vaccine.js' $($vaccine --size-built vaccine.js)
-out 'vaccine.js integrated' $($vaccine --size-built with_vaccine.js without_vaccine.js)
+out 'vaccine.js integrated' $(compare $with $without)
+echo ''
 out 'already_ordered' $($vaccine --size-built vaccine_already_ordered.js)
-out 'already_ordered integrated' $($vaccine --size-built with_ordered.js without_vaccine.js)
+out 'already_ordered integrated' $(compare $with_already_ordered $without)
+echo ''
 out 'minimal' $($vaccine --size-built vaccine_minimal.js)
-out 'minimal integrated' $($vaccine --size-built with_minimal.js without_vaccine.js)
+out 'minimal integrated' $(compare $with_minimal $without)
 
 cd ..
 

@@ -1,18 +1,23 @@
 #!/bin/sh
 
-SOURCE="$0"
-DIR="$( dirname "$SOURCE" )"
-while [ -h "$SOURCE" ]
-do
-  SOURCE="$(readlink "$SOURCE")"
-  [ "$(echo "$SOURCE" | cut -c 1)" != '/' ] && SOURCE="$DIR/$SOURCE"
-  DIR="$( cd -P "$( dirname "$SOURCE"  )" && pwd )"
-done
-DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+if test "X$vaccine_bin_dir" = X
+then
+  SOURCE="$0"
+  DIR="$( dirname "$SOURCE" )"
+  while [ -h "$SOURCE" ]
+  do
+    SOURCE="$(readlink "$SOURCE")"
+    [ "$(echo "$SOURCE" | cut -c 1)" != '/' ] && SOURCE="$DIR/$SOURCE"
+    DIR="$( cd -P "$( dirname "$SOURCE"  )" && pwd )"
+  done
+  DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 
-# Inputs
-vaccine_bin_dir=$DIR
-vaccine_src_dir="$(cd "$DIR/../src" && pwd)"
+  vaccine_bin_dir=$DIR
+  vaccine_src_dir="$(cd "$DIR/../src" && pwd)"
+  export vaccine_bin_dir
+  export vaccine_src_dir
+fi
+
 vaccine_src=$vaccine_src_dir/vaccine.js
 standalone_server_src=$vaccine_src_dir/dev_server_standalone.js
 express_server_src=$vaccine_src_dir/dev_server_express.js
