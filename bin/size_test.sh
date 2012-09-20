@@ -57,13 +57,13 @@ with_minimal=$($vaccine --size-built with_minimal.js)
 out 'size types' text mini gzip
 echo ''
 out 'vaccine.js' $($vaccine --size-built vaccine.js)
-out 'vaccine.js integrated' $(compare $with $without)
+out '(integrated) vaccine.js' $(compare $with $without)
 echo ''
 out 'already_ordered' $($vaccine --size-built vaccine_already_ordered.js)
-out 'already_ordered integrated' $(compare $with_already_ordered $without)
+out '(integrated) already_ordered' $(compare $with_already_ordered $without)
 echo ''
 out 'minimal' $($vaccine --size-built vaccine_minimal.js)
-out 'minimal integrated' $(compare $with_minimal $without)
+out '(integrated) minimal' $(compare $with_minimal $without)
 
 cd ..
 
