@@ -19,7 +19,7 @@ test-node: pre-test
 	cd test; node dev_server_standalone_node.js
 
 pre-test: | configure build-test
-	printf '\n\n!!!\nOpen localhost:3000 in a browser.\n!!!\n\n'
+	@printf '\n\n!!!\nOpen localhost:3000 in a browser.\n!!!\n\n'
 
 build-test:
 	cd test; ./build_util > test_lib/util.js

@@ -1,5 +1,22 @@
 #!/bin/sh
 
+help() {
+  echo 'vaccine
+        --inject [file]   # Inject vaccine into an existing file
+        --app [app]       # Your app or lib name
+        --main [path]     # The main script for your app (path from root)
+        --lib [dir]       # The directory for your libraries (dependencies)
+        --global [name]   # The global variable for the file being injected
+        --output [file]   # The name of your built app (e. g. app.js)
+        --size [dir]      # Calculate sizes. dir is your source directory.
+
+Examples:
+  vaccine --app datazooka --main src/index.js --lib lib
+  vaccine --size src
+  vaccine --inject d3.js
+'
+}
+
 if test "X$vaccine_bin_dir" = X
 then
   SOURCE="$0"
@@ -44,6 +61,11 @@ fail() {
 while test $# -gt 0
 do
   case $1 in
+    --help | -h)
+      shift
+      help
+      exit 0
+      ;;
     --app | -a)
       shift
       app_name=$1
@@ -52,15 +74,15 @@ do
       shift
       app_main=$1
       ;;
-    --output | -o)
+    --output)
       shift
       output_file=$1
       ;;
-    --lib | -l)
+    --lib)
       shift
       library_dir=$1
       ;;
-    --build | -b)
+    --build)
       shift
       build_script=$1
       ;;
@@ -73,7 +95,7 @@ do
       shift
       inject_file=$1
       ;;
-    --global | -g)
+    --global)
       shift
       global_var=$1
       ;;
