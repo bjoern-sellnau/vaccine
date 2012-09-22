@@ -141,34 +141,6 @@ define('my_app/examples/fun', function(require, exports, module) {
   module's function return, you can call require at some later point to get
   it.
 
-Minimal Vaccine
----------------
-
-Vaccine is extremely simple. The full version is ~50 lines, with other
-versions that are even fewer.
-
-The minimal vaccine (17 lines of code) is just a global vaccine object with
-three methods:
-
-* `get: function(id) ...`: Pass it an id, and it will return the value
-  associated with that id.
-* `set: function(id, value) ...`: Set's the value associated with the
-  given id and calls all `on` functions registered to that id.
-* `on: function(id, func) ...`: Add's a callback tied to the id that
-  gets called whenever the id's value gets set.
-
-The other vaccine versions keep the minimal vaccine intact while varying
-the `define` and `require` functionality to suit different needs.
-
-In AMD, where the app (generally) decides to use AMD, libraries must check if
-`define` and `define.amd` are true. With vaccine, if a library decides to
-support vaccine, they must at least use the minimal version. They provide
-their library with a line of code like so:
-
-```javascript
-vaccine.set('my_lib', myLib);
-```
-
 Developing With Vaccine
 -----------------------
 
@@ -231,4 +203,72 @@ id is determined by your app name and each files path on your file system.
 to compile your app/lib on the fly. As an added bonus, it will even wrap the
 individual files with `define` so that you can use vaccine_loader.js or
 separate `script` tags.
+
+Vaccine Variations
+------------------
+
+Vaccine comes in different variations. Each one suits a different need.
+
+### vaccine_minimal.js ###
+
+Vaccine is extremely simple. The full version is ~50 lines, with other
+versions that are even fewer.
+
+The minimal vaccine (17 lines of code) is just a global vaccine object with
+three methods:
+
+* `get: function(id) ...`: Pass it an id, and it will return the value
+  associated with that id.
+* `set: function(id, value) ...`: Set's the value associated with the
+  given id and calls all `on` functions registered to that id.
+* `on: function(id, func) ...`: Add's a callback tied to the id that
+  gets called whenever the id's value gets set.
+
+The other vaccine versions keep the minimal vaccine intact while varying
+the `define` and `require` functionality to suit different needs.
+
+In AMD, where the app (generally) decides to use AMD, libraries must check if
+`define` and `define.amd` are true. With vaccine, if a library decides to
+support vaccine, they must at least use the minimal version. They provide
+their library with a line of code like so:
+
+```javascript
+vaccine.set('my_lib', myLib);
+```
+
+If you are using libaries that do not have support for vaccine, you can easily
+add support by copying vaccine_minimal.js to the bottom of their lib, and
+adding a line like above.
+
+Even easier, the `vaccine` binary has a way to do this with the `--inject`
+option:
+
+```sh
+$ vaccine -i lib_file.js     # You can also use the --app and --global options.
+```
+
+### vaccine_already_ordered.js ###
+
+To save a few bytes and split seconds to the run time, you can use this
+version if the modules are defined in order. In order means that every
+call to `require` must be to a module that has already been defined.
+
+### vaccine_absolute_require.js ###
+
+This version is vaccine.js but without support for a relative `require`. To
+use this, every module id must be typed out in full when calling `require`.
+
+### vaccine_absolute_require_already_ordered.js ###
+
+This is the combination of the above two versions. Must use full module
+ids for `require`, and must define everything in order.
+
+### vaccine_(Your vaccine type here).js ###
+
+Lastly, vaccine is meant to be simple enough, that you can make any changes
+you want. The one rule, is don't break the global `vaccine` api (in
+vaccine_minimal.js). Other than that, anything is game.
+
+If you think you have some changes that other people might like, send a
+pull request, and I may support it if there is enough interest.
 
