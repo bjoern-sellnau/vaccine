@@ -272,3 +272,44 @@ vaccine_minimal.js). Other than that, anything is game.
 If you think you have some changes that other people might like, send a
 pull request, and I may support it if there is enough interest.
 
+Vaccine Size
+------------
+
+Vaccine aims to be as small as possible, so if you see a way to save a
+byte, let me know.
+
+If you use the `vaccine` binary, you can figure out how much vaccine will
+add to the size of your library app by doing the following:
+
+```sh
+$ vaccine --size src        # the location of your source files
+```
+
+Running this on [DataZooka](http://www.datazooka.com), a tool I am developing
+that is using vaccine, I get the following output:
+
+```sh
+$ vaccine --size src
+                                   size types:  text mini gzip
+
+                                   vaccine.js:  1534  605  367
+                      (integrated) vaccine.js:  1507  579  241
+
+                              already_ordered:  1282  519  323
+                 (integrated) already_ordered:  1255  493  200
+
+                             absolute_require:  1086  413  247
+                (integrated) absolute_require:  1059  387  146
+
+             absolute_require_already_ordered:   834  327  202
+(integrated) absolute_require_already_ordered:   807  301  110
+
+                                      minimal:   515  195  145
+                         (integrated) minimal:   515  195   67
+```
+
+The *integrated* lines are the ones where it compares the size of your app with
+and without vaccine. As you can see, while vaccine is small to begin with, it
+gets even smaller when gzipped with your sources, due to the way compression
+works.
+
