@@ -49,14 +49,6 @@ build_without > $v/without_vaccine.js
 cp "$v/original.js" "$v/with_minimal.js"
 $vaccine --inject "$v/with_minimal.js" --app "$app_name" --global "$global_var"
 
-out() {
-  type=$1
-  text=$2
-  min=$3
-  gzip=$4
-  printf '%45s:  %4s %4s %4s\n' "$type" $text $min $gzip
-}
-
 
 cd $v
 
@@ -82,7 +74,8 @@ compare() {
   else
     text=$(($1 - $4))
   fi
-  echo $text $(($2 - $5)) $(($3 - $6))
+  percent=$(awk 'BEGIN{ printf "%.2f%%", (100 * ('$3' - '$6') / '$6') }')
+  echo $text $(($2 - $5)) $(($3 - $6)) $percent
 }
 
 comp_vaccine=$(compare --text "$size_vaccine" $with $without)
@@ -90,21 +83,30 @@ comp_already_ordered=$(compare --text "$size_already_ordered" $with_already_orde
 comp_absolute_require=$(compare --text "$size_absolute_require" $with_absolute_require $without)
 comp_absolute_require_ordered=$(compare --text "$size_absolute_require_ordered" $with_absolute_require_ordered $without)
 
-out 'size types' text min gzip
+out() {
+  type=$1
+  text=$2
+  min=$3
+  gzip=$4
+  gzip_percent=$5
+  printf '%33s:  %4s %4s %4s %6s\n' "$type" $text $min $gzip $gzip_percent
+}
+
+out 'size types' text min gz 'gz-%'
 echo ''
-out 'vaccine.js' $size_vaccine
+out 'vaccine.js' $size_vaccine -
 out '(integrated) vaccine.js' $comp_vaccine
 echo ''
-out 'already_ordered' $size_already_ordered
+out 'already_ordered' $size_already_ordered -
 out '(integrated) already_ordered' $comp_already_ordered
 echo ''
-out 'absolute_require' $size_absolute_require
+out 'absolute_require' $size_absolute_require -
 out '(integrated) absolute_require' $comp_absolute_require
 echo ''
-out 'absolute_require_already_ordered' $size_absolute_require_ordered
-out '(integrated) absolute_require_already_ordered' $comp_absolute_require_ordered
+out 'absolute_..._ordered' $size_absolute_require_ordered -
+out '(integrated) absolute_..._ordered' $comp_absolute_require_ordered
 echo ''
-out 'minimal' $($vaccine --size-built vaccine_minimal.js)
+out 'minimal' $($vaccine --size-built vaccine_minimal.js) -
 out '(integrated) minimal' $(compare $with_minimal $original)
 
 cd ..
