@@ -283,39 +283,50 @@ Vaccine aims to be as small as possible, so if you see a way to save a
 byte, let me know.
 
 If you use the `vaccine` binary, you can figure out how much vaccine will
-add to the size of your library app by doing the following:
+add to the size of your library app by running the line below. Your modules
+need to already be in vaccine `define` format for accurate size measurements
+(besides minimal, which doesn't require that).
 
 ```sh
 $ vaccine --size src        # the location of your source files
 ```
 
 Running this on [DataZooka](http://www.datazooka.com), a tool I am developing
-that uses vaccine, I get the following output:
+that uses vaccine, I get the following output: (the size is ~12k gzipped)
 
 ```sh
-$ vaccine --size src
-                                   size types:  text  min gzip
+$ vaccine --size src --app datazooka
+                       size types:  text  min   gz   gz-%
 
-                                   vaccine.js:  1534  605  367
-                      (integrated) vaccine.js:  1507  579  241
+                       vaccine.js:  1534  605  367      -
+          (integrated) vaccine.js:  1534  594  256  2.16%
 
-                              already_ordered:  1282  519  323
-                 (integrated) already_ordered:  1255  493  200
+                  already_ordered:  1282  519  323      -
+     (integrated) already_ordered:  1282  513  211  1.78%
 
-                             absolute_require:  1086  413  247
-                (integrated) absolute_require:  1059  387  146
+                 absolute_require:  1086  413  247      -
+    (integrated) absolute_require:  1086  402  154  1.30%
 
-             absolute_require_already_ordered:   834  327  202
-(integrated) absolute_require_already_ordered:   807  301  110
+             absolute_..._ordered:   834  327  202      -
+(integrated) absolute_..._ordered:   834  321  119  1.01%
 
-                                      minimal:   515  195  145
-                         (integrated) minimal:   515  195   67
+                          minimal:   515  195  145      -
+             (integrated) minimal:   552  230   79  0.67%
 ```
 
 The *integrated* lines are the ones where it compares the size of your app with
 and without vaccine. As you can see, while vaccine is small to begin with, it
 gets even smaller when gzipped with your sources, due to the way compression
 works.
+
+The reason "integrated" minimal is larger for both text and minified sizes
+is because it uses `vaccine --inject app.js` which adds a line like
+`vaccine.set('my_app', my_app);`.
+
+Note that the gz-% column shows the percentage increase of your gzipped
+app when adding vaccine. The percentage of bytes that make up vaccine
+in the gzipped app would be slightly smaller, depending on the initial
+size of your app.
 
 LICENSE
 -------
