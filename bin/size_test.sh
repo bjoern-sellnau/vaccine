@@ -1,6 +1,11 @@
 
 vaccine=$vaccine_bin_dir/vaccine
 source_dir=$1
+app_name=$2
+global_var=$3
+
+test "X$app_name" = X && app_name=app_name
+test "X$global_var" = X && global_var=$app_name
 
 if test -d "$source_dir"
 then
@@ -15,15 +20,23 @@ test -d $v && mv $v old_vaccines
 
 $vaccine --app my_app
 
+short_define() {
+  sed 's/define(/d(/g'
+}
+
+cat $files_list > "$v/original.js"
+cat "$v/original.js" | short_define > "$v/original_short_define.js"
+
 build() {
-  if test "X$2" = "Xdefine"
-  then
-    echo "(function() {var define = window.define;"
-  else
-    echo "(function() {"
-  fi
-  cat $files_list
-  test "X$1" != 'Xwithout' && cat "$v/$1"
+  echo "(function() {'use strict';"
+  cat "$v/original.js"
+  cat "$v/$1"
+  echo "}());"
+}
+
+build_without() {
+  echo "(function() {'use strict';"
+  cat "$v/original_short_define.js"
   echo "}());"
 }
 
@@ -31,25 +44,23 @@ build vaccine.js > $v/with_vaccine.js
 build vaccine_already_ordered.js > $v/with_ordered.js
 build vaccine_absolute_require.js > $v/with_absolute_require.js
 build vaccine_absolute_require_already_ordered.js > $v/with_absolute_require_ordered.js
-build vaccine_minimal.js define > $v/with_minimal.js
-build without define > $v/without_vaccine.js
+build_without > $v/without_vaccine.js
 
+cp "$v/original.js" "$v/with_minimal.js"
+$vaccine --inject "$v/with_minimal.js" --app "$app_name" --global "$global_var"
 
 out() {
   type=$1
   text=$2
-  mini=$3
+  min=$3
   gzip=$4
-  printf '%45s:  %4s %4s %4s\n' "$type" $text $mini $gzip
+  printf '%45s:  %4s %4s %4s\n' "$type" $text $min $gzip
 }
 
 
 cd $v
 
-compare() {
-  echo $(($1 - $4)) $(($2 - $5)) $(($3 - $6))
-}
-
+original=$($vaccine --size-built original.js)
 without=$($vaccine --size-built without_vaccine.js)
 with=$($vaccine --size-built with_vaccine.js)
 with_already_ordered=$($vaccine --size-built with_ordered.js)
@@ -57,22 +68,44 @@ with_absolute_require=$($vaccine --size-built with_absolute_require.js)
 with_absolute_require_ordered=$($vaccine --size-built with_absolute_require_ordered.js)
 with_minimal=$($vaccine --size-built with_minimal.js)
 
+size_vaccine=$($vaccine --size-built vaccine.js)
+size_already_ordered=$($vaccine --size-built vaccine_already_ordered.js)
+size_absolute_require=$($vaccine --size-built vaccine_absolute_require.js)
+size_absolute_require_ordered=$($vaccine --size-built vaccine_absolute_require_already_ordered.js)
+
+compare() {
+  if test "X$1" = "X--text"
+  then
+    shift
+    text=$(echo "$1" | cut -d ' ' -f 1)
+    shift
+  else
+    text=$(($1 - $4))
+  fi
+  echo $text $(($2 - $5)) $(($3 - $6))
+}
+
+comp_vaccine=$(compare --text "$size_vaccine" $with $without)
+comp_already_ordered=$(compare --text "$size_already_ordered" $with_already_ordered $without)
+comp_absolute_require=$(compare --text "$size_absolute_require" $with_absolute_require $without)
+comp_absolute_require_ordered=$(compare --text "$size_absolute_require_ordered" $with_absolute_require_ordered $without)
+
 out 'size types' text min gzip
 echo ''
-out 'vaccine.js' $($vaccine --size-built vaccine.js)
-out '(integrated) vaccine.js' $(compare $with $without)
+out 'vaccine.js' $size_vaccine
+out '(integrated) vaccine.js' $comp_vaccine
 echo ''
-out 'already_ordered' $($vaccine --size-built vaccine_already_ordered.js)
-out '(integrated) already_ordered' $(compare $with_already_ordered $without)
+out 'already_ordered' $size_already_ordered
+out '(integrated) already_ordered' $comp_already_ordered
 echo ''
-out 'absolute_require' $($vaccine --size-built vaccine_absolute_require.js)
-out '(integrated) absolute_require' $(compare $with_absolute_require $without)
+out 'absolute_require' $size_absolute_require
+out '(integrated) absolute_require' $comp_absolute_require
 echo ''
-out 'absolute_require_already_ordered' $($vaccine --size-built vaccine_absolute_require_already_ordered.js)
-out '(integrated) absolute_require_already_ordered' $(compare $with_absolute_require_ordered $without)
+out 'absolute_require_already_ordered' $size_absolute_require_ordered
+out '(integrated) absolute_require_already_ordered' $comp_absolute_require_ordered
 echo ''
 out 'minimal' $($vaccine --size-built vaccine_minimal.js)
-out '(integrated) minimal' $(compare $with_minimal $without)
+out '(integrated) minimal' $(compare $with_minimal $original)
 
 cd ..
 

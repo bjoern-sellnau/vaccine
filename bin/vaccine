@@ -88,8 +88,8 @@ do
       ;;
     --size | -s)
       shift
-      $vaccine_bin_dir/size_test.sh $1
-      exit 0
+      size_dir_or_file=$1
+      test "X$size_dir_or_file" = X && fail 'Must provide source directory or file'
       ;;
     --inject | -i)
       shift
@@ -112,6 +112,30 @@ do
   shift
 done
 
+if test "X$inject_file" != X -o "X$size_dir_or_file" != X
+then
+  if test "X$inject_file" != X
+  then
+    file=$inject_file
+  else
+    file=$size_dir_or_file
+  fi
+  derived_app_name=$(echo "$file" | sed -e 's#.*/##' -e 's/\..*$//')
+  if test "X$app_name" = X
+  then
+    app_name=$derived_app_name
+  fi
+  if test "X$global_var" = X
+  then
+    global_var=$app_name
+  fi
+fi
+
+if test "X$size_dir_or_file" != X
+then
+  $vaccine_bin_dir/size_test.sh "$size_dir_or_file" "$app_name" "$global_var"
+  exit 0
+fi
 
 if test "X$inject_file" = X
 then
@@ -125,7 +149,6 @@ then
 
   source_dir=$(echo $app_main | sed 's#/[^/]*$##')
   test "X$source_dir" = "X$app_main" && source_dir=.
-
 fi
 
 
@@ -181,16 +204,6 @@ vaccine_minimal() {
 
 if test "X$inject_file" != X
 then
-  derived_app_name=$(echo "$inject_file" | sed -e 's#.*/##' -e 's/\..*$//')
-  if test "X$global_var" = X
-  then
-    global_var=$derived_app_name
-  fi
-  if test "X$app_name" = X
-  then
-    app_name=$derived_app_name
-  fi
-
   if grep -q "window\.vaccine *=" $inject_file
   then
     echo 'vaccine already found'
