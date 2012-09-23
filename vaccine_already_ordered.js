@@ -39,20 +39,11 @@ function define(id, defn) {
     }
     reqId = reqId.replace(/\/$/, '');
     var mod = globalVaccine.get(reqId);
-    if (!mod) {
-      require.id = reqId;
-      throw require;  // Throw require, to ensure correct error gets handled
-    }
 
     return mod;
   }
 
-  try {
     defn(require, module.exports, module);
     globalVaccine.set(id, module.exports);
-  } catch (e) {
-    if (e != require) throw e;
-    globalVaccine.on(require.id, function() { define(id, defn); });
-  }
 }
 

@@ -57,7 +57,7 @@ with_absolute_require=$($vaccine --size-built with_absolute_require.js)
 with_absolute_require_ordered=$($vaccine --size-built with_absolute_require_ordered.js)
 with_minimal=$($vaccine --size-built with_minimal.js)
 
-out 'size types' text mini gzip
+out 'size types' text min gzip
 echo ''
 out 'vaccine.js' $($vaccine --size-built vaccine.js)
 out '(integrated) vaccine.js' $(compare $with $without)
