@@ -317,3 +317,10 @@ and without vaccine. As you can see, while vaccine is small to begin with, it
 gets even smaller when gzipped with your sources, due to the way compression
 works.
 
+LICENSE
+-------
+
+I'm not sure how to license this. I would say MIT, but that means you need
+to copy the license whenever you use vaccine. I don't want you to have to
+do that. So maybe just make it public domain?
+
