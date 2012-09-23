@@ -32,8 +32,6 @@ $ echo '}());'
 ```
 
 Your compiled app now works with vaccine's module syntax. It's that easy!
-There are other ways to "install" vaccine desribed further below if you
-want more functionality/flexibility.
 
 NPM Install
 -----------
@@ -41,7 +39,7 @@ NPM Install
 You can also install vaccine with `npm`. This creates a binary that lets
 you configure vaccine scripts for your app. Calling `vaccine` with
 `--app MyAppName` will create a directory called `vaccines` with various
-scripts you can use.
+scripts you can use. See `vaccine --help` to get a list of options.
 
 ```sh
 $ npm install -g vaccine
@@ -57,7 +55,7 @@ $ cp vaccines/dev_server_standlone.js .
 $ rm -r vaccines
 ```
 
-In other places in this README I will make reference to copying down a file.
+In other places in this README I will make reference to copying a file.
 This can be done by `curl`ing github or by creating a `vaccines` folder.
 The [root](https://github.com/jakesandlund/vaccine) directory for vaccine
 is actually built using the `vaccine` binary.
@@ -103,9 +101,9 @@ define('runner', function(require, exports, module) {
 });
 ```
 
-The module name/id given to define is the full name, so be careful that no two
-modules use the same name. It is best to use a name for you app/library and
-have that be the first part of all modules, separated by a slash.
+The module name/id given to `define` is the full name, so be careful that no two
+modules use the same name. It is best to prefix your module names with the
+name of your app or lib, separated by a slash.
 
 ### Relative require ###
 
@@ -157,10 +155,14 @@ includes your sources and vaccine.js. This could be done manually
 However, vaccine comes with a simple development server
 (dev_server_standalone.js) that can build on the fly, so you can just refresh.
 
-The one requirement with the various dev_server*.js files, is that you have
-a `build` file somewhere that will output (on stdout) the exact text of your
-compiled app when called. So you can't have the `build` file save directly
-into your file (as shown above).
+The one requirement with the various dev_server_*.js files, is that you must
+have a `build` file somewhere that will output (on stdout) the exact text of
+your compiled app when called. So you can't have the `build` file save directly
+into your file (as shown above). Instead, do this:
+
+```sh
+$ ./build > my_app.js
+```
 
 ### Separate scripts ###
 
@@ -198,6 +200,8 @@ app/lib.
 With this build script, simply leave out the `define` wrapper and use
 require, exports, and module as you would in any other CommonJS file. The module
 id is determined by your app name and each files path on your file system.
+Also make sure that the string passed to `require` does not end in ".js", and
+that it would work when you wrap the file in a `define` call.
 
 `dev_server_standalone_node.js` and `dev_server_express_node.js` can be used
 to compile your app/lib on the fly. As an added bonus, it will even wrap the
@@ -208,11 +212,10 @@ Vaccine Variations
 ------------------
 
 Vaccine comes in different variations. Each one suits a different need.
+The full version (but without the loader) is only ~50 lines of code, and
+other versions are even less.
 
 ### vaccine_minimal.js ###
-
-Vaccine is extremely simple. The full version is ~50 lines, with other
-versions that are even fewer.
 
 The minimal vaccine (17 lines of code) is just a global vaccine object with
 three methods:
@@ -255,19 +258,20 @@ call to `require` must be to a module that has already been defined.
 
 ### vaccine_absolute_require.js ###
 
-This version is vaccine.js but without support for a relative `require`. To
+This version is vaccine.js but without support for relative requires. To
 use this, every module id must be typed out in full when calling `require`.
 
 ### vaccine_absolute_require_already_ordered.js ###
 
-This is the combination of the above two versions. Must use full module
-ids for `require`, and must define everything in order.
+This is the combination of the above two versions. You must use full module
+ids for `require`, and define everything in order.
 
-### vaccine_(Your vaccine type here).js ###
+### vaccine_(*Your vaccine type here*).js ###
 
-Lastly, vaccine is meant to be simple enough, that you can make any changes
-you want. The one rule, is don't break the global `vaccine` api (in
-vaccine_minimal.js). Other than that, anything is game.
+Lastly, vaccine is meant to be simple enough that you can easily make any
+changes you want. The two rules are don't break the global `vaccine` api (in
+vaccine_minimal.js), and don't add any other global functionality. Other than
+that, anything is game.
 
 If you think you have some changes that other people might like, send a
 pull request, and I may support it if there is enough interest.
@@ -286,11 +290,11 @@ $ vaccine --size src        # the location of your source files
 ```
 
 Running this on [DataZooka](http://www.datazooka.com), a tool I am developing
-that is using vaccine, I get the following output:
+that uses vaccine, I get the following output:
 
 ```sh
 $ vaccine --size src
-                                   size types:  text mini gzip
+                                   size types:  text  min gzip
 
                                    vaccine.js:  1534  605  367
                       (integrated) vaccine.js:  1507  579  241
