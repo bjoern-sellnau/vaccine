@@ -31,20 +31,20 @@
       (function() {
         var waiting = {}, modules = {};
         window.vaccine = {
-          on: function(id, callback) {
+          o: function(id, callback) {
             (waiting[id] = waiting[id] || []).push(callback);
           },
-          get: function(id) {
+          g: function(id) {
             return modules[id];
           },
-          set: function(id, val) {
+          s: function(id, val) {
             modules[id] = val;
             (waiting[id] || []).forEach(function(w) { w(); });
           }
         };
       }());
     }
-    // Set your library with vaccine.set('mylib', mylib);
+    // Set your library with vaccine.s('mylib', mylib);
 >>>>>>>>>>>>>>>>>>>>>>>> MINIMAL END >>>>>>>>>>>>>>>>>>>>>>>>
 
 ###################### RELATIVE START ######################
@@ -68,7 +68,7 @@
       }
       reqId = reqId.replace(/\/$/, '');
 >>>>>>>>>>>>>>>>>>>>>>> RELATIVE END >>>>>>>>>>>>>>>>>>>>>>>
-      var mod = globalVaccine.get(reqId);
+      var mod = globalVaccine.g(reqId);
 #################### OUT_OF_ORDER START ####################
       if (!mod) {
         require.id = reqId;
@@ -83,7 +83,7 @@
     try {
 >>>>>>>>>>>>>>>>>>>>> OUT_OF_ORDER END >>>>>>>>>>>>>>>>>>>>>
       defn(require, module.exports, module);
-      globalVaccine.set(id, module.exports);
+      globalVaccine.s(id, module.exports);
 #################### OUT_OF_ORDER START ####################
     } catch (e) {
       if (e != require) throw e;
@@ -103,7 +103,7 @@
       }
       loadScript('/' + src + '.js');
   >>>>>>>>>>>>>>>>>>>>>> LOADER END >>>>>>>>>>>>>>>>>>>>>>
-      globalVaccine.on(require.id, function() { define(id, defn); });
+      globalVaccine.o(require.id, function() { define(id, defn); });
     }
 >>>>>>>>>>>>>>>>>>>>> OUT_OF_ORDER END >>>>>>>>>>>>>>>>>>>>>
   }

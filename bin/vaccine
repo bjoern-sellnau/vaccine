@@ -209,7 +209,7 @@ then
     echo 'vaccine already found'
   else
     vaccine_minimal >> $inject_file
-    echo "vaccine.set('$app_name', $global_var);" >> $inject_file
+    echo "vaccine.s('$app_name', $global_var);" >> $inject_file
   fi
   exit 0
 fi

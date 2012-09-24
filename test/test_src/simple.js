@@ -16,16 +16,16 @@ define('test_app/simple', function(require, e, module) {
 
     define('make the global vaccine', function() {});
 
-    assert.equal(vaccine.get('undef'), undefined);
+    assert.equal(vaccine.g('undef'), undefined);
 
-    vaccine.set('set test', 'set test passed?');
-    assert.equal(vaccine.get('set test'), 'set test passed?');
+    vaccine.s('set test', 'set test passed?');
+    assert.equal(vaccine.g('set test'), 'set test passed?');
 
-    vaccine.on('pancake', function() { window.syrup = true; });
+    vaccine.o('pancake', function() { window.syrup = true; });
 
-    vaccine.set('waffle', 'hmm');
+    vaccine.s('waffle', 'hmm');
     assert(!window.syrup);
-    vaccine.set('pancake');
+    vaccine.s('pancake');
     assert(window.syrup);
 
 
