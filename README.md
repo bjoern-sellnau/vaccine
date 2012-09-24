@@ -243,15 +243,31 @@ other versions are even less.
 
 ### vaccine_minimal.js ###
 
-The minimal vaccine (17 lines of code) is just a global vaccine object with
-three methods:
+The minimal vaccine is just a global vaccine object with
+three properties:
 
-* `get: function(id) ...`: Pass it an id, and it will return the value
-  associated with that id.
-* `set: function(id, value) ...`: Set's the value associated with the
-  given id and calls all `on` functions registered to that id.
-* `on: function(id, func) ...`: Add's a callback tied to the id that
-  gets called whenever the id's value gets set.
+```javascript
+window.vaccine || (window.vaccine = {
+  // The minimal code required to be vaccine compliant.
+
+  // w = waiting: Functions to be called when a modules
+  // gets defined. w[moduleId] = [array of functions];
+  w: {},
+
+  // m = modules: Modules that have been fully defined.
+  // m[moduleId] = module.exports value
+  m: {},
+
+  // s = set: When a module becomes fully defined, set
+  // the module.exports value here.
+  // s(moduleId, module.exports)
+  s: function(id, val) {
+    this.m[id] = val;
+    (this.w[id] || []).forEach(function(w) { w(); });
+  }
+});
+// Set your library with vaccine.s('mylib', mylib);
+```
 
 The other vaccine versions keep the minimal vaccine intact while varying
 the `define` and `require` functionality to suit different needs.
@@ -262,7 +278,7 @@ support vaccine, they must at least use the minimal version. They provide
 their library with a line of code like so:
 
 ```javascript
-vaccine.set('my_lib', myLib);
+vaccine.s('my_lib', myLib);
 ```
 
 If you are using libaries that do not have support for vaccine, you can easily
@@ -324,20 +340,20 @@ that uses vaccine, I get the following output: (the size is ~12k gzipped)
 $ vaccine --size src --app datazooka
                        size types:  text  min   gz   gz-%
 
-                       vaccine.js:  1534  605  367      -
-          (integrated) vaccine.js:  1534  594  256  2.16%
+                       vaccine.js:  1655  530  340      -
+          (integrated) vaccine.js:  1655  519  236  2.00%
 
-                  already_ordered:  1282  519  323      -
-     (integrated) already_ordered:  1282  513  211  1.78%
+                  already_ordered:  1350  421  287      -
+     (integrated) already_ordered:  1350  415  178  1.51%
 
-                 absolute_require:  1086  413  247      -
-    (integrated) absolute_require:  1086  402  154  1.30%
+                 absolute_require:  1207  338  221      -
+    (integrated) absolute_require:  1207  327  133  1.12%
 
-             absolute_..._ordered:   834  327  202      -
-(integrated) absolute_..._ordered:   834  321  119  1.01%
+             absolute_..._ordered:   902  229  167      -
+(integrated) absolute_..._ordered:   902  223   84  0.71%
 
-                          minimal:   515  195  145      -
-             (integrated) minimal:   552  230   79  0.67%
+                          minimal:   607  116  109      -
+             (integrated) minimal:   583  143   54  0.46%
 ```
 
 The *integrated* lines are the ones where it compares the size of your app with
@@ -346,8 +362,8 @@ gets even smaller when gzipped with your sources, due to the way compression
 works.
 
 The reason "integrated" minimal is larger for both text and minified sizes
-is because it uses `vaccine --inject app.js` which adds a line like
-`vaccine.set('my_app', my_app);`.
+is because it uses `vaccine --inject app.js` which (effectively) adds a line
+like `vaccine.set('my_app', my_app);`.
 
 Note that the gz-% column shows the percentage increase of your gzipped
 app when adding vaccine. The percentage of bytes that make up vaccine
