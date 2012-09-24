@@ -132,12 +132,38 @@ define('my_app/examples/fun', function(require, exports, module) {
 });
 ```
 
+Since you will probably want to take advantage of relative requires in your
+app's main module, it is common to see this type of pattern:
+
+```javascript
+
+define('my_app', function(require, exports, module) {
+
+  // Relative requires, such as require('./util'), work unexpectedly by
+  // requiring a top-level module ('util' instead of 'my_app/util').
+  module.exports = require('my_app/main');
+});
+
+define('my_app/main', function(require, exports, module) {
+  var util = require('./util');   // 'my_app/util'
+
+  // The module.exports object will be returned from
+  // require('my_app'), due to the small define above.
+  ...
+  // Set exports or module.exports
+});
+```
+
 ### Things to know ###
 
 * The `define`'s can be in any order.
 * Circular dependencies are not supported. However, as long as you let the
   module's function return, you can call require at some later point to get
   it.
+* The `require` currently works by using exceptions (try, catch, throw). This
+  means that you should not have any side effects before a `require` call
+  for a module that isn't yet defined. I do not see this being a problem,
+  as it is common practice to keep requires at the top of a module.
 
 Developing With Vaccine
 -----------------------
