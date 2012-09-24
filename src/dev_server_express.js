@@ -1,7 +1,3 @@
-
-var outputFile = '{{{ OUTPUT_FILE }}}';   // Change this to your app file name.
-var buildScript = '{{{ BUILD_SCRIPT }}}';   // Change this to your app's build script.
-
 ####################### NODE START #######################
 
 var appName = '{{{ APP_NAME }}}';   // Change this to your app name.
@@ -22,8 +18,8 @@ var express = require('express'),
     exec = require('child_process').exec,
     app = express();
 
-app.get('/' + outputFile, function(req, res) {
-  exec(buildScript, function(err, stdout) {
+app.get(/\/build[\/\w]*$/, function(req, res) {
+  exec('.' + req.path, function(err, stdout) {
     res.type('application/javascript');
     res.send(stdout);
   });

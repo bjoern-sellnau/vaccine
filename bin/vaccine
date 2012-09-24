@@ -7,7 +7,6 @@ help() {
         --main [path]     # The main script for your app (path from root)
         --lib [dir]       # The directory for your libraries (dependencies)
         --global [name]   # The global variable for the file being injected
-        --output [file]   # The name of your built app (e. g. app.js)
         --size [dir]      # Calculate sizes. dir is your source directory.
 
 Examples:
@@ -45,12 +44,10 @@ build_node_src=$vaccine_src_dir/build_node
 # Variables
 app_name=
 app_main=src/index
-output_file=
 library_dir=lib
-build_script=./build
 vaccine_path=vaccine.js    # The path to vaccine.js relative to build_node
 
-vars_list='app_name app_main app_main_module output_file source_dir library_dir build_script vaccine_path'
+vars_list='app_name app_main app_main_module source_dir library_dir vaccine_path'
 
 
 fail() {
@@ -74,17 +71,9 @@ do
       shift
       app_main=$1
       ;;
-    --output)
-      shift
-      output_file=$1
-      ;;
     --lib)
       shift
       library_dir=$1
-      ;;
-    --build)
-      shift
-      build_script=$1
       ;;
     --size | -s)
       shift
@@ -140,8 +129,6 @@ fi
 if test "X$inject_file" = X
 then
   test "X$app_name" = X && fail 'Must provide the name of app (option --app)'
-
-  test "X$output_file" = X && output_file=$app_name.js
 
   app_main=$(echo $app_main | sed 's/\.js$//')
 

@@ -1,8 +1,4 @@
-
-var outputFile = '{{{ OUTPUT_FILE }}}';   // Change this to your app file name.
-var buildScript = '{{{ BUILD_SCRIPT }}}';   // Change this to your app's build script.
-
-####################### NODE START #######################
+u###################### NODE START #######################
 
 var appName = '{{{ APP_NAME }}}';   // Change this to your app name.
 
@@ -34,8 +30,8 @@ types = {
 };
 
 http.createServer(function (req, res) {
-  if (req.url === '/' + outputFile) {
-    exec(buildScript, function(err, stdout) {
+  if (req.url.match(/\/build[\/\w]*$/)) {
+    exec('.' + req.url, function(err, stdout) {
       if (err) return notFound(req.url, res);
       res.writeHead(200, {'Content-Type': 'application/javascript'});
       res.end(stdout);
