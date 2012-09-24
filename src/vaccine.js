@@ -28,21 +28,24 @@
 ####################### MINIMAL START #######################
     if (!window.vaccine) {
       // The minimal code required to be vaccine compliant.
-      (function() {
-        var waiting = {}, modules = {};
-        window.vaccine = {
-          o: function(id, callback) {
-            (waiting[id] = waiting[id] || []).push(callback);
-          },
-          g: function(id) {
-            return modules[id];
-          },
-          s: function(id, val) {
-            modules[id] = val;
-            (waiting[id] || []).forEach(function(w) { w(); });
-          }
-        };
-      }());
+      window.vaccine = {
+
+        // w = waiting: Functions to be called when a modules
+        // gets defined. w[moduleId] = [array of functions];
+        w: {},
+
+        // m = modules: Modules that have been fully defined.
+        // m[moduleId] = module.exports value
+        m: {},
+
+        // s = set: When a module becomes fully defined, set
+        // the module.exports value here.
+        // s(moduleId, module.exports)
+        s: function(id, val) {
+          this.m[id] = val;
+          (this.w[id] || []).forEach(function(w) { w(); });
+        }
+      };
     }
     // Set your library with vaccine.s('mylib', mylib);
 >>>>>>>>>>>>>>>>>>>>>>>> MINIMAL END >>>>>>>>>>>>>>>>>>>>>>>>
@@ -68,7 +71,7 @@
       }
       reqId = reqId.replace(/\/$/, '');
 >>>>>>>>>>>>>>>>>>>>>>> RELATIVE END >>>>>>>>>>>>>>>>>>>>>>>
-      var mod = globalVaccine.g(reqId);
+      var mod = globalVaccine.m[reqId];
 #################### OUT_OF_ORDER START ####################
       if (!mod) {
         require.id = reqId;
@@ -103,7 +106,8 @@
       }
       loadScript('/' + src + '.js');
   >>>>>>>>>>>>>>>>>>>>>> LOADER END >>>>>>>>>>>>>>>>>>>>>>
-      globalVaccine.o(require.id, function() { define(id, defn); });
+      (globalVaccine.w[require.id] || (globalVaccine.w[require.id] = []))
+          .push(function() { define(id, defn); });
     }
 >>>>>>>>>>>>>>>>>>>>> OUT_OF_ORDER END >>>>>>>>>>>>>>>>>>>>>
   }
