@@ -201,6 +201,10 @@ vaccine_minimal() {
       unindent | clean
 }
 
+inject_vaccine() {
+  vaccine_minimal | sed '$d' | sed "\$s#;#).s('$app_name', $global_var);#" |
+      sed '1s/^/(/'
+}
 
 if test "X$inject_file" != X
 then
@@ -208,8 +212,7 @@ then
   then
     echo 'vaccine already found'
   else
-    vaccine_minimal >> $inject_file
-    echo "vaccine.s('$app_name', $global_var);" >> $inject_file
+    inject_vaccine >> $inject_file
   fi
   exit 0
 fi
