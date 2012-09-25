@@ -1,13 +1,12 @@
+
+var sourceDir = '{{{ SOURCE_DIR }}}';   // Change this to... uh, your source directory.
 ####################### NODE START #######################
-
-var appName = '{{{ APP_NAME }}}',       // Change this to your app name.
-    sourceDir = '{{{ SOURCE_DIR }}}';   // Change this to... uh, your source directory.
-
-
-var fs = require('fs');
+var appName = '{{{ APP_NAME }}}';       // Change this to your app name.
 >>>>>>>>>>>>>>>>>>>>>>>> NODE END >>>>>>>>>>>>>>>>>>>>>>>>
 
+
 var express = require('express'),
+    fs = require('fs'),
     exec = require('child_process').exec,
     app = express();
 
@@ -18,18 +17,25 @@ app.get(/\/build[\/\w]*$/, function(req, res) {
   });
 });
 
-####################### NODE START #######################
 app.get(new RegExp('^/' + sourceDir + '/.*'), function(req, res) {
-  fs.readFile('.' + req.path, 'utf8', function(err, rawFileText) {
-    if (err) throw err;
+  findFile(req.path, function(err, fileText, path) {
+    if (err) {
+      console.log('404: ' + req.path);
+      res.send('Not Found', 404);
+      return;
+    }
     res.type('application/javascript');
-    res.send(nodeWrap(req.path, rawFileText));
+####################### NODE START #######################
+    fileText = nodeWrap(path, fileText);
+>>>>>>>>>>>>>>>>>>>>>>>> NODE END >>>>>>>>>>>>>>>>>>>>>>>>
+    res.send(fileText);
   });
 });
 
+-------------------- FIND_FILE INSERT --------------------
+
 -------------------- NODE_WRAP INSERT --------------------
 
->>>>>>>>>>>>>>>>>>>>>>>> NODE END >>>>>>>>>>>>>>>>>>>>>>>>
 
 app.use(express.static(__dirname));
 

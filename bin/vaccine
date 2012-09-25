@@ -38,6 +38,7 @@ vaccine_src=$vaccine_src_dir/vaccine.js
 standalone_server_src=$vaccine_src_dir/dev_server_standalone.js
 express_server_src=$vaccine_src_dir/dev_server_express.js
 node_wrap_src=$vaccine_src_dir/dev_server_node_wrap.js
+find_file_src=$vaccine_src_dir/dev_server_find_file.js
 build_src=$vaccine_src_dir/build
 build_node_src=$vaccine_src_dir/build_node
 
@@ -200,6 +201,8 @@ fi
 test -d vaccines || mkdir vaccines
 cd vaccines
 
+# Vaccines
+
 start $vaccine_src | clean > vaccine_loader.js
 vaccine_intermediate | clean > vaccine.js
 ordered_intermediate | clean > vaccine_already_ordered.js
@@ -209,14 +212,28 @@ ordered_intermediate | remove_sections RELATIVE |
 vaccine_intermediate | remove_sections RELATIVE |
     clean > vaccine_absolute_require.js
 
+
+# Servers
+
+start_server() {
+  start $1 | insert_section FIND_FILE $find_file_src
+}
+
 insert_node_wrap() {
   insert_section NODE_WRAP $node_wrap_src
 }
 
-start $express_server_src | remove_sections NODE | clean > dev_server_express.js
-start $express_server_src | insert_node_wrap | clean > dev_server_express_node.js
-start $standalone_server_src | remove_sections NODE | clean > dev_server_standalone.js
-start $standalone_server_src | insert_node_wrap | clean > dev_server_standalone_node.js
+start_server $express_server_src | remove_sections STANDALONE |
+    remove_sections NODE | clean > dev_server_express.js
+start_server $express_server_src | remove_sections STANDALONE |
+    insert_node_wrap | clean > dev_server_express_node.js
+start_server $standalone_server_src | remove_sections NODE |
+    clean > dev_server_standalone.js
+start_server $standalone_server_src | insert_node_wrap |
+    clean > dev_server_standalone_node.js
+
+
+# Builds
 
 start $build_src > build
 chmod +x build

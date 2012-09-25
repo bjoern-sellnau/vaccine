@@ -30,30 +30,16 @@ http.createServer(function (req, res) {
       res.end(stdout);
     });
   } else {
-    findFile(req.url, res, false);
-  }
-}).listen(3000, 'localhost');
-
-function findFile(path, res, lastCheck) {
-  fs.stat('.' + path, function(err, stats) {
-    if (err) {
-      if (lastCheck) return notFound(path, res);
-      var re = /\/(\w*)\.js$/,
-          match = re.exec(path);
-      if (!match) return notFound(path, res);
-      var dir = match[1],
-          replace = '/' + (dir ? dir + '/' : '') + 'index.js';
-      findFile(path.replace(re, replace), res, true);
-      return;
-    }
-    if (stats.isDirectory()) {
-      findFile(path + '/index.html', res, true);
-      return;
-    }
-
-    fs.readFile('.' + path, 'utf8', function(err, fileText) {
-      if (err) throw err;
-      var type = types[path.split('.').pop()];
+    findFile(req.url, function(err, fileText, path) {
+      if (err) {
+        console.log('404: ' + req.url);
+        res.writeHead(404, {'Content-Type': 'text/plain'});
+        res.end('404 Not Found\n');
+        return;
+      }
+      var ext = path.split('.').pop();
+      if (ext === path) ext = 'html';
+      var type = types[ext];
       if (!type) type = 'text/plain';
 ####################### NODE START #######################
       if (path.match(new RegExp('^.' + sourceDir + '/'))) {
@@ -63,14 +49,10 @@ function findFile(path, res, lastCheck) {
       res.writeHead(200, {'Content-Type': type});
       res.end(fileText);
     });
-  });
-}
+  }
+}).listen(3000, 'localhost');
+
+-------------------- FIND_FILE INSERT --------------------
 
 -------------------- NODE_WRAP INSERT --------------------
-
-function notFound(path, res) {
-  console.log('404: ' + path);
-  res.writeHead(404, {'Content-Type': 'text/plain'});
-  res.end('404 Not Found\n');
-}
 
