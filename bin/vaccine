@@ -181,6 +181,10 @@ vaccine_minimal() {
       unindent | clean
 }
 
+simplify() {
+  remove_sections RELATIVE | remove_sections INDEX
+}
+
 inject_vaccine() {
   vaccine_minimal | sed '$d' | sed "\$s#;#).s('$app_name', $global_var);#" |
       sed '1s/^/(/'
@@ -205,12 +209,12 @@ cd vaccines
 
 start $vaccine_src | clean > vaccine_loader.js
 vaccine_intermediate | clean > vaccine.js
-ordered_intermediate | clean > vaccine_already_ordered.js
+ordered_intermediate | clean > vaccine_ordered.js
+vaccine_intermediate | simplify |
+    clean > vaccine_simple.js
+ordered_intermediate | simplify |
+    clean > vaccine_simple_ordered.js
 vaccine_minimal > vaccine_minimal.js
-ordered_intermediate | remove_sections RELATIVE |
-    clean > vaccine_absolute_require_already_ordered.js
-vaccine_intermediate | remove_sections RELATIVE |
-    clean > vaccine_absolute_require.js
 
 
 # Servers

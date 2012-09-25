@@ -41,9 +41,9 @@ build_without() {
 }
 
 build vaccine.js > $v/with_vaccine.js
-build vaccine_already_ordered.js > $v/with_ordered.js
-build vaccine_absolute_require.js > $v/with_absolute_require.js
-build vaccine_absolute_require_already_ordered.js > $v/with_absolute_require_ordered.js
+build vaccine_ordered.js > $v/with_ordered.js
+build vaccine_simple.js > $v/with_simple.js
+build vaccine_simple_ordered.js > $v/with_simple_ordered.js
 build_without > $v/without_vaccine.js
 
 cp "$v/original.js" "$v/with_minimal.js"
@@ -55,15 +55,15 @@ cd $v
 original=$($vaccine --size-built original.js)
 without=$($vaccine --size-built without_vaccine.js)
 with=$($vaccine --size-built with_vaccine.js)
-with_already_ordered=$($vaccine --size-built with_ordered.js)
-with_absolute_require=$($vaccine --size-built with_absolute_require.js)
-with_absolute_require_ordered=$($vaccine --size-built with_absolute_require_ordered.js)
+with_ordered=$($vaccine --size-built with_ordered.js)
+with_simple=$($vaccine --size-built with_simple.js)
+with_simple_ordered=$($vaccine --size-built with_simple_ordered.js)
 with_minimal=$($vaccine --size-built with_minimal.js)
 
 size_vaccine=$($vaccine --size-built vaccine.js)
-size_already_ordered=$($vaccine --size-built vaccine_already_ordered.js)
-size_absolute_require=$($vaccine --size-built vaccine_absolute_require.js)
-size_absolute_require_ordered=$($vaccine --size-built vaccine_absolute_require_already_ordered.js)
+size_ordered=$($vaccine --size-built vaccine_ordered.js)
+size_simple=$($vaccine --size-built vaccine_simple.js)
+size_simple_ordered=$($vaccine --size-built vaccine_simple_ordered.js)
 
 compare() {
   if test "X$1" = "X--text"
@@ -79,9 +79,10 @@ compare() {
 }
 
 comp_vaccine=$(compare --text "$size_vaccine" $with $without)
-comp_already_ordered=$(compare --text "$size_already_ordered" $with_already_ordered $without)
-comp_absolute_require=$(compare --text "$size_absolute_require" $with_absolute_require $without)
-comp_absolute_require_ordered=$(compare --text "$size_absolute_require_ordered" $with_absolute_require_ordered $without)
+comp_ordered=$(compare --text "$size_ordered" $with_ordered $without)
+comp_simple=$(compare --text "$size_simple" $with_simple $without)
+comp_simple_ordered=$(compare --text "$size_simple_ordered" $with_simple_ordered $without)
+comp_minimal=$(compare $with_minimal $original)
 
 out() {
   type=$1
@@ -89,7 +90,7 @@ out() {
   min=$3
   gzip=$4
   gzip_percent=$5
-  printf '%33s:  %4s %4s %4s %6s\n' "$type" $text $min $gzip $gzip_percent
+  printf '%27s:  %4s %4s %4s %6s\n' "$type" $text $min $gzip $gzip_percent
 }
 
 out 'size types' text min gz 'gz-%'
@@ -97,17 +98,17 @@ echo ''
 out 'vaccine.js' $size_vaccine -
 out '(integrated) vaccine.js' $comp_vaccine
 echo ''
-out 'already_ordered' $size_already_ordered -
-out '(integrated) already_ordered' $comp_already_ordered
+out 'ordered' $size_ordered -
+out '(integrated) ordered' $comp_ordered
 echo ''
-out 'absolute_require' $size_absolute_require -
-out '(integrated) absolute_require' $comp_absolute_require
+out 'simple' $size_simple -
+out '(integrated) simple' $comp_simple
 echo ''
-out 'absolute_..._ordered' $size_absolute_require_ordered -
-out '(integrated) absolute_..._ordered' $comp_absolute_require_ordered
+out 'simple_ordered' $size_simple_ordered -
+out '(integrated) simple_ordered' $comp_simple_ordered
 echo ''
 out 'minimal' $($vaccine --size-built vaccine_minimal.js) -
-out '(integrated) minimal' $(compare $with_minimal $original)
+out '(integrated) minimal' $comp_minimal
 
 cd ..
 

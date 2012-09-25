@@ -75,9 +75,11 @@
 >>>>>>>>>>>>>>>>>>>>> OUT_OF_ORDER END >>>>>>>>>>>>>>>>>>>>>
       defn(require, module.exports, module);
       globalVaccine.s(id, module.exports);
+######################## INDEX START ########################
       if (id.match(/\/index$/)) {
         globalVaccine.s(id.replace(/\/index$/,''), module.exports);
       }
+>>>>>>>>>>>>>>>>>>>>>>>>> INDEX END >>>>>>>>>>>>>>>>>>>>>>>>>
 #################### OUT_OF_ORDER START ####################
     } catch (e) {
       if (e != require) throw e;
