@@ -18,7 +18,7 @@ files_list=$(echo "$files_list" | grep -v 'vaccine.*\.js')
 v=vaccines
 test -d $v && mv $v old_vaccines
 
-$vaccine --app my_app
+$vaccine configure my_app
 
 short_define() {
   sed 's/define(/d(/g'
@@ -47,23 +47,23 @@ build vaccine_simple_ordered.js > $v/with_simple_ordered.js
 build_without > $v/without_vaccine.js
 
 cp "$v/original.js" "$v/with_minimal.js"
-$vaccine --inject "$v/with_minimal.js" --app "$app_name" --global "$global_var"
+$vaccine inject "$v/with_minimal.js" --app "$app_name" --global "$global_var"
 
 
 cd $v
 
-original=$($vaccine --size-built original.js)
-without=$($vaccine --size-built without_vaccine.js)
-with=$($vaccine --size-built with_vaccine.js)
-with_ordered=$($vaccine --size-built with_ordered.js)
-with_simple=$($vaccine --size-built with_simple.js)
-with_simple_ordered=$($vaccine --size-built with_simple_ordered.js)
-with_minimal=$($vaccine --size-built with_minimal.js)
+original=$($vaccine built-size original.js)
+without=$($vaccine built-size without_vaccine.js)
+with=$($vaccine built-size with_vaccine.js)
+with_ordered=$($vaccine built-size with_ordered.js)
+with_simple=$($vaccine built-size with_simple.js)
+with_simple_ordered=$($vaccine built-size with_simple_ordered.js)
+with_minimal=$($vaccine built-size with_minimal.js)
 
-size_vaccine=$($vaccine --size-built vaccine.js)
-size_ordered=$($vaccine --size-built vaccine_ordered.js)
-size_simple=$($vaccine --size-built vaccine_simple.js)
-size_simple_ordered=$($vaccine --size-built vaccine_simple_ordered.js)
+size_vaccine=$($vaccine built-size vaccine.js)
+size_ordered=$($vaccine built-size vaccine_ordered.js)
+size_simple=$($vaccine built-size vaccine_simple.js)
+size_simple_ordered=$($vaccine built-size vaccine_simple_ordered.js)
 
 compare() {
   if test "X$1" = "X--text"
@@ -107,7 +107,7 @@ echo ''
 out 'simple_ordered' $size_simple_ordered -
 out '(integrated) simple_ordered' $comp_simple_ordered
 echo ''
-out 'minimal' $($vaccine --size-built vaccine_minimal.js) -
+out 'minimal' $($vaccine built-size vaccine_minimal.js) -
 out '(integrated) minimal' $comp_minimal
 
 cd ..

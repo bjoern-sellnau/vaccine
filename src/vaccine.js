@@ -36,7 +36,7 @@
         (this.w[id] || []).forEach(function(w) { w(); });
       }
     });
-    // Set your library with vaccine.s('mylib', mylib);
+    // Set your library with vaccine.s('{{{ APP_NAME }}}', {{{ GLOBAL_VAR }}});
 >>>>>>>>>>>>>>>>>>>>>>>> MINIMAL END >>>>>>>>>>>>>>>>>>>>>>>>
 
 ###################### RELATIVE START ######################

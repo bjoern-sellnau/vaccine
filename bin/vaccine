@@ -1,18 +1,25 @@
 #!/bin/sh
 
 help() {
-  echo 'vaccine
-        --inject [file]   # Inject vaccine into an existing file
-        --app [app]       # Your app or lib name
-        --src [dir]       # The directory for your sources
-        --lib [dir]       # The directory for your libraries (dependencies)
-        --global [name]   # The global variable for the file being injected
-        --size [dir]      # Calculate sizes. dir is your source directory.
+  echo 'vaccine <verb> <verb-argument> [options]
+
+Verbs: (Can be shortened if unambiguous)
+        configure <app>   # Build vaccines configured for app name.
+        inject <file>     # Inject vaccine into an existing file.
+        size <file/dir>   # Calculate sizes for sources in dir, or for file.
+        built-size <file> [compare]  # Compute file sizes for .min, .gz versions.
+
+Options:
+        --app <app>       # Your app or lib name.
+        --src <dir>       # The directory for your sources (default: src).
+        --lib <dir>       # The directory for your libraries (default: lib).
+        --global <name>   # The global variable for the file being injected.
+                          # (default: app name)
 
 Examples:
-  vaccine --app datazooka --src src --lib lib
-  vaccine --size src
-  vaccine --inject d3.js
+  vaccine configure datazooka --src src --lib lib   # src and lib are defaults
+  vaccine size src --app datazooka
+  vaccine inject underscore.js --global _
 '
 }
 
@@ -44,10 +51,11 @@ build_node_src=$vaccine_src_dir/build_node
 
 # Variables
 app_name=
+global_var=
 source_dir=src
 library_dir=lib
 
-vars_list='app_name source_dir library_dir'
+vars_list='app_name source_dir library_dir global_var'
 
 
 fail() {
@@ -55,80 +63,87 @@ fail() {
   exit 1
 }
 
-while test $# -gt 0
-do
-  case $1 in
-    --help | -h)
-      shift
-      help
-      exit 0
-      ;;
-    --app | -a)
-      shift
-      app_name=$1
-      ;;
-    --src)
-      shift
-      source_dir=$1
-      ;;
-    --lib)
-      shift
-      library_dir=$1
-      ;;
-    --size | -s)
-      shift
-      size_dir_or_file=$1
-      test "X$size_dir_or_file" = X && fail 'Must provide source directory or file'
-      ;;
-    --inject | -i)
-      shift
-      inject_file=$1
-      ;;
-    --global)
-      shift
-      global_var=$1
-      ;;
-    --size-built)
-      shift
-      $vaccine_bin_dir/size.sh $@
-      exit 0
-      ;;
-    *)
-      fail "Unrecognized option: $1"
-      ;;
-  esac
+case $1 in
+  --help | -h)
+    help
+    exit 0
+    ;;
+  c | co | con | conf | confi | config | configu | configur | configure)
+    command=configure
+    ;;
+  s | si | siz | size)
+    command=size
+    ;;
+  i | in | inj | inje | injec | inject)
+    command=inject
+    ;;
+  b | bu | bui | buil | built | built- | built-s | built-si | built-siz | built-size)
+    command=built-size
+    ;;
+  *)
+    fail "Unrecognized command: $1"
+    ;;
+esac
 
-  shift
-done
+shift
 
-if test "X$inject_file" != X -o "X$size_dir_or_file" != X
+if test $command = built-size
 then
-  if test "X$inject_file" != X
-  then
-    file=$inject_file
-  else
-    file=$size_dir_or_file
-  fi
-  derived_app_name=$(echo "$file" | sed -e 's#.*/##' -e 's/\..*$//')
-  if test "X$app_name" = X
-  then
-    app_name=$derived_app_name
-  fi
-  if test "X$global_var" = X
-  then
-    global_var=$app_name
-  fi
-fi
-
-if test "X$size_dir_or_file" != X
-then
-  $vaccine_bin_dir/size_test.sh "$size_dir_or_file" "$app_name" "$global_var"
+  $vaccine_bin_dir/size.sh $@
   exit 0
 fi
 
-if test "X$inject_file" = X
+if ! $(echo "$1" | grep -q "^-")
 then
-  test "X$app_name" = X && fail 'Must provide the name of app (option --app)'
+  argument=$1
+  shift
+fi
+
+if test "X$argument" != X
+then
+  if test $command = configure
+  then
+    app_name=$argument
+  else
+    dir_or_file=$argument
+  fi
+fi
+
+
+while test $# -gt 0
+do
+  case $1 in
+    --app) app_name=$2 ;;
+    --src) dir_or_file=$2; source_dir=$2 ;;
+    --lib) library_dir=$2 ;;
+    --global) global_var=$2 ;;
+    *) fail "Unrecognized option: $1" ;;
+  esac
+  shift 2
+done
+
+if test $command = size -o $command = inject
+then
+  if test "X$app_name" = X
+  then
+    app_name=$(echo "$dir_or_file" | sed -e 's#.*/##' -e 's/\..*$//')
+  fi
+fi
+
+if test "X$global_var" = X
+then
+  global_var=$app_name
+fi
+
+if test $command = size
+then
+  $vaccine_bin_dir/size_test.sh "$dir_or_file" "$app_name" "$global_var"
+  exit 0
+fi
+
+if test $command = configure
+then
+  test "X$app_name" = X && fail 'Must provide the name of app (vaccine configure app)'
 fi
 
 
@@ -190,13 +205,13 @@ inject_vaccine() {
       sed '1s/^/(/'
 }
 
-if test "X$inject_file" != X
+if test $command = inject
 then
-  if grep -q "window\.vaccine *=" $inject_file
+  if grep -q "window\.vaccine *=" "$dir_or_file"
   then
     echo 'vaccine already found'
   else
-    inject_vaccine >> $inject_file
+    inject_vaccine >> "$dir_or_file"
   fi
   exit 0
 fi
