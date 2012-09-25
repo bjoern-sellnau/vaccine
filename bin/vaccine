@@ -4,13 +4,13 @@ help() {
   echo 'vaccine
         --inject [file]   # Inject vaccine into an existing file
         --app [app]       # Your app or lib name
-        --main [path]     # The main script for your app (path from root)
+        --src [dir]       # The directory for your sources
         --lib [dir]       # The directory for your libraries (dependencies)
         --global [name]   # The global variable for the file being injected
         --size [dir]      # Calculate sizes. dir is your source directory.
 
 Examples:
-  vaccine --app datazooka --main src/index.js --lib lib
+  vaccine --app datazooka --src src --lib lib
   vaccine --size src
   vaccine --inject d3.js
 '
@@ -43,11 +43,10 @@ build_node_src=$vaccine_src_dir/build_node
 
 # Variables
 app_name=
-app_main=src/index
+source_dir=src
 library_dir=lib
-vaccine_path=vaccine.js    # The path to vaccine.js relative to build_node
 
-vars_list='app_name app_main app_main_module source_dir library_dir vaccine_path'
+vars_list='app_name source_dir library_dir'
 
 
 fail() {
@@ -67,9 +66,9 @@ do
       shift
       app_name=$1
       ;;
-    --main | -m)
+    --src)
       shift
-      app_main=$1
+      source_dir=$1
       ;;
     --lib)
       shift
@@ -129,13 +128,6 @@ fi
 if test "X$inject_file" = X
 then
   test "X$app_name" = X && fail 'Must provide the name of app (option --app)'
-
-  app_main=$(echo $app_main | sed 's/\.js$//')
-
-  app_main_module=$(echo $app_main | sed 's#.*/##')
-
-  source_dir=$(echo $app_main | sed 's#/[^/]*$##')
-  test "X$source_dir" = "X$app_main" && source_dir=.
 fi
 
 

@@ -1,15 +1,8 @@
-u###################### NODE START #######################
+####################### NODE START #######################
 
-var appName = '{{{ APP_NAME }}}';   // Change this to your app name.
+var appName = '{{{ APP_NAME }}}',       // Change this to your app name.
+    sourceDir = '{{{ SOURCE_DIR }}}';   // Change this to... uh, your source directory.
 
-// Change appMain to the location of your app's main/index file,
-// but without .js at the end.
-var appMain = '{{{ APP_MAIN }}}';
-
-
-var appMainSplit = appMain.split('/'),
-    appMainModule = appMainSplit.pop(),
-    sourceDir = appMainSplit.join('/') || '.';
 >>>>>>>>>>>>>>>>>>>>>>>> NODE END >>>>>>>>>>>>>>>>>>>>>>>>
 
 var http = require('http'),

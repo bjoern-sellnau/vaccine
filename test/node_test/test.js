@@ -2,7 +2,7 @@
 node_define('test_node_test_app', function(require) {
 
   var util = require('test_app/util'),
-      main = require('test_app/main'),
+      main = require('test_app/index'),
       results;
 
   results = main.execute();
