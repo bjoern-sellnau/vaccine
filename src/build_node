@@ -8,25 +8,13 @@ app_name='{{{ APP_NAME }}}'
 echo '(function() {"use strict";' # You can remove "use strict" if you like
 cat vaccine.js   # Output vaccine.js separately
 
-
 for file in $(find $source_dir -type f)
 do
   name="$app_name/$(echo "$file" | sed -e "s#^$source_dir/##" -e 's/\.js//')"
   echo "define('$name', function(require, exports, module) {"
   cat $file
   echo '});'
-
-  # Check for /index, and make it so
-  # require('$first_part') == require('$first_part/index')
-  if $(echo "$name" | grep -q '/index$')
-  then
-    first_part=$(echo "$name" | sed 's#/index$##')
-    echo "define('$first_part', function(require, exports, module) {"
-    echo "  module.exports = require('$name');"
-    echo '});'
-  fi
 done
-
 
 echo '}());'
 

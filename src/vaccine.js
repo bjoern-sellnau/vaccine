@@ -2,21 +2,11 @@
 ####################### LOADER START #######################
 (function() {
 
-  var appName = '{{{ APP_NAME }}}';   // Change this to your app name.
-
-  // Change appMain to the location of your app's main/index file,
-  // but without .js at the end.
-  var appMain = '{{{ APP_MAIN }}}';
+  var appName = '{{{ APP_NAME }}}',       // Change this to your app name.
+      sourceDir = '{{{ SOURCE_DIR }}}';   // Change this to... uh, your source directory.
 
   // Change libraryDir to the directory of your pre-built library dependencies.
   var libraryDir = '{{{ LIBRARY_DIR }}}';
-
-
-  // Figure out your app's main module based on the path to it (appMain).
-  // Also determine the source directory.
-  var appMainSplit = appMain.split('/'),
-      appMainModule = appMainSplit.pop(),
-      sourceDir = appMainSplit.join('/') || '.';
 
 
   // The scripts that are currently loading. Don't touch this.
@@ -85,6 +75,9 @@
 >>>>>>>>>>>>>>>>>>>>> OUT_OF_ORDER END >>>>>>>>>>>>>>>>>>>>>
       defn(require, module.exports, module);
       globalVaccine.s(id, module.exports);
+      if (id.match(/\/index$/)) {
+        globalVaccine.s(id.replace(/\/index$/,''), module.exports);
+      }
 #################### OUT_OF_ORDER START ####################
     } catch (e) {
       if (e != require) throw e;
@@ -95,9 +88,6 @@
           src,
           script;
       if (root === appName) {
-        if (!split.length) {
-          split.push(appMainModule);
-        }
         src = sourceDir + '/' + split.join('/');
       } else {
         src = libraryDir + '/' + root;

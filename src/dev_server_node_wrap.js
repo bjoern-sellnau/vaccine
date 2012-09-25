@@ -6,12 +6,5 @@ function nodeWrap(path, rawFileText) {
   compiled = 'define("' + fullModule + '", function(require, exports, module) {';
   compiled += rawFileText;
   compiled += '});';
-  if (fullModule.match(/\/index$/)) {
-    var firstPart = fullModule.replace(/\/index$/, '');
-    compiled += '\n';
-    compiled += 'define("' + firstPart + '", function(require, exports, module) {\n';
-    compiled += '  module.exports = require("' + fullModule + '");\n';
-    compiled += '});\n';
-  }
   return compiled;
 }

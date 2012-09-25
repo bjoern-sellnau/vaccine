@@ -30,18 +30,26 @@ http.createServer(function (req, res) {
       res.end(stdout);
     });
   } else {
-    findFile(req.url, res);
+    findFile(req.url, res, false);
   }
 }).listen(3000, 'localhost');
 
-function findFile(path, res) {
+function findFile(path, res, lastCheck) {
   fs.stat('.' + path, function(err, stats) {
-    if (err) return notFound(path, res);
-    if (stats.isDirectory()) {
-      findFile(path + '/index.html', res);
+    if (err) {
+      if (lastCheck) return notFound(path, res);
+      var re = /\/(\w*)\.js$/,
+          match = re.exec(path);
+      if (!match) return notFound(path, res);
+      var dir = match[1],
+          replace = '/' + (dir ? dir + '/' : '') + 'index.js';
+      findFile(path.replace(re, replace), res, true);
       return;
     }
-    if (!stats.isFile()) return notFound(path, res);
+    if (stats.isDirectory()) {
+      findFile(path + '/index.html', res, true);
+      return;
+    }
 
     fs.readFile('.' + path, 'utf8', function(err, fileText) {
       if (err) throw err;
