@@ -21,7 +21,7 @@ function define(id, defn) {
       (this.w[id] || []).forEach(function(w) { w(); });
     }
   });
-  // Set your library with vaccine.s('mylib', mylib);
+  // Set your library with vaccine.s('my_app', my_app);
 
   var parts = id.split('/');
 
@@ -51,6 +51,9 @@ function define(id, defn) {
   try {
     defn(require, module.exports, module);
     globalVaccine.s(id, module.exports);
+    if (id.match(/\/index$/)) {
+      globalVaccine.s(id.replace(/\/index$/,''), module.exports);
+    }
   } catch (e) {
     if (e != require) throw e;
     (globalVaccine.w[require.id] || (globalVaccine.w[require.id] = []))

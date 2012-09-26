@@ -21,7 +21,7 @@ function define(id, defn) {
       (this.w[id] || []).forEach(function(w) { w(); });
     }
   });
-  // Set your library with vaccine.s('mylib', mylib);
+  // Set your library with vaccine.s('my_app', my_app);
 
 
   var module = {exports: {}};
