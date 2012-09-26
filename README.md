@@ -37,16 +37,19 @@ NPM Install
 -----------
 
 You can also install vaccine with `npm`. This creates a binary that lets
-you configure vaccine scripts for your app. Calling `vaccine` with
-`--app MyAppName` will create a directory called `vaccines` with various
-scripts you can use. See `vaccine --help` to get a list of options.
+you configure vaccine scripts for your app. Calling `vaccine configure
+my_app_name` will create a directory called `vaccines` with various scripts you
+can use. See `vaccine --help` to get a list of options.
 
 ```sh
+# Install the vaccine binary
 $ npm install -g vaccine
-$ vaccine --app MyAppName --main src/my/app/main/file.js
+
+# Configure vaccine for your app (--src defaults to src/, --lib to lib)
+$ vaccine configure my_app_name --src path/to/my/sources --lib libraries
 
 # Pick out scripts to use
-$ cp vaccines/vaccine.js src
+$ cp vaccines/vaccine.js path/to/my/sources
 $ cp vaccines/build .
 $ cp vaccines/vaccine_loader.js .
 $ cp vaccines/dev_server_standlone.js .
@@ -132,26 +135,34 @@ define('my_app/examples/fun', function(require, exports, module) {
 });
 ```
 
-Since you will probably want to take advantage of relative requires in your
-app's main module, it is common to see this type of pattern:
+### Index modules ###
+
+If you define a module that ends in `/index`, then it will also set the
+module without that suffix to the same name. It is best practice to require
+the id *without* the `/index`, but define the module *with* it. The advantage
+of doing it this way is that you can use a relative require within the
+index module, and it will work as expected.
 
 ```javascript
+// define with '/index'
+define('my_lib/util/index', function(require, exports, module) {
+  var logger = require('./logger'),
+      mailer = require('./mailer'),
 
-define('my_app', function(require, exports, module) {
-
-  // Relative requires, such as require('./util'), work unexpectedly by
-  // requiring a top-level module ('util' instead of 'my_app/util').
-  module.exports = require('my_app/main');
+  module.exports = {
+    logger: logger,
+    mailer: mailer,
+  };
 });
 
-define('my_app/main', function(require, exports, module) {
-  var util = require('./util');   // 'my_app/util'
+define('my_lib/index', function(require, exports, module) {
+  var util = require('./util');  // require without '/index'
 
-  // The module.exports object will be returned from
-  // require('my_app'), due to the small define above.
+  util.logger.log('Cool this works...');
   ...
-  // Set exports or module.exports
 });
+
+// my_lib can now be required with: require('my_lib');
 ```
 
 ### Things to know ###
@@ -178,17 +189,8 @@ to use vaccine.
 One way to develop with vaccine is to develop with the built file that
 includes your sources and vaccine.js. This could be done manually
 (which would get annoying) with a separate build step before refreshing a page.
-However, vaccine comes with a simple development server
-(dev_server_standalone.js) that can build on the fly, so you can just refresh.
-
-The one requirement with the various dev_server_*.js files, is that you must
-have a `build` file somewhere that will output (on stdout) the exact text of
-your compiled app when called. So you can't have the `build` file save directly
-into your file (as shown above). Instead, do this:
-
-```sh
-$ ./build > my_app.js
-```
+However, vaccine comes with development servers (dev_server_*.js) that can
+build on the fly, so you can just refresh.
 
 ### Separate scripts ###
 
@@ -199,7 +201,8 @@ sure that `vaccine.js` is first in this case.
 
 Vaccine comes with a loader version that automatically loads your modules.
 Just copy down [vaccine_loader.js](https://github.com/jakesandlund/vaccine/blob/master/vaccine_loader.js)
-and edit some of the variables at the top of the file.
+and edit some of the variables at the top of the file. Or you can use the
+`vaccine` binary, described above.
 
 ```sh
 $ curl -O https://raw.github.com/jakesandlund/vaccine/master/vaccine_loader.js
@@ -215,6 +218,52 @@ Then use it in your html files like this:
      script below vaccine_loader. Like so: -->
 <script>vaccine_load("/full/path/to/script.js");</script>
 ```
+
+Things to know:
+
+* This loader is for development purposes only! When you go to combine your
+  files, make sure you are not using vaccine_loader.js.
+* The loader is meant to go with any of the development servers (described
+  below). It will not work with `python -m SimpleHTTPServer` or equivalent.
+  This is because when you `require('my_app/pkg')`, it will make a request
+  for `source_dir/pkg.js`, even if the file is actually
+  `source_dir/pkg/index.js`. The dev servers sort this out.
+
+Development Servers
+-------------------
+
+Vaccine comes with a few choices for development servers to easily serve
+your scripts and static files. These have a number of capabilities:
+
+* Serve static files, including pre-built JavaScript sources, and `index.html`
+  for directories.
+* Serve a built-on-the-fly version of your compiled app/lib.
+* Work with vaccine_loader.js to find the '/index' versions of modules.
+* For the '_node' versions, wrap the node modules in `define` calls.
+
+For the build-on-the-fly functionality, put `script` tags in your html
+with the name/path of an executable that will output (on stdout) the exact text
+of your compiled app when called.
+
+```html
+<script src="/build_your_app_on"></script>
+```
+
+You can't have the build script save directly into your file (as shown at the
+beginning of this README). Instead, do this when you want to compile your
+file:
+
+```sh
+$ ./build > my_app.js
+```
+
+The build script must have "build" as the prefix to the path/name.
+Any of these will work:
+
+* build
+* build_my_app.sh
+* build/with/uglifyjs
+* build_scripts/production
 
 Node / CommonJS Files
 ---------------------
@@ -337,23 +386,23 @@ Running this on [DataZooka](http://www.datazooka.com), a tool I am developing
 that uses vaccine, I get the following output: (the size is ~12k gzipped)
 
 ```sh
-$ vaccine --size src --app datazooka
-                       size types:  text  min   gz   gz-%
+vaccine size src --app datazooka
+                 size types:  text  min   gz   gz-%
 
-                       vaccine.js:  1655  530  340      -
-          (integrated) vaccine.js:  1655  519  236  2.00%
+                 vaccine.js:  1761  591  363      -
+    (integrated) vaccine.js:  1761  580  259  2.19%
 
-                  already_ordered:  1350  421  287      -
-     (integrated) already_ordered:  1350  415  178  1.51%
+                    ordered:  1456  482  310      -
+       (integrated) ordered:  1456  476  201  1.70%
 
-                 absolute_require:  1207  338  221      -
-    (integrated) absolute_require:  1207  327  133  1.12%
+                     simple:  1209  338  221      -
+        (integrated) simple:  1209  327  137  1.16%
 
-             absolute_..._ordered:   902  229  167      -
-(integrated) absolute_..._ordered:   902  223   84  0.71%
+             simple_ordered:   904  229  167      -
+(integrated) simple_ordered:   904  223   85  0.72%
 
-                          minimal:   607  116  109      -
-             (integrated) minimal:   583  143   54  0.46%
+                    minimal:   609  116  109      -
+       (integrated) minimal:   583  143   55  0.47%
 ```
 
 The *integrated* lines are the ones where it compares the size of your app with
