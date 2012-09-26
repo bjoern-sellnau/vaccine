@@ -28,7 +28,7 @@ this (or use the provided
 $ file=my_app.js          # Whatever you want your compiled file to be called
 $ echo '(function() {' > $file
 $ cat src/* > $file       # Concatenate all source files and vaccine.js
-$ echo '}());'
+$ echo '}());' > $file
 ```
 
 Your compiled app now works with vaccine's module syntax. It's that easy!
@@ -59,9 +59,9 @@ $ rm -r vaccines
 ```
 
 In other places in this README I will make reference to copying a file.
-This can be done by `curl`ing github or by creating a `vaccines` folder.
-The [root](https://github.com/jakesandlund/vaccine) directory for vaccine
-is actually built using the `vaccine` binary.
+This can be done by `curl`ing github or by creating a `vaccines` folder with
+the binary. The [root](https://github.com/jakesandlund/vaccine) directory for
+vaccine is actually built using the `vaccine` binary.
 
 Define and Require
 ------------------
@@ -105,8 +105,8 @@ define('runner', function(require, exports, module) {
 ```
 
 The module name/id given to `define` is the full name, so be careful that no two
-modules use the same name. It is best to prefix your module names with the
-name of your app or lib, separated by a slash.
+modules use the same name. **It is important to prefix your module names with
+the name of your app or lib, separated by a slash**.
 
 ### Relative require ###
 
@@ -138,7 +138,7 @@ define('my_app/examples/fun', function(require, exports, module) {
 ### Index modules ###
 
 If you define a module that ends in `/index`, then it will also set the
-module without that suffix to the same name. It is best practice to require
+module without that suffix to the same object. It is best practice to require
 the id *without* the `/index`, but define the module *with* it. The advantage
 of doing it this way is that you can use a relative require within the
 index module, and it will work as expected.
@@ -167,14 +167,17 @@ define('my_lib/index', function(require, exports, module) {
 
 ### Things to know ###
 
-* The `define`'s can be in any order.
+* The `define`'s can be in any order (for the full version of vaccine.js).
+* The module id's passed to `define` are global, so make sure that there
+  are no collisions by using your app/lib name as a prefix.
+* Don't use ".js" at the end of module ids.
 * Circular dependencies are not supported. However, as long as you let the
   module's function return, you can call require at some later point to get
-  it.
+  a module's object.
 * The `require` currently works by using exceptions (try, catch, throw). This
   means that you should not have any side effects before a `require` call
-  for a module that isn't yet defined. I do not see this being a problem,
-  as it is common practice to keep requires at the top of a module.
+  for a module that isn't yet defined. This shouldn't be a problem,
+  as it is common practice to keep requires at the top of a module anyway.
 
 Developing With Vaccine
 -----------------------
@@ -186,10 +189,10 @@ to use vaccine.
 
 ### With a built file ###
 
-One way to develop with vaccine is to develop with the built file that
+One workflow is to develop with the built file that
 includes your sources and vaccine.js. This could be done manually
 (which would get annoying) with a separate build step before refreshing a page.
-However, vaccine comes with development servers (dev_server_*.js) that can
+However, vaccine comes with development servers (`dev_server_*.js`) that can
 build on the fly, so you can just refresh.
 
 ### Separate scripts ###
@@ -223,7 +226,7 @@ Things to know:
 
 * This loader is for development purposes only! When you go to combine your
   files, make sure you are not using vaccine_loader.js.
-* The loader is meant to go with any of the development servers (described
+* The loader is meant to be used with any of the development servers (described
   below). It will not work with `python -m SimpleHTTPServer` or equivalent.
   This is because when you `require('my_app/pkg')`, it will make a request
   for `source_dir/pkg.js`, even if the file is actually
@@ -232,7 +235,7 @@ Things to know:
 Development Servers
 -------------------
 
-Vaccine comes with a few choices for development servers to easily serve
+Vaccine comes with a few choices for development servers to serve
 your scripts and static files. These have a number of capabilities:
 
 * Serve static files, including pre-built JavaScript sources, and `index.html`
@@ -241,12 +244,25 @@ your scripts and static files. These have a number of capabilities:
 * Work with vaccine_loader.js to find the "/index" versions of modules.
 * For the "_node" versions, wrap the node modules in `define` calls.
 
+If you want to use the [express](http://expressjs.com/) versions, you must
+first install express:
+
+```sh
+$ npm install express
+```
+
+Run the servers with Node.js:
+
+```sh
+$ node dev_server_standalone.js
+```
+
 For the build-on-the-fly functionality, put `script` tags in your html
 with the name/path of an executable that will output (on stdout) the exact text
 of your compiled app when called.
 
 ```html
-<script src="/build_your_app_on"></script>
+<script src="/build_your_app"></script>
 ```
 
 You can't have the build script save directly into your file (as shown at the
@@ -269,14 +285,14 @@ Node / CommonJS Files
 ---------------------
 
 If you want to have your modules be CommonJS compliant, there is a slightly
-more complicated (but still only ~20 lines of code) way to build your
+more complicated (but still only ~13 lines of code) way to build your
 app/lib.
 
 With this build script, simply leave out the `define` wrapper and use
 require, exports, and module as you would in any other CommonJS file. The module
-id is determined by your app name and each files path on your file system.
-Also make sure that the string passed to `require` does not end in ".js", and
-that it would work when you wrap the file in a `define` call.
+id is determined by each file's path on your file system, prefixed by your
+app name. Also make sure that the string passed to `require` does not end in
+".js", and that it would work when you wrap the file in a `define` call.
 
 `dev_server_standalone_node.js` and `dev_server_express_node.js` can be used
 to compile your app/lib on the fly. As an added bonus, it will even wrap the
@@ -287,7 +303,7 @@ Vaccine Variations
 ------------------
 
 Vaccine comes in different variations. Each one suits a different need.
-The full version (but without the loader) is only ~50 lines of code, and
+The full version (but without the loader) is only ~40 lines of code, and
 other versions are even less.
 
 ### vaccine_minimal.js ###
@@ -335,7 +351,7 @@ add support by copying vaccine_minimal.js to the bottom of their lib, and
 adding a line like above.
 
 Even easier, the `vaccine` binary has a way to do this with the `inject`
-action:
+command:
 
 ```sh
 $ vaccine inject lib_file.js   # You can also use the --app and --global options.
@@ -363,7 +379,7 @@ order.
 ### vaccine_(*Your vaccine type here*).js ###
 
 Lastly, vaccine is meant to be simple enough that you can easily make any
-changes you want. The two rules are don't break the global `vaccine` api (in
+changes you want. The two rules are:  don't break the global `vaccine` api (in
 vaccine_minimal.js), and don't add any other global functionality. Other than
 that, anything is game.
 
@@ -377,9 +393,9 @@ Vaccine aims to be as small as possible, so if you see a way to save a
 byte, let me know.
 
 If you use the `vaccine` binary, you can figure out how much vaccine will
-add to the size of your library app by running the line below. Your modules
-need to already be in vaccine `define` format for accurate size measurements
-(besides minimal, which doesn't require that).
+add to the size of your library/app by running the line below. Your modules
+need to be in vaccine `define` format for accurate size measurements
+(besides minimal, which doesn't have that requirement).
 
 ```sh
 $ vaccine size src [--app my_app ...]   # src is the location of your source files
@@ -409,11 +425,11 @@ vaccine size src --app datazooka
 ```
 
 The *integrated* lines are the ones where it compares the size of your app with
-and without vaccine. As you can see, while vaccine is small to begin with, it
+and without vaccine. While vaccine is small to begin with, it
 gets even smaller when gzipped with your sources, due to the way compression
 works.
 
-The reason "integrated" minimal is larger for both text and minified sizes
+The reason "integrated" minimal is larger for the minified sizes
 is because it uses `vaccine inject app.js` which (effectively) adds a line
 like `vaccine.set('my_app', my_app_global);`.
 
