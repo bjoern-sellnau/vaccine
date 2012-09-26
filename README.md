@@ -238,8 +238,8 @@ your scripts and static files. These have a number of capabilities:
 * Serve static files, including pre-built JavaScript sources, and `index.html`
   for directories.
 * Serve a built-on-the-fly version of your compiled app/lib.
-* Work with vaccine_loader.js to find the '/index' versions of modules.
-* For the '_node' versions, wrap the node modules in `define` calls.
+* Work with vaccine_loader.js to find the "/index" versions of modules.
+* For the "_node" versions, wrap the node modules in `define` calls.
 
 For the build-on-the-fly functionality, put `script` tags in your html
 with the name/path of an executable that will output (on stdout) the exact text
@@ -334,28 +334,31 @@ If you are using libaries that do not have support for vaccine, you can easily
 add support by copying vaccine_minimal.js to the bottom of their lib, and
 adding a line like above.
 
-Even easier, the `vaccine` binary has a way to do this with the `--inject`
-option:
+Even easier, the `vaccine` binary has a way to do this with the `inject`
+action:
 
 ```sh
-$ vaccine -i lib_file.js     # You can also use the --app and --global options.
+$ vaccine inject lib_file.js   # You can also use the --app and --global options.
 ```
 
-### vaccine_already_ordered.js ###
+### vaccine_ordered.js ###
 
 To save a few bytes and split seconds to the run time, you can use this
 version if the modules are defined in order. In order means that every
 call to `require` must be to a module that has already been defined.
 
-### vaccine_absolute_require.js ###
+### vaccine_simple.js ###
 
-This version is vaccine.js but without support for relative requires. To
-use this, every module id must be typed out in full when calling `require`.
+This version is vaccine.js but without support for relative requires and
+the "/index" hook. To use this, every module id must be typed out in full
+when calling `require`. Also, defining "my_app/index" does not also define
+"my_app".
 
-### vaccine_absolute_require_already_ordered.js ###
+### vaccine_simple_ordered.js ###
 
 This is the combination of the above two versions. You must use full module
-ids for `require`, and define everything in order.
+ids for `require`, not rely on the "/index" trick, and define everything in
+order.
 
 ### vaccine_(*Your vaccine type here*).js ###
 
@@ -365,7 +368,7 @@ vaccine_minimal.js), and don't add any other global functionality. Other than
 that, anything is game.
 
 If you think you have some changes that other people might like, send a
-pull request, and I may support it if there is enough interest.
+pull request, and I might support it if there is enough interest.
 
 Vaccine Size
 ------------
@@ -379,7 +382,7 @@ need to already be in vaccine `define` format for accurate size measurements
 (besides minimal, which doesn't require that).
 
 ```sh
-$ vaccine --size src        # the location of your source files
+$ vaccine size src [--app my_app ...]   # src is the location of your source files
 ```
 
 Running this on [DataZooka](http://www.datazooka.com), a tool I am developing
@@ -411,8 +414,8 @@ gets even smaller when gzipped with your sources, due to the way compression
 works.
 
 The reason "integrated" minimal is larger for both text and minified sizes
-is because it uses `vaccine --inject app.js` which (effectively) adds a line
-like `vaccine.set('my_app', my_app);`.
+is because it uses `vaccine inject app.js` which (effectively) adds a line
+like `vaccine.set('my_app', my_app_global);`.
 
 Note that the gz-% column shows the percentage increase of your gzipped
 app when adding vaccine. The percentage of bytes that make up vaccine
