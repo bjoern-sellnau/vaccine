@@ -10,7 +10,7 @@ var express = require('express'),
     exec = require('child_process').exec,
     app = express();
 
-app.get(/\/build[\/\w]*$/, function(req, res) {
+app.get(/^\/build[\/\w]*\.?\w*$/, function(req, res) {
   exec('.' + req.path, function(err, stdout) {
     res.type('application/javascript');
     res.send(stdout);

@@ -23,7 +23,7 @@ types = {
 };
 
 http.createServer(function (req, res) {
-  if (req.url.match(/\/build[\/\w]*$/)) {
+  if (req.url.match(/^\/build[\/\w]*\.?\w*$/)) {
     exec('.' + req.url, function(err, stdout) {
       if (err) return notFound(req.url, res);
       res.writeHead(200, {'Content-Type': 'application/javascript'});
