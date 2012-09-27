@@ -1,5 +1,5 @@
 
-define('test_app/main', function(require) {
+define('test_app/index', function(require) {
 
   var counter = require('util/counter'),
       simple = require('./simple'),

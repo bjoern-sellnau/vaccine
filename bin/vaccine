@@ -45,7 +45,7 @@ vaccine_src=$vaccine_src_dir/vaccine.js
 standalone_server_src=$vaccine_src_dir/dev_server_standalone.js
 express_server_src=$vaccine_src_dir/dev_server_express.js
 node_wrap_src=$vaccine_src_dir/dev_server_node_wrap.js
-find_file_src=$vaccine_src_dir/dev_server_find_file.js
+common_server_src=$vaccine_src_dir/dev_server_common.js
 build_src=$vaccine_src_dir/build
 build_node_src=$vaccine_src_dir/build_node
 
@@ -235,7 +235,7 @@ vaccine_minimal > vaccine_minimal.js
 # Servers
 
 start_server() {
-  start $1 | insert_section FIND_FILE $find_file_src
+  start $1 | insert_section COMMON $common_server_src
 }
 
 insert_node_wrap() {

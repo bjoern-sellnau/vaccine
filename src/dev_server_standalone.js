@@ -25,13 +25,13 @@ types = {
 http.createServer(function (req, res) {
   if (req.url.match(/^\/build[\/\w]*\.?\w*$/)) {
     exec('.' + req.url, function(err, stdout) {
-      if (err) return notFound(req.url, res);
+      if (err) return notFound(err, req.url, res);
       res.writeHead(200, {'Content-Type': 'application/javascript'});
       res.end(stdout);
     });
   } else {
     findFile(req.url, function(err, fileText, path) {
-      if (err) return notFound(req.url, res);
+      if (err) return notFound(err, req.url, res);
       var ext = path.split('.').pop();
       if (ext === path) ext = 'html';
       var type = types[ext];
@@ -47,13 +47,7 @@ http.createServer(function (req, res) {
   }
 }).listen(3000, 'localhost');
 
-function notFound(path, res) {
-  console.log('404: ' + path);
-  res.writeHead(404, {'Content-Type': 'text/plain'});
-  res.end('404 Not Found\n');
-}
-
--------------------- FIND_FILE INSERT --------------------
+--------------------- COMMON INSERT ---------------------
 
 -------------------- NODE_WRAP INSERT --------------------
 

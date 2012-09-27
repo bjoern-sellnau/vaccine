@@ -1,3 +1,10 @@
+function notFound(err, path, res) {
+  if (err !== true) console.log(err);
+  console.log('404: ' + path);
+  res.writeHead(404, {'Content-Type': 'text/plain'});
+  res.end('404 Not Found\n');
+}
+
 function findFile(path, callback, lastCheck) {
   fs.stat('.' + path, function(err, stats) {
     if (err) {
