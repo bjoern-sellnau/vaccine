@@ -1,4 +1,3 @@
-
 .PHONY: configure test build size
 
 all: configure size
@@ -25,4 +24,3 @@ build-test:
 	cd test; ./build_util > test_lib/util.js
 	cd test; ./build > test_already_built.js
 	cd test; ./build_node > test_already_built_node.js
-

@@ -1,4 +1,3 @@
-
 define('test_app/complex', function(require, e, module) {
 
   var util = require('util'),
@@ -70,4 +69,3 @@ define('test_app/complex', function(require, e, module) {
   };
 
 });
-

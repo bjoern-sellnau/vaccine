@@ -1,4 +1,3 @@
-
 define('test_app/index', function(require) {
 
   var counter = require('util/counter'),
@@ -19,4 +18,3 @@ define('test_app/index', function(require) {
   console.log('Failed: ' + counts.failed);
 
 });
-

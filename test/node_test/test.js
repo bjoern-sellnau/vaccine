@@ -1,4 +1,3 @@
-
 node_define('test_node_test_app', function(require) {
 
   var util = require('test_app/util'),
@@ -14,4 +13,3 @@ node_define('test_node_test_app', function(require) {
   util.log(require('test_app') === main ? 'PASS' : 'FAIL');
 
 });
-

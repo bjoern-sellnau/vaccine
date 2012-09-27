@@ -1,4 +1,3 @@
-
 var sourceDir = '{{{ SOURCE_DIR }}}';   // Change this to... uh, your source directory.
 ####################### NODE START #######################
 var appName = '{{{ APP_NAME }}}';       // Change this to your app name.
@@ -37,4 +36,3 @@ app.get(new RegExp('^/' + sourceDir + '/.*'), function(req, res) {
 app.use(express.static(__dirname));
 
 app.listen(3000);
-

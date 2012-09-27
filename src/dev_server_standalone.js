@@ -1,10 +1,9 @@
 ####################### NODE START #######################
-
 var appName = '{{{ APP_NAME }}}',       // Change this to your app name.
     sourceDir = '{{{ SOURCE_DIR }}}';   // Change this to... uh, your source directory.
 
->>>>>>>>>>>>>>>>>>>>>>>> NODE END >>>>>>>>>>>>>>>>>>>>>>>>
 
+>>>>>>>>>>>>>>>>>>>>>>>> NODE END >>>>>>>>>>>>>>>>>>>>>>>>
 var http = require('http'),
     fs = require('fs'),
     exec = require('child_process').exec,
@@ -50,4 +49,3 @@ http.createServer(function (req, res) {
 --------------------- COMMON INSERT ---------------------
 
 -------------------- NODE_WRAP INSERT --------------------
-
