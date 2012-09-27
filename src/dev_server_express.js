@@ -11,7 +11,7 @@ var express = require('express'),
     app = express();
 
 app.get(/^\/build[\/\w]*\.?\w*$/, function(req, res) {
-  exec('.' + req.path, function(err, stdout) {
+  exec('.' + req.path, {maxBuffer: 1024*1024}, function(err, stdout) {
     if (err) return notFound(err, req.path, res);
     res.type('application/javascript');
     res.send(stdout);

@@ -24,7 +24,7 @@ types = {
 
 http.createServer(function (req, res) {
   if (req.url.match(/^\/build[\/\w]*\.?\w*$/)) {
-    exec('.' + req.url, function(err, stdout) {
+    exec('.' + req.url, {maxBuffer: 1024*1024}, function(err, stdout) {
       if (err) return notFound(err, req.url, res);
       res.writeHead(200, {'Content-Type': 'application/javascript'});
       res.end(stdout);
