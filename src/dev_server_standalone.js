@@ -31,12 +31,7 @@ http.createServer(function (req, res) {
     });
   } else {
     findFile(req.url, function(err, fileText, path) {
-      if (err) {
-        console.log('404: ' + req.url);
-        res.writeHead(404, {'Content-Type': 'text/plain'});
-        res.end('404 Not Found\n');
-        return;
-      }
+      if (err) return notFound(req.url, res);
       var ext = path.split('.').pop();
       if (ext === path) ext = 'html';
       var type = types[ext];
@@ -51,6 +46,12 @@ http.createServer(function (req, res) {
     });
   }
 }).listen(3000, 'localhost');
+
+function notFound(path, res) {
+  console.log('404: ' + path);
+  res.writeHead(404, {'Content-Type': 'text/plain'});
+  res.end('404 Not Found\n');
+}
 
 -------------------- FIND_FILE INSERT --------------------
 

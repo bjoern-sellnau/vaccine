@@ -12,6 +12,7 @@ var express = require('express'),
 
 app.get(/^\/build[\/\w]*\.?\w*$/, function(req, res) {
   exec('.' + req.path, function(err, stdout) {
+    if (err) return notFound(req.path, res);
     res.type('application/javascript');
     res.send(stdout);
   });
@@ -19,11 +20,7 @@ app.get(/^\/build[\/\w]*\.?\w*$/, function(req, res) {
 
 app.get(new RegExp('^/' + sourceDir + '/.*'), function(req, res) {
   findFile(req.path, function(err, fileText, path) {
-    if (err) {
-      console.log('404: ' + req.path);
-      res.send('Not Found', 404);
-      return;
-    }
+    if (err) return notFound(req.path, res);
     res.type('application/javascript');
 ####################### NODE START #######################
     fileText = nodeWrap(path, fileText);
@@ -31,6 +28,11 @@ app.get(new RegExp('^/' + sourceDir + '/.*'), function(req, res) {
     res.send(fileText);
   });
 });
+
+function notFound(path, res) {
+  console.log('404: ' + path);
+  res.send('Not Found', 404);
+}
 
 -------------------- FIND_FILE INSERT --------------------
 
