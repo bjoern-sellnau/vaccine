@@ -1,0 +1,25 @@
+<body>
+<script>
+  var preGlobals = [],
+      globals = [],
+      ul,
+      lis,
+      i;
+  for (i in window) {
+    preGlobals.push(i);
+  }
+</script>
+<script src="your_app_with_exposed_globals.js"></script>
+<script>
+  for (i in window) {
+    if (preGlobals.indexOf(i) === -1) globals.push(i);
+  }
+  ul = document.createElement('ul');
+  lis = '';
+  for (i = 0; i < globals.length; i++) {
+    lis += '<li>' + globals[i] + '</li>';
+  }
+  ul.innerHTML = lis;
+  document.body.appendChild(ul);
+</script>
+</body>

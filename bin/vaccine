@@ -68,7 +68,10 @@ case $1 in
     help
     exit 0
     ;;
-  c | co | con | conf | confi | config | configu | configur | configure)
+  conv | conve | conver | convert)
+    command=convert
+    ;;
+  conf | confi | config | configu | configur | configure)
     command=configure
     ;;
   s | si | siz | size)
@@ -90,7 +93,7 @@ shift
 if test $command = built-size
 then
   $vaccine_bin_dir/size.sh $@
-  exit 0
+  exit $?
 fi
 
 if ! $(echo "$1" | grep -q "^-")
@@ -101,12 +104,12 @@ fi
 
 if test "X$argument" != X
 then
-  if test $command = configure
-  then
-    app_name=$argument
-  else
-    dir_or_file=$argument
-  fi
+  case $command in
+    configure) app_name=$argument ;;
+    convert) globals_list=$argument ;;
+    inject) dir_or_file=$argument ;;
+    size) dir_or_file=$argument ;;
+  esac
 fi
 
 
@@ -117,6 +120,8 @@ do
     --src) dir_or_file=$2; source_dir=$2 ;;
     --lib) library_dir=$2 ;;
     --global) global_var=$2 ;;
+    --globals) globals_list=$2 ;;
+    --sources-list) sources_list=$2 ;;
     *) fail "Unrecognized option: $1" ;;
   esac
   shift 2
@@ -138,7 +143,13 @@ fi
 if test $command = size
 then
   $vaccine_bin_dir/size_test.sh "$dir_or_file" "$app_name" "$global_var"
-  exit 0
+  exit $?
+fi
+
+if test $command = convert
+then
+  $vaccine_bin_dir/convert.sh "$globals_list" "$sources_list"
+  exit $?
 fi
 
 if test $command = configure
@@ -213,7 +224,7 @@ then
   else
     inject_vaccine >> "$dir_or_file"
   fi
-  exit 0
+  exit $?
 fi
 
 
