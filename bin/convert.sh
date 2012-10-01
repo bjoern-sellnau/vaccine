@@ -1,8 +1,10 @@
 #!/bin/sh
 
-global=$1
-globals=$(cat "$2" | grep -v "^$global$")
-sources=$(cat "$3")
+app_name=$1
+global=$2
+source_dir=$3
+globals=$(cat "$4" | grep -v "^$global$")
+sources=$(cat "$5")
 
 all_globals=$(echo "$globals")
 all_exports=$(echo "$sources" | sed 's/$/:/')
@@ -23,11 +25,6 @@ add_to_exports() {
   all_exports=$(echo "$all_exports" | append_value "$defined_in" "$1")
 }
 
-extract_values() {
-  key=$(safe_re "$1")
-  grep "^$key:" | sed -e 's/^[^:]*://' -e 's/:$//' | tr ':' '\n' |
-      sort | uniq
-}
 
 # Exports
 
@@ -97,25 +94,30 @@ done
 
 # Write to files
 
+echo "$all_requires"
+
+extract_values() {
+  key=$(safe_re "$1")
+  grep "^$key:" | sed -e 's/^[^:]*://' -e 's/:$//' | tr ':' '\n' |
+      sed '/^$/d' | sort | uniq
+}
+
+module_names() {
+  sed -e "s#^$source_dir/##" -e 's/\.js//' -e "s#^#$app_name/#"
+}
+
 echo ''
 echo 'Writing to files'
 
-comment() {
-  sed 's#^#// #'
-}
 
 for source in $sources
 do
   exports=$(echo "$all_exports" | extract_values "$source")
-  requires=$(echo "$all_requires" | extract_values "$source")
-  pullouts=$(echo "$all_pullouts" | extract_values "$source")
-  echo "Exports" | comment >> $source
-  echo "$exports" | comment >> $source
-  echo "" | comment >> $source
-  echo "Requires" | comment >> $source
-  echo "$requires" | comment >> $source
-  echo "" | comment >> $source
-  echo "" | comment >> $source
-  echo "Pullouts" | comment >> $source
-  echo "$pullouts" | comment >> $source
+  requires=$(echo "$all_requires" | extract_values "$source" | module_names |
+             sed -e "s/.*/& = require('&'),/" -e 's#[^=]*/#    #')
+  pullouts=$(echo "$all_pullouts" | extract_values "$source" |
+             sed 's#.*/\(.*\)\.js%\(.*\)#    \2 = \1.\2,#')
+  lines=$(echo "$requires"'
+'"$pullouts" | sed '/^ *$/d' | sed -e '1s/^    /var /' -e '$s/,/;/')
+  test "X$lines" != X && echo "$lines" >> $source
 done

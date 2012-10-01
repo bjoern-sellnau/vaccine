@@ -106,7 +106,7 @@ if test "X$argument" != X
 then
   case $command in
     configure) app_name=$argument ;;
-    convert) global_var=$argument ;;
+    convert) app_name=$argument ;;
     inject) dir_or_file=$argument ;;
     size) dir_or_file=$argument ;;
   esac
@@ -148,7 +148,7 @@ fi
 
 if test $command = convert
 then
-  $vaccine_bin_dir/convert.sh "$global_var" "$globals_list" "$sources_list"
+  $vaccine_bin_dir/convert.sh "$app_name" "$global_var" "$source_dir" "$globals_list" "$sources_list"
   exit $?
 fi
 
