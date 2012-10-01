@@ -10,6 +10,8 @@ all_globals=_vaccine_all_globals
 all_exports=_vaccine_all_exports
 all_requires=_vaccine_all_requires
 all_pullouts=_vaccine_all_pullouts
+all_require_vars=_vaccine_all_require_vars
+all_pullout_vars=_vaccine_all_pullout_vars
 printf '' > $all_exports
 printf '' > $all_requires
 printf '' > $all_pullouts
@@ -71,25 +73,28 @@ sort_uniq all_requires
 sort_uniq all_pullouts
 
 
+# Vars
+
+sed -e "s#:$source_dir/#:#" -e 's/\.js$//' -e "s#:#:$app_name/#" \
+    -e "s/:\(.*\)/& = require('\1'),/" \
+    -e 's#:[^=]*/#:    #' $all_requires > $all_require_vars
+
+sed 's#:.*/\(.*\)\.js%\(.*\)#:    \2 = \1.\2,#' $all_pullouts > $all_pullout_vars
+
+
 # Write to files
 
 extract_values() {
   from=$1
   key=$(safe_re "$2")
-  grep "^$key:" $from | sed 's/^[^:]*://' | sed '/^$/d'
-}
-
-module_names() {
-  sed -e "s#^$source_dir/##" -e 's/\.js//' -e "s#^#$app_name/#"
+  grep "^$key:" $from | sed -e 's/^[^:]*://' -e '/^$/d'
 }
 
 for source in $sources
 do
   exports=$(extract_values $all_exports "$source")
-  requires=$(extract_values "$all_requires" "$source" | module_names |
-             sed -e "s/.*/& = require('&'),/" -e 's#[^=]*/#    #')
-  pullouts=$(extract_values "$all_pullouts" "$source" |
-             sed 's#.*/\(.*\)\.js%\(.*\)#    \2 = \1.\2,#')
+  requires=$(extract_values $all_require_vars "$source")
+  pullouts=$(extract_values $all_pullout_vars "$source")
   lines=$(echo "$requires"'
 '"$pullouts" | sed '/^ *$/d' | sed -e '1s/^    /var /' -e '$s/,/;/')
   test "X$lines" != X && echo "$lines" >> $source
