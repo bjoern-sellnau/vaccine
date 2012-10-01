@@ -62,9 +62,11 @@ do
     echo "$defined_in" | sed 's/^/> /' >&2
     defined_in=$(echo "$defined_in" | head -n 1)
   fi
+  def_module=$(echo "$defined_in" | sed -e 's/\/index.js//' \
+               -e 's/\.js$//' -e "s#:$source_dir/#:#" -e "s#:#:$app_name/#")
   defined_in_re=$(safe_re "$defined_in")
   requires=$(grep "\<$global[^.[:alnum:]]" $sources | sed 1d | cut -d ':' -f 1 |
-             grep -v "^$defined_in_re$" | sed "s#\$#:$defined_in#")
+             grep -v "^$defined_in_re$" | sed "s#\$#:$def_module#")
   echo "$requires" >> $all_requires
   echo "$requires" | sed "s/$/%$global/" >> $all_pullouts
 done
@@ -75,11 +77,10 @@ sort_uniq all_pullouts
 
 # Vars
 
-sed -e "s#:$source_dir/#:#" -e 's/\.js$//' -e "s#:#:$app_name/#" \
-    -e "s/:\(.*\)/& = require('\1'),/" \
+sed -e "s/:\(.*\)/& = require('\1'),/" \
     -e 's#:[^=]*/#:    #' $all_requires > $all_require_vars
 
-sed 's#:.*/\(.*\)\.js%\(.*\)#:    \2 = \1.\2,#' $all_pullouts > $all_pullout_vars
+sed 's#:.*/\(.*\)%\(.*\)#:    \2 = \1.\2,#' $all_pullouts > $all_pullout_vars
 
 
 # Write to files
