@@ -60,15 +60,11 @@ do
     echo "$defined_in" | sed 's/^/> /' >&2
     defined_in=$(echo "$defined_in" | head -n 1)
   fi
-  requires=$(grep "\<$global[^.[:alnum:]]" $sources | sed 1d | cut -d ':' -f 1)
-  for requiring in $requires
-  do
-    if test "X$requiring" != "X$defined_in"
-    then
-      echo "$requiring:$defined_in" >> $all_requires
-      echo "$requiring:$defined_in%$global" >> $all_pullouts
-    fi
-  done
+  defined_in_re=$(safe_re "$defined_in")
+  requires=$(grep "\<$global[^.[:alnum:]]" $sources | sed 1d | cut -d ':' -f 1 |
+             grep -v "^$defined_in_re$" | sed "s#\$#:$defined_in#")
+  echo "$requires" >> $all_requires
+  echo "$requires" | sed "s/$/%$global/" >> $all_pullouts
 done
 
 sort_uniq all_requires
