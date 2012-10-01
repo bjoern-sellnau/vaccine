@@ -3,19 +3,28 @@
 app_name=$1
 global=$2
 source_dir=$3
-globals=$(cat "$4" | grep -v "^$global$")
+globals=$4
 sources=$(cat "$5")
 
-all_globals=$(echo "$globals")
-all_exports=vaccine_all_exports
-all_requires=vaccine_all_requires
-all_pullouts=vaccine_all_pullouts
+all_globals=_vaccine_all_globals
+all_exports=_vaccine_all_exports
+all_requires=_vaccine_all_requires
+all_pullouts=_vaccine_all_pullouts
 printf '' > $all_exports
 printf '' > $all_requires
 printf '' > $all_pullouts
+cp $globals $all_globals
 
 safe_re() {
   echo "$1" | sed 's/\./\\./g'
+}
+
+sort_uniq() {
+  var_name=$1
+  eval "old_file_name=\$$var_name"
+  new_file_name="$old_file_name"_sort_uniq
+  sort $old_file_name | uniq > $new_file_name
+  eval $var_name=$new_file_name
 }
 
 
@@ -25,24 +34,24 @@ safe_re() {
 grep "\<$global\>[.[:alnum:]]* *=" $sources |
     sed -e "s/\($global[.[:alnum:]]*\) *=.*/\1/" -e "s/:.*$global/:$global/" >> $all_exports
 
-all_globals=$(echo "$all_globals"'
-'"$(cat $all_exports | cut -d : -f 2)")
+cat $all_exports | cut -d : -f 2 >> $all_globals
 
-for global in $globals
+for global in $(grep -v "^$global$" "$globals")
 do
   defined_in=$(grep "\<$global\>" $sources | head -n 1 | cut -d ':' -f 1)
   echo "$defined_in:$global" >> $all_exports
 done
 
-all_globals="$(echo "$all_globals" | sort | uniq)"
+sort_uniq all_globals
+sort_uniq all_exports
 
 
 # Requires
 
-for global in $all_globals
+for global in $(cat $all_globals)
 do
   global_re=$(safe_re "$global")
-  defined_in=$(cat $all_exports | grep ":$global_re$" | cut -d ':' -f 1)
+  defined_in=$(grep ":$global_re$" $all_exports | cut -d ':' -f 1)
   num=$(echo "$defined_in" | wc -l | sed 's/ //g')
   if test "$num" -gt 1
   then
@@ -62,13 +71,16 @@ do
   done
 done
 
+sort_uniq all_requires
+sort_uniq all_pullouts
+
 
 # Write to files
 
 extract_values() {
   from=$1
   key=$(safe_re "$2")
-  grep "^$key:" $from | sed 's/^[^:]*://' | sed '/^$/d' | sort | uniq
+  grep "^$key:" $from | sed 's/^[^:]*://' | sed '/^$/d'
 }
 
 module_names() {
@@ -87,6 +99,4 @@ do
   test "X$lines" != X && echo "$lines" >> $source
 done
 
-rm $all_exports
-rm $all_requires
-rm $all_pullouts
+rm _vaccine_all_*
