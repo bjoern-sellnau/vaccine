@@ -16,11 +16,17 @@ Options:
         --lib <dir>       # The directory for your libraries (default: lib).
         --global <name>   # The global variable for the file being injected.
                           # (default: app name)
+        --to <type>       # Conversion types: vaccine, relative, absolute.
+        --globals-list <file>
+                          # List of globals when converting to vaccine.
+        --sources-list <file>
+                          # List of sources that need to be converted
 
 Examples:
   vaccine configure datazooka --src src --lib lib   # src and lib are defaults
   vaccine size src --app datazooka
   vaccine inject underscore.js --global _
+  vaccine convert crossfilter --to relative
 '
 }
 

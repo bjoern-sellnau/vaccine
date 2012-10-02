@@ -1,4 +1,3 @@
-
 vaccine=$vaccine_bin_dir/vaccine
 source_dir=$1
 app_name=$2
@@ -115,3 +114,4 @@ cd ..
 rm -r $v
 test -d old_vaccines && mv old_vaccines $v
 
+exit 0

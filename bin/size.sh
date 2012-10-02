@@ -41,3 +41,4 @@ then
   rm $compare.min.gz
 fi
 
+exit 0
