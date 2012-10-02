@@ -5,6 +5,7 @@ help() {
 
 Verbs: (Can be shortened if unambiguous)
         configure <app>   # Build vaccines configured for app name.
+        convert <app>     # Convert app to vaccine format, relative requires, etc.
         inject <file>     # Inject vaccine into an existing file.
         size <file/dir>   # Calculate sizes for sources in dir, or for file.
         built-size <file> [compare]  # Compute file sizes for .min, .gz versions.
@@ -122,6 +123,7 @@ do
     --global) global_var=$2 ;;
     --globals-list) globals_list=$2 ;;
     --sources-list) sources_list=$2 ;;
+    --to) convert_to=$2 ;;
     *) fail "Unrecognized option: $1" ;;
   esac
   shift 2
@@ -148,7 +150,19 @@ fi
 
 if test $command = convert
 then
-  $vaccine_bin_dir/convert.sh "$app_name" "$global_var" "$source_dir" "$globals_list" "$sources_list"
+  case $convert_to in
+    relative | absolute)
+      $vaccine_bin_dir/convert_relative_requires.sh "$convert_to" \
+                                                    "$app_name" "$source_dir"
+      ;;
+    vaccine)
+      $vaccine_bin_dir/convert.sh "$app_name" "$global_var" "$source_dir" \
+                                  "$globals_list" "$sources_list"
+      ;;
+    *)
+      fail "Unrecognized convert to type (--to): $convert_to"
+      ;;
+  esac
   exit $?
 fi
 

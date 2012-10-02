@@ -68,8 +68,8 @@ sed 's/:.*//' $all_exports | uniq -u > $all_module_exports
 # Requires
 
 to_module() {
-  echo "$1" | sed -e 's/\/index.js//' -e 's/\.js$//' \
-                  -e "s#:$source_dir/#:#" -e "s#:#:$app_name/#"
+  echo "$1" | sed -e "s#^$source_dir/##" -e "s#^#$app_name/#" \
+                  -e 's/\/index.js//' -e 's/\.js$//' -e 's#/$##'
 }
 
 for global in $(cat $all_globals)
@@ -207,4 +207,5 @@ do
   rm "$source_copy"
 done
 
+$vaccine_bin_dir/vaccine convert $app_name --to relative --src "$source_dir"
 rm _vaccine_all_*
