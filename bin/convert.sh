@@ -6,6 +6,7 @@ source_dir=$3
 globals=$4
 sources=$(cat "$5")
 
+all_circulars=_vaccine_all_circulars
 all_warnings=_vaccine_all_warnings
 all_globals=_vaccine_all_globals
 all_exports=_vaccine_all_exports
@@ -14,6 +15,7 @@ all_requires=_vaccine_all_requires
 all_pullouts=_vaccine_all_pullouts
 all_require_vars=_vaccine_all_require_vars
 all_pullout_vars=_vaccine_all_pullout_vars
+printf '' > $all_circulars
 printf '' > $all_warnings
 printf '' > $all_exports
 printf '' > $all_requires
@@ -26,14 +28,17 @@ safe_re() {
 
 warn() {
   id=$1
-  msg="[$id] $2"
+  original_message=$2
   shift 2
   if test $# -eq 1
   then
-    printf '%-26s %s\n' "$1" "$msg"
+    file=$1
   else
-    echo "$msg"
+    file='<multiple files>'
   fi
+  printf '%-24s %-16s %s\n' "$file" "$id" "$msg"
+
+  msg="[$id] $original_message"
   for source in "$@"
   do
     echo "$source:$msg" >> $all_warnings
@@ -88,7 +93,7 @@ do
     defined_in_all=$defined_in
     defined_in_list=$(echo "$defined_in" | tr '\n' ',' | sed 's/,/, /g')
     defined_in=$(echo "$defined_in" | head -n 1)
-    msg="global '$global' defined in $num files: $defined_in_list. Using $defined_in"
+    msg="Global <$global> defined in $num files: $defined_in_list. Using $defined_in"
     warn 'multi-def' "$msg" $defined_in_all
   fi
   def_module=$(to_module "$defined_in")
@@ -102,13 +107,13 @@ do
     var=$(echo "$def_module" | sed 's/.*\///')
     if test "X$var" = "X$global"
     then
-      msg="global '$global' conflicts with require var name"
+      msg="Global <$global> conflicts with require var name"
       warn 'req-conflict' "$msg" "$defined_in"
       var="require_$var"
     fi
   fi
   requires=$(grep "\<$global[^.[:alnum:]]" $sources | cut -d ':' -f 1 |
-             grep -v "^$defined_in_re$" | sed "s#\$#:$var:$def_module#")
+             grep -v "^$defined_in_re$" | sed "s#\$#:$var:$def_module:$defined_in#")
   echo "$requires" >> $all_requires
   if test "X$module_exports" != Xtrue
   then
@@ -120,9 +125,29 @@ sort_uniq all_requires
 sort_uniq all_pullouts
 
 
+# Circular requires
+
+for require_line in $(cat $all_requires)
+do
+  requiring=$(echo "$require_line" | cut -d ':' -f 1)
+  being_required=$(echo "$require_line" | cut -d ':' -f 4)
+  requiring_re=$(safe_re "$requiring")
+  being_required_re=$(safe_re "$being_required")
+  if ! $(grep -q "^$being_required_re:$requiring_re$" $all_circulars)
+  then
+    if $(grep -q "^$being_required_re:.*:$requiring_re$" $all_requires)
+    then
+      echo "$requiring:$being_required" >> $all_circulars
+      msg="Circular requires between <$requiring> and <$being_required>"
+      warn 'circular' "$msg" "$requiring" "$being_required"
+    fi
+  fi
+done
+
+
 # Vars
 
-sed -e "s/:\(.*\):\(.*\)$/:    \1 = require('\2'),/" \
+sed -e "s/:\(.*\):\(.*\):/:    \1 = require('\2'),/" \
     $all_requires > $all_require_vars
 
 sed 's/:\(.*\):.*:\(.*\)/:    \2 = \1.\2,/' $all_pullouts > $all_pullout_vars
@@ -170,12 +195,11 @@ for source in $sources
 do
   source_copy="${source}_vaccine_copy"
   source_re=$(safe_re "$source")
-  def_module=$(to_module "$source")
 
   exports=$(extract_values $all_exports "$source_re")
   requires=$(extract_values $all_require_vars "$source_re")
   pullouts=$(extract_values $all_pullout_vars "$source_re")
-  required_by=$(grep ":$def_module$" $all_requires | cut -d ':' -f 1 |
+  required_by=$(grep ":$source_re$" $all_requires | cut -d ':' -f 1 |
                 indent_list)
 
   var_lines=$(echo "$requires"'
@@ -188,7 +212,7 @@ do
     if test "$num_exports" -eq 1
     then
       global=$exports
-      msg="global '$global' replaced with module.exports"
+      msg="Global <$global> replaced with module.exports"
       warn 'module.exports' "$msg" "$source"
       sed -e "s/function *$global(/module.exports = exports = function(/" \
           -e "/[[:<:]]$global *= *{/d" \
