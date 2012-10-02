@@ -152,8 +152,8 @@ if test $command = convert
 then
   case $convert_to in
     relative | absolute)
-      $vaccine_bin_dir/convert_relative_requires.sh "$convert_to" \
-                                                    "$app_name" "$source_dir"
+      $vaccine_bin_dir/convert_requires.sh "$convert_to" \
+                                           "$app_name" "$source_dir"
       ;;
     vaccine)
       $vaccine_bin_dir/convert.sh "$app_name" "$global_var" "$source_dir" \
