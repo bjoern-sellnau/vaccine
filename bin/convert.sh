@@ -82,6 +82,7 @@ do
     if test "X$var" = "X$global"
     then
       warn "$global (defined in $defined_in) conflicts with require var name"
+      var="require_$var"
     fi
   fi
   requires=$(grep "\<$global[^.[:alnum:]]" $sources | cut -d ':' -f 1 |
@@ -113,14 +114,51 @@ extract_values() {
   grep "^$key:" $from | sed -e 's/^[^:]*://' -e '/^$/d'
 }
 
+
 for source in $sources
 do
+  source_copy="${source}_vaccine_copy"
+
   exports=$(extract_values $all_exports "$source")
   requires=$(extract_values $all_require_vars "$source")
   pullouts=$(extract_values $all_pullout_vars "$source")
+
   lines=$(echo "$requires"'
 '"$pullouts" | sed '/^ *$/d' | sed -e '1s/^    /var /' -e '$s/,/;/')
-  test "X$lines" != X && echo "$lines" >> $source
+
+  # Write exports in file
+  num_exports=$(echo "$exports" | wc -l | sed 's/ //g')
+  if test "$num_exports" -gt 0
+  then
+    if test "$num_exports" -eq 1
+    then
+      global="$exports"
+      sed -e "s/function *$global(/module.exports = exports = function(/" \
+          -e "/[[:<:]]$global *= *{/d" \
+          -e "s/var *$global *=/module.exports = exports =/" \
+          -e "s/[[:<:]]$global[[:>:]]/exports/g" "$source" > "$source_copy"
+    else
+      cp "$source" "$source_copy"
+      for global in $exports
+      do
+        sed -i '' -e "s/function *$global(/$global = function(/" \
+            -e "s/[[:<:]]$global[[:>:]]/exports.$global/g" \
+            -e "s/var *exports/exports/" "$source_copy"
+      done
+    fi
+  else
+    cp "$source" "$source_copy"
+  fi
+
+  if test "X$lines" != X
+  then
+    echo "$lines" > $source
+  else
+    printf '' > $source
+  fi
+  cat "$source_copy" >> "$source"
+  rm "$source_copy"
+
 done
 
 rm _vaccine_all_*
