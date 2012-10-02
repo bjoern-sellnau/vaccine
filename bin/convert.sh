@@ -25,9 +25,15 @@ safe_re() {
 }
 
 warn() {
-  msg="$1"
-  echo "$msg"
-  shift
+  id=$1
+  msg="[$id] $2"
+  shift 2
+  if test $# -eq 1
+  then
+    printf '%-26s %s\n' "$1" "$msg"
+  else
+    echo "$msg"
+  fi
   for source in "$@"
   do
     echo "$source:$msg" >> $all_warnings
@@ -82,8 +88,8 @@ do
     defined_in_all=$defined_in
     defined_in_list=$(echo "$defined_in" | tr '\n' ',' | sed 's/,/, /g')
     defined_in=$(echo "$defined_in" | head -n 1)
-    msg="global $global defined in $num files: $defined_in_list. Using $defined_in"
-    warn "$msg" $defined_in_all
+    msg="global '$global' defined in $num files: $defined_in_list. Using $defined_in"
+    warn 'multi-def' "$msg" $defined_in_all
   fi
   def_module=$(to_module "$defined_in")
   defined_in_re=$(safe_re "$defined_in")
@@ -96,8 +102,8 @@ do
     var=$(echo "$def_module" | sed 's/.*\///')
     if test "X$var" = "X$global"
     then
-      msg="global $global (defined in $defined_in) conflicts with require var name"
-      warn "$msg" $defined_in
+      msg="global '$global' conflicts with require var name"
+      warn 'req-conflict' "$msg" "$defined_in"
       var="require_$var"
     fi
   fi
@@ -171,7 +177,6 @@ do
   pullouts=$(extract_values $all_pullout_vars "$source_re")
   required_by=$(grep ":$def_module$" $all_requires | cut -d ':' -f 1 |
                 indent_list)
-  warnings=$(extract_values $all_warnings "$source_re" | indent_list)
 
   var_lines=$(echo "$requires"'
 '"$pullouts" | sed '/^ *$/d' | sed -e '1s/^    /var /' -e '$s/,/;/')
@@ -182,7 +187,9 @@ do
   then
     if test "$num_exports" -eq 1
     then
-      global="$exports"
+      global=$exports
+      msg="global '$global' replaced with module.exports"
+      warn 'module.exports' "$msg" "$source"
       sed -e "s/function *$global(/module.exports = exports = function(/" \
           -e "/[[:<:]]$global *= *{/d" \
           -e "s/$global *=/module.exports = exports =/" \
@@ -201,6 +208,7 @@ do
     cp "$source" "$source_copy"
   fi
 
+  warnings=$(extract_values $all_warnings "$source_re" | indent_list)
   source_file_text "$warnings" "$required_by" "$var_lines" \
                    "$source_copy" > "$source"
 
