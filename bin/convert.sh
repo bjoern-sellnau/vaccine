@@ -58,6 +58,11 @@ sed 's/:.*//' $all_exports | uniq -u > $all_module_exports
 
 # Requires
 
+to_module() {
+  echo "$1" | sed -e 's/\/index.js//' -e 's/\.js$//' \
+                  -e "s#:$source_dir/#:#" -e "s#:#:$app_name/#"
+}
+
 for global in $(cat $all_globals)
 do
   global_re=$(safe_re "$global")
@@ -69,8 +74,7 @@ do
     warn $(echo "$defined_in" | sed 's/^/> /')
     defined_in=$(echo "$defined_in" | head -n 1)
   fi
-  def_module=$(echo "$defined_in" | sed -e 's/\/index.js//' \
-               -e 's/\.js$//' -e "s#:$source_dir/#:#" -e "s#:#:$app_name/#")
+  def_module=$(to_module "$defined_in")
   defined_in_re=$(safe_re "$defined_in")
   if grep -q "^$defined_in_re$" $all_module_exports
   then
@@ -118,10 +122,13 @@ extract_values() {
 for source in $sources
 do
   source_copy="${source}_vaccine_copy"
+  def_module=$(to_module "$source")
 
   exports=$(extract_values $all_exports "$source")
   requires=$(extract_values $all_require_vars "$source")
   pullouts=$(extract_values $all_pullout_vars "$source")
+  required_by=$(grep ":$def_module$" $all_requires | cut -d ':' -f 1 |
+                sed 's#^#// - #')
 
   lines=$(echo "$requires"'
 '"$pullouts" | sed '/^ *$/d' | sed -e '1s/^    /var /' -e '$s/,/;/')
@@ -135,30 +142,38 @@ do
       global="$exports"
       sed -e "s/function *$global(/module.exports = exports = function(/" \
           -e "/[[:<:]]$global *= *{/d" \
-          -e "s/var *$global *=/module.exports = exports =/" \
+          -e "s/$global *=/module.exports = exports =/" \
           -e "s/[[:<:]]$global[[:>:]]/exports/g" "$source" > "$source_copy"
     else
       cp "$source" "$source_copy"
       for global in $exports
       do
         sed -i '' -e "s/function *$global(/$global = function(/" \
-            -e "s/[[:<:]]$global[[:>:]]/exports.$global/g" \
-            -e "s/var *exports/exports/" "$source_copy"
+            -e "s/[[:<:]]$global[[:>:]]/exports.$global/g" "$source_copy"
       done
     fi
+    sed -i '' -e "s/var *module\.exports[[:>:]]/module.exports/" \
+        -e "s/var *exports[[:>:]]/exports/" "$source_copy"
   else
     cp "$source" "$source_copy"
   fi
 
-  if test "X$lines" != X
+  # Actually write to the source file
+  if test "X$required_by" != X
   then
-    echo "$lines" > $source
+    echo '// REQUIRED_BY START' > $source
+    echo "$required_by" >> $source
+    echo '// REQUIRED_BY END' >> $source
   else
     printf '' > $source
   fi
+  if test "X$lines" != X
+  then
+    echo "$lines" >> $source
+  fi
   cat "$source_copy" >> "$source"
-  rm "$source_copy"
 
+  rm "$source_copy"
 done
 
 rm _vaccine_all_*
