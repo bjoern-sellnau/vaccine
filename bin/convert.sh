@@ -1,15 +1,12 @@
 #!/bin/sh
 
-warn() {
-  echo "$1" >&2
-}
-
 app_name=$1
 global=$2
 source_dir=$3
 globals=$4
 sources=$(cat "$5")
 
+all_warnings=_vaccine_all_warnings
 all_globals=_vaccine_all_globals
 all_exports=_vaccine_all_exports
 all_module_exports=_vaccine_all_module_exports
@@ -17,6 +14,7 @@ all_requires=_vaccine_all_requires
 all_pullouts=_vaccine_all_pullouts
 all_require_vars=_vaccine_all_require_vars
 all_pullout_vars=_vaccine_all_pullout_vars
+printf '' > $all_warnings
 printf '' > $all_exports
 printf '' > $all_requires
 printf '' > $all_pullouts
@@ -24,6 +22,16 @@ cp $globals $all_globals
 
 safe_re() {
   echo "$1" | sed 's/\./\\./g'
+}
+
+warn() {
+  msg="$1"
+  echo "$msg"
+  shift
+  for source in "$@"
+  do
+    echo "$source:$msg" >> $all_warnings
+  done
 }
 
 sort_uniq() {
@@ -39,7 +47,8 @@ sort_uniq() {
 
 # Find the public api (e.g. my_app_global.some_property.some_other_property)
 grep "\<$global\>[.[:alnum:]]* *=" $sources |
-    sed -e "s/\($global[.[:alnum:]]*\) *=.*/\1/" -e "s/:.*$global/:$global/" >> $all_exports
+    sed -e "s/\($global[.[:alnum:]]*\) *=.*/\1/" \
+        -e "s/:.*$global/:$global/" >> $all_exports
 
 cat $all_exports | cut -d : -f 2 >> $all_globals
 
@@ -70,9 +79,11 @@ do
   num=$(echo "$defined_in" | wc -l | sed 's/ //g')
   if test "$num" -ne 1
   then
-    warn "$global defined $num times. Using first definition:"
-    warn $(echo "$defined_in" | sed 's/^/> /')
+    defined_in_all=$defined_in
+    defined_in_list=$(echo "$defined_in" | tr '\n' ',' | sed 's/,/, /g')
     defined_in=$(echo "$defined_in" | head -n 1)
+    msg="global $global defined in $num files: $defined_in_list. Using $defined_in"
+    warn "$msg" $defined_in_all
   fi
   def_module=$(to_module "$defined_in")
   defined_in_re=$(safe_re "$defined_in")
@@ -85,7 +96,8 @@ do
     var=$(echo "$def_module" | sed 's/.*\///')
     if test "X$var" = "X$global"
     then
-      warn "$global (defined in $defined_in) conflicts with require var name"
+      msg="global $global (defined in $defined_in) conflicts with require var name"
+      warn "$msg" $defined_in
       var="require_$var"
     fi
   fi
@@ -114,23 +126,54 @@ sed 's/:\(.*\):.*:\(.*\)/:    \2 = \1.\2,/' $all_pullouts > $all_pullout_vars
 
 extract_values() {
   from=$1
-  key=$(safe_re "$2")
+  key=$2
   grep "^$key:" $from | sed -e 's/^[^:]*://' -e '/^$/d'
 }
 
+indent_list() {
+  sed 's#^#//  - #'
+}
+
+source_file_text() {
+  warnings=$1
+  required_by=$2
+  var_lines=$3
+  source_copy=$4
+  echo '// VACCINE_CONVERSION_DATA START'
+  if test "X$warnings" != X
+  then
+    echo "// Warnings:"
+    echo "$warnings"
+    echo "//"
+  fi
+  if test "X$required_by" != X
+  then
+    echo "// Required by:"
+    echo "$required_by"
+    echo "//"
+  fi
+  echo '// VACCINE_CONVERSION_DATA END'
+  if test "X$var_lines" != X
+  then
+    echo "$var_lines"
+  fi
+  cat "$source_copy"
+}
 
 for source in $sources
 do
   source_copy="${source}_vaccine_copy"
+  source_re=$(safe_re "$source")
   def_module=$(to_module "$source")
 
-  exports=$(extract_values $all_exports "$source")
-  requires=$(extract_values $all_require_vars "$source")
-  pullouts=$(extract_values $all_pullout_vars "$source")
+  exports=$(extract_values $all_exports "$source_re")
+  requires=$(extract_values $all_require_vars "$source_re")
+  pullouts=$(extract_values $all_pullout_vars "$source_re")
   required_by=$(grep ":$def_module$" $all_requires | cut -d ':' -f 1 |
-                sed 's#^#// - #')
+                indent_list)
+  warnings=$(extract_values $all_warnings "$source_re" | indent_list)
 
-  lines=$(echo "$requires"'
+  var_lines=$(echo "$requires"'
 '"$pullouts" | sed '/^ *$/d' | sed -e '1s/^    /var /' -e '$s/,/;/')
 
   # Write exports in file
@@ -158,20 +201,8 @@ do
     cp "$source" "$source_copy"
   fi
 
-  # Actually write to the source file
-  if test "X$required_by" != X
-  then
-    echo '// REQUIRED_BY START' > $source
-    echo "$required_by" >> $source
-    echo '// REQUIRED_BY END' >> $source
-  else
-    printf '' > $source
-  fi
-  if test "X$lines" != X
-  then
-    echo "$lines" >> $source
-  fi
-  cat "$source_copy" >> "$source"
+  source_file_text "$warnings" "$required_by" "$var_lines" \
+                   "$source_copy" > "$source"
 
   rm "$source_copy"
 done
