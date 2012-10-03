@@ -166,6 +166,36 @@ indent_list() {
   sed 's#^#//  - #'
 }
 
+write_exports() {
+  exports=$1
+  source=$2
+  source_copy=$3
+  num_exports=$(echo "$exports" | wc -l | sed 's/ //g')
+  if test "$num_exports" -gt 0
+  then
+    if test "$num_exports" -eq 1
+    then
+      global=$exports
+      msg="Global <$global> replaced with module.exports"
+      warn 'module.exports' "$msg" "$source"
+      sed -e "s/function *$global(/module.exports = exports = function(/" \
+          -e "/[[:<:]]$global *= *{/d" \
+          -e "s/$global *=/module.exports = exports =/" \
+          -e "s/[[:<:]]$global[[:>:]]/exports/g" "$source" > "$source_copy"
+    else
+      cp "$source" "$source_copy"
+      for global in $exports
+      do
+        sed -i '' -e "s/function *$global(/$global = function(/" \
+            -e "s/[[:<:]]$global[[:>:]]/exports.$global/g" "$source_copy"
+      done
+    fi
+    sed -i '' -e "s/var *module\.exports[[:>:]]/module.exports/" \
+        -e "s/var *exports[[:>:]]/exports/" "$source_copy"
+  else
+    cp "$source" "$source_copy"
+  fi
+}
 source_file_text() {
   warnings=$1
   required_by=$2
@@ -206,32 +236,7 @@ do
   var_lines=$(echo "$requires"'
 '"$pullouts" | sed '/^ *$/d' | sed -e '1s/^    /var /' -e '$s/,/;/')
 
-  # Write exports in file
-  num_exports=$(echo "$exports" | wc -l | sed 's/ //g')
-  if test "$num_exports" -gt 0
-  then
-    if test "$num_exports" -eq 1
-    then
-      global=$exports
-      msg="Global <$global> replaced with module.exports"
-      warn 'module.exports' "$msg" "$source"
-      sed -e "s/function *$global(/module.exports = exports = function(/" \
-          -e "/[[:<:]]$global *= *{/d" \
-          -e "s/$global *=/module.exports = exports =/" \
-          -e "s/[[:<:]]$global[[:>:]]/exports/g" "$source" > "$source_copy"
-    else
-      cp "$source" "$source_copy"
-      for global in $exports
-      do
-        sed -i '' -e "s/function *$global(/$global = function(/" \
-            -e "s/[[:<:]]$global[[:>:]]/exports.$global/g" "$source_copy"
-      done
-    fi
-    sed -i '' -e "s/var *module\.exports[[:>:]]/module.exports/" \
-        -e "s/var *exports[[:>:]]/exports/" "$source_copy"
-  else
-    cp "$source" "$source_copy"
-  fi
+  write_exports "$exports" "$source" "$source_copy"
 
   warnings=$(extract_values $all_warnings "$source_re" | indent_list)
   source_file_text "$warnings" "$required_by" "$var_lines" \
