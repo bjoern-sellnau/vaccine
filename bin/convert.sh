@@ -4,23 +4,21 @@ app_name=$1
 global=$2
 source_dir=$3
 globals=$4
-sources=$(cat "$5")
+sources_file=$5
+sources=$(cat "$sources_file")
 
-all_circulars=_vaccine_all_circulars
-all_warnings=_vaccine_all_warnings
-all_globals=_vaccine_all_globals
-all_exports=_vaccine_all_exports
-all_module_exports=_vaccine_all_module_exports
-all_requires=_vaccine_all_requires
-all_pullouts=_vaccine_all_pullouts
-all_require_vars=_vaccine_all_require_vars
-all_pullout_vars=_vaccine_all_pullout_vars
-printf '' > $all_circulars
-printf '' > $all_warnings
-printf '' > $all_exports
-printf '' > $all_requires
-printf '' > $all_pullouts
-cp $globals $all_globals
+prefix=_vaccine_all_
+temp_files='circulars conflicting warnings globals exports module_exports'
+temp_files="$temp_files requires pullouts require_vars pullout_vars sources"
+for temp in $temp_files
+do
+  file=${prefix}$temp
+  eval "all_$temp=$file"
+  printf '' > $file
+done
+
+cp "$globals" $all_globals
+cp "$sources_file" $all_sources
 
 LF='
 '
@@ -60,6 +58,11 @@ sort_uniq() {
   eval $var_name=$new_file_name
 }
 
+to_module() {
+  sed -e "s#^$source_dir/##" -e "s#^#$app_name/#" \
+      -e 's/\/index.js//' -e 's/\.js$//' -e 's#/$##'
+}
+
 
 # Exports
 
@@ -79,16 +82,16 @@ done
 sort_uniq all_globals
 sort_uniq all_exports
 
+
 # Module.exports
 sed 's/:.*//' $all_exports | uniq -u > $all_module_exports
 
 
-# Requires
+# Conflicting file/global name
+cat $all_globals $all_sources | to_module | sort | uniq -d > $all_conflicting
 
-to_module() {
-  echo "$1" | sed -e "s#^$source_dir/##" -e "s#^#$app_name/#" \
-                  -e 's/\/index.js//' -e 's/\.js$//' -e 's#/$##'
-}
+
+# Requires
 
 for global in $(cat $all_globals)
 do
@@ -103,7 +106,7 @@ do
     msg="Global <$global> defined in $num files: $defined_in_list. Using $defined_in"
     warn 'multi-def' "$msg" $defined_in_all
   fi
-  def_module=$(to_module "$defined_in")
+  def_module=$(echo "$defined_in" | to_module)
   defined_in_re=$(safe_re "$defined_in")
   if grep -q "^$defined_in_re$" $all_module_exports
   then
@@ -112,10 +115,13 @@ do
   else
     module_exports=false
     var=$(echo "$def_module" | sed 's/.*\///')
-    if test "X$var" = "X$global"
+    if grep -q "^$def_module$" $all_conflicting
     then
-      msg="Global <$global> conflicts with require var name"
-      warn 'req-conflict' "$msg" "$defined_in"
+      if test "X$var" = "X$global"
+      then
+        msg="Global <$global> conflicts with require var name"
+        warn 'req-conflict' "$msg" "$defined_in"
+      fi
       var="require_$var"
     fi
   fi
@@ -278,4 +284,4 @@ do
 done
 
 $vaccine_bin_dir/vaccine convert $app_name --to relative --src "$source_dir"
-rm _vaccine_all_*
+rm $prefix*
