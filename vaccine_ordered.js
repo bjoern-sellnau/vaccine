@@ -1,4 +1,3 @@
-
 function define(id, defn) {
 
   var globalVaccine =
@@ -50,4 +49,3 @@ function define(id, defn) {
       globalVaccine.s(id.replace(/\/index$/,''), module.exports);
     }
 }
-

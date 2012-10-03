@@ -1,4 +1,3 @@
-
 var appName = 'my_app',       // Change this to your app name.
     sourceDir = 'src';   // Change this to... uh, your source directory.
 
@@ -22,19 +21,14 @@ types = {
 
 http.createServer(function (req, res) {
   if (req.url.match(/^\/build[\/\w]*\.?\w*$/)) {
-    exec('.' + req.url, function(err, stdout) {
-      if (err) return notFound(req.url, res);
+    exec('.' + req.url, {maxBuffer: 1024*1024}, function(err, stdout) {
+      if (err) return notFound(err, req.url, res);
       res.writeHead(200, {'Content-Type': 'application/javascript'});
       res.end(stdout);
     });
   } else {
     findFile(req.url, function(err, fileText, path) {
-      if (err) {
-        console.log('404: ' + req.url);
-        res.writeHead(404, {'Content-Type': 'text/plain'});
-        res.end('404 Not Found\n');
-        return;
-      }
+      if (err) return notFound(err, req.url, res);
       var ext = path.split('.').pop();
       if (ext === path) ext = 'html';
       var type = types[ext];
@@ -47,6 +41,13 @@ http.createServer(function (req, res) {
     });
   }
 }).listen(3000, 'localhost');
+
+function notFound(err, path, res) {
+  if (err !== true) console.log(err);
+  console.log('404: ' + path);
+  res.writeHead(404, {'Content-Type': 'text/plain'});
+  res.end('404 Not Found\n');
+}
 
 function findFile(path, callback, lastCheck) {
   fs.stat('.' + path, function(err, stats) {
@@ -82,4 +83,3 @@ function nodeWrap(path, rawFileText) {
   compiled += '});';
   return compiled;
 }
-

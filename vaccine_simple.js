@@ -1,4 +1,3 @@
-
 function define(id, defn) {
 
   var globalVaccine =
@@ -46,4 +45,3 @@ function define(id, defn) {
         .push(function() { define(id, defn); });
   }
 }
-

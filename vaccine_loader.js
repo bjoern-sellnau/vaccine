@@ -1,4 +1,3 @@
-
 (function() {
 
   var appName = 'my_app',       // Change this to your app name.
@@ -122,4 +121,3 @@
   };
 
 }());
-

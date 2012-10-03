@@ -1,4 +1,3 @@
-
 function define(id, defn) {
 
   var globalVaccine =
@@ -36,4 +35,3 @@ function define(id, defn) {
     defn(require, module.exports, module);
     globalVaccine.s(id, module.exports);
 }
-
