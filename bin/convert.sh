@@ -22,12 +22,15 @@ printf '' > $all_requires
 printf '' > $all_pullouts
 cp $globals $all_globals
 
+LF='
+'
+
 safe_re() {
   echo "$1" | sed 's/\./\\./g'
 }
 
 warn() {
-  id=$1
+  id="[$1]"
   original_message=$2
   shift 2
   if test $# -eq 1
@@ -36,13 +39,17 @@ warn() {
   else
     file='<multiple files>'
   fi
-  printf '%-24s %-16s %s\n' "$file" "$id" "$original_message"
+  printf '%-24s %-17s %s\n' "$file" "$id" "$original_message"
 
-  msg="[$id] $original_message"
+  msg="$id $original_message"
   for source in "$@"
   do
     echo "$source:$msg" >> $all_warnings
   done
+}
+
+join_comma() {
+  tr '\n' ',' | sed -e 's/,$//' -e 's/,/, /g'
 }
 
 sort_uniq() {
@@ -91,7 +98,7 @@ do
   if test "$num" -ne 1
   then
     defined_in_all=$defined_in
-    defined_in_list=$(echo "$defined_in" | tr '\n' ',' | sed 's/,/, /g')
+    defined_in_list=$(echo "$defined_in" | join_comma)
     defined_in=$(echo "$defined_in" | head -n 1)
     msg="Global <$global> defined in $num files: $defined_in_list. Using $defined_in"
     warn 'multi-def' "$msg" $defined_in_all
@@ -168,14 +175,17 @@ indent_list() {
 
 write_exports() {
   exports=$1
-  source=$2
-  source_copy=$3
+  required_by=$2
+  source=$3
+  source_copy=$4
   num_exports=$(echo "$exports" | wc -l | sed 's/ //g')
+  globals_list=''
   if test "$num_exports" -gt 0
   then
     if test "$num_exports" -eq 1
     then
       global=$exports
+      globals_list="$global: $(echo "$required_by" | join_comma)"
       msg="Global <$global> replaced with module.exports"
       warn 'module.exports' "$msg" "$source"
       sed -e "s/function *$global(/module.exports = exports = function(/" \
@@ -186,6 +196,10 @@ write_exports() {
       cp "$source" "$source_copy"
       for global in $exports
       do
+        global_re=$(safe_re "$global")
+        requiring_global=$(grep ":$global_re$" $all_pullouts |
+                           cut -d ':' -f 1 | join_comma)
+        globals_list="${globals_list}${global}: ${requiring_global}${LF}"
         sed -i '' -e "s/function *$global(/$global = function(/" \
             -e "s/[[:<:]]$global[[:>:]]/exports.$global/g" "$source_copy"
       done
@@ -195,23 +209,35 @@ write_exports() {
   else
     cp "$source" "$source_copy"
   fi
+  if test "X$globals_list" != X
+  then
+    globals_list=$(echo "$globals_list" | sed '/^ *$/d')
+  fi
 }
+
 source_file_text() {
   warnings=$1
   required_by=$2
-  var_lines=$3
-  source_copy=$4
+  globals_list=$3
+  var_lines=$4
+  source_copy=$5
   echo '// VACCINE_CONVERSION_DATA START'
   if test "X$warnings" != X
   then
     echo "// Warnings:"
-    echo "$warnings"
+    echo "$warnings" | indent_list
+    echo "//"
+  fi
+  if test "X$globals_list" != X
+  then
+    echo "// Exports:"
+    echo "$globals_list" | indent_list
     echo "//"
   fi
   if test "X$required_by" != X
   then
     echo "// Required by:"
-    echo "$required_by"
+    echo "$required_by" | indent_list
     echo "//"
   fi
   echo '// VACCINE_CONVERSION_DATA END'
@@ -230,16 +256,16 @@ do
   exports=$(extract_values $all_exports "$source_re")
   requires=$(extract_values $all_require_vars "$source_re")
   pullouts=$(extract_values $all_pullout_vars "$source_re")
-  required_by=$(grep ":$source_re$" $all_requires | cut -d ':' -f 1 |
-                indent_list)
+  required_by=$(grep ":$source_re$" $all_requires | cut -d ':' -f 1)
 
-  var_lines=$(echo "$requires"'
-'"$pullouts" | sed '/^ *$/d' | sed -e '1s/^    /var /' -e '$s/,/;/')
+  var_lines=$(echo "${requires}${LF}$pullouts" | sed '/^ *$/d' |
+              sed -e '1s/^    /var /' -e '$s/,/;/')
 
-  write_exports "$exports" "$source" "$source_copy"
+  # Also sets globals_list
+  write_exports "$exports" "$required_by" "$source" "$source_copy"
 
-  warnings=$(extract_values $all_warnings "$source_re" | indent_list)
-  source_file_text "$warnings" "$required_by" "$var_lines" \
+  warnings=$(extract_values $all_warnings "$source_re")
+  source_file_text "$warnings" "$required_by" "$globals_list" "$var_lines" \
                    "$source_copy" > "$source"
 
   rm "$source_copy"
