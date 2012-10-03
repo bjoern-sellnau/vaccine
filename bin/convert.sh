@@ -119,12 +119,19 @@ do
       var="require_$var"
     fi
   fi
-  requires=$(grep "\<$global[^.[:alnum:]]" $sources | cut -d ':' -f 1 |
-             grep -v "^$defined_in_re$" | sed "s#\$#:$var:$def_module:$defined_in#")
-  echo "$requires" >> $all_requires
-  if test "X$module_exports" != Xtrue
+  requires=$(grep "\<$global\>" $sources | cut -d ':' -f 1 |
+             grep -v "^$defined_in_re$" |
+             sed "s#\$#:$var:$def_module:$defined_in#")
+  if test "X$requires" = X
   then
-    echo "$requires" | sed "s/$/:$global/" >> $all_pullouts
+    msg="Global <$global> never required"
+    warn 'no-req' "$msg" "$defined_in"
+  else
+    echo "$requires" >> $all_requires
+    if test "X$module_exports" != Xtrue
+    then
+      echo "$requires" | sed "s/$/:$global/" >> $all_pullouts
+    fi
   fi
 done
 
@@ -173,7 +180,7 @@ indent_list() {
   sed 's#^#//  - #'
 }
 
-write_exports() {
+write_exports_global_list() {
   exports=$1
   required_by=$2
   source=$3
@@ -261,8 +268,7 @@ do
   var_lines=$(echo "${requires}${LF}$pullouts" | sed '/^ *$/d' |
               sed -e '1s/^    /var /' -e '$s/,/;/')
 
-  # Also sets globals_list
-  write_exports "$exports" "$required_by" "$source" "$source_copy"
+  write_exports_global_list "$exports" "$required_by" "$source" "$source_copy"
 
   warnings=$(extract_values $all_warnings "$source_re")
   source_file_text "$warnings" "$required_by" "$globals_list" "$var_lines" \
