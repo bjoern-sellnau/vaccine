@@ -36,7 +36,7 @@ warn() {
   else
     file='<multiple files>'
   fi
-  printf '%-24s %-16s %s\n' "$file" "$id" "$msg"
+  printf '%-24s %-16s %s\n' "$file" "$id" "$original_message"
 
   msg="[$id] $original_message"
   for source in "$@"
@@ -138,8 +138,9 @@ do
     if $(grep -q "^$being_required_re:.*:$requiring_re$" $all_requires)
     then
       echo "$requiring:$being_required" >> $all_circulars
-      msg="Circular requires between <$requiring> and <$being_required>"
-      warn 'circular' "$msg" "$requiring" "$being_required"
+      pre="Circular require with"
+      warn 'circular' "$pre <$being_required>" "$requiring"
+      warn 'circular' "$pre <$requiring>" "$being_required"
     fi
   fi
 done
