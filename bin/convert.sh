@@ -148,10 +148,10 @@ done
 
 # Vars
 
-sed -e "s/:\(.*\):\(.*\):/:    \1 = require('\2'),/" \
+sed -e "s/:\(.*\):\(.*\):.*$/:    \1 = require('\2'),/" \
     $all_requires > $all_require_vars
 
-sed 's/:\(.*\):.*:\(.*\)/:    \2 = \1.\2,/' $all_pullouts > $all_pullout_vars
+sed 's/:\(.*\):.*:.*:\(.*\)$/:    \2 = \1.\2,/' $all_pullouts > $all_pullout_vars
 
 
 # Write to files
