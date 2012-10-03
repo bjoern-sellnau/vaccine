@@ -66,12 +66,6 @@ vaccine is actually built using the `vaccine` binary.
 Define and Require
 ------------------
 
-If you are familiar with [RequireJS](requirejs.org) or
-[Asynchronus Module Definition (AMD)](https://github.com/amdjs/amdjs-api/wiki/AMD),
-then you may find it easier to think of vaccine as the alternative
-[CommonJS syntax](http://requirejs.org/docs/commonjs.html) with a required
-module id.
-
 To make a module, simply wrap your module in a call to `define` with the
 module's name, and a function that accepts three arguments (require, exports,
 module):
@@ -437,6 +431,16 @@ Note that the gz-% column shows the percentage increase of your gzipped
 app when adding vaccine. The percentage of bytes that make up vaccine
 in the gzipped app would be slightly smaller, depending on the initial
 size of your app.
+
+Conversion Tool
+---------------
+
+Vaccine comes with a conversion tool (`vaccine convert`) to help you convert
+your code base to vaccine format, or between absolute and relative requires.
+
+**This tool is destructive. Back up your code.**
+
+**This tool is a work in progress.**
 
 LICENSE
 -------
