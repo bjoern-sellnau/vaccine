@@ -99,8 +99,9 @@ define('runner', function(require, exports, module) {
 ```
 
 The module name/id given to `define` is the full name, so be careful that no two
-modules use the same name. **It is important to prefix your module names with
-the name of your app or lib, separated by a slash**.
+modules use the same name. It is important to **prefix your module names** with
+the name of your app or lib, separated by a slash (e. g.
+`define('my_app/module', ...` instead of `define('module', ...`).
 
 ### Relative require ###
 
@@ -164,10 +165,10 @@ define('my_lib/index', function(require, exports, module) {
 * The `define`'s can be in any order (for the full version of vaccine.js).
 * The module id's passed to `define` are global, so make sure that there
   are no collisions by using your app/lib name as a prefix.
-* Don't use ".js" at the end of module ids.
+* Don't use `.js` at the end of module ids.
 * Circular dependencies are not supported. However, as long as you let the
   module's function return, you can call require at some later point to get
-  a module's object.
+  a module's exports.
 * The `require` currently works by using exceptions (try, catch, throw). This
   means that you should not have any side effects before a `require` call
   for a module that isn't yet defined. This shouldn't be a problem,
@@ -279,7 +280,8 @@ Node / CommonJS Files
 ---------------------
 
 If you want to have your modules be CommonJS compliant, there is a slightly
-more complicated (but still only ~13 lines of code) way to build your
+more complicated (but still only ~13 lines of code) way to
+[build](https://github.com/jakesandlund/vaccine/blob/master/build_node) your
 app/lib.
 
 With this build script, simply leave out the `define` wrapper and use
