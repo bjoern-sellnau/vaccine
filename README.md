@@ -6,7 +6,8 @@ Vaccine is a temporary treatment
 to JavaScript's modularity problem that works by injecting a small script into
 your code (like how a vaccine uses a virus). It is small enough to be used in
 libraries, so that library developers do not have to depend on the application
-using it. Vaccine includes support for Node/CommonJS modules.
+using it. Vaccine includes support for Node/CommonJS modules. It also handles
+library-to-library or application-to-library "requires".
 
 Simple Install
 --------------

@@ -12,7 +12,7 @@ then
 else
   files_list=$source_dir
 fi
-files_list=$(echo "$files_list" | grep -v 'vaccine.*\.js')
+files_list=$(echo "$files_list" | grep -v '^vaccine.*\.js$')
 
 v=vaccines
 test -d $v && mv $v old_vaccines
