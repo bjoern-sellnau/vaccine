@@ -5,6 +5,7 @@ global=$2
 source_dir=$3
 globals=$4
 sources_file=$5
+write_exports=$6
 sources=$(cat "$sources_file")
 
 prefix=_vaccine_all_
@@ -275,6 +276,7 @@ do
               sed -e '1s/^    /var /' -e '$s/,/;/')
 
   write_exports_global_list "$exports" "$required_by" "$source" "$source_copy"
+  test "X$write_exports" = Xtrue || cp "$source" "$source_copy"
 
   warnings=$(extract_values $all_warnings "$source_re")
   source_file_text "$warnings" "$required_by" "$globals_list" "$var_lines" \

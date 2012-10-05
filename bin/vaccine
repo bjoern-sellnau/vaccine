@@ -21,6 +21,7 @@ Options:
                           # List of globals when converting to vaccine.
         --sources-list <file>
                           # List of sources that need to be converted
+        --write-exports   # Convert globals to exports [dangerous]
 
 Examples:
   vaccine configure datazooka --src src --lib lib   # src and lib are defaults
@@ -129,10 +130,16 @@ do
     --global) global_var=$2 ;;
     --globals-list) globals_list=$2 ;;
     --sources-list) sources_list=$2 ;;
+    --write-exports) write_exports=true ;;
     --to) convert_to=$2 ;;
     *) fail "Unrecognized option: $1" ;;
   esac
-  shift 2
+  if test "X$1" = "X--write-exports"
+  then
+    shift 1
+  else
+    shift 2
+  fi
 done
 
 if test $command = size -o $command = inject
@@ -163,7 +170,7 @@ then
       ;;
     vaccine)
       $vaccine_bin_dir/convert.sh "$app_name" "$global_var" "$source_dir" \
-                                  "$globals_list" "$sources_list"
+                                  "$globals_list" "$sources_list" "$write_exports"
       ;;
     *)
       fail "Unrecognized convert to type (--to): $convert_to"
