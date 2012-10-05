@@ -40,5 +40,4 @@ make_simple() {
 make_simple vaccine 0
 make_simple vaccine_loader 0
 make_simple vaccine_ordered 2
-make_simple vaccine_simple 1
-make_simple vaccine_simple_ordered 3
+make_simple vaccine_simple 3

@@ -234,6 +234,10 @@ vaccine_minimal() {
       unindent | clean
 }
 
+relative() {
+  remove_sections SIMPLE_RELATIVE
+}
+
 simplify() {
   remove_sections RELATIVE | remove_sections INDEX
 }
@@ -260,13 +264,11 @@ cd vaccines
 
 # Vaccines
 
-start $vaccine_src | clean > vaccine_loader.js
-vaccine_intermediate | clean > vaccine.js
-ordered_intermediate | clean > vaccine_ordered.js
-vaccine_intermediate | simplify |
-    clean > vaccine_simple.js
+start $vaccine_src | relative | clean > vaccine_loader.js
+vaccine_intermediate | relative | clean > vaccine.js
+ordered_intermediate | relative | clean > vaccine_ordered.js
 ordered_intermediate | simplify |
-    clean > vaccine_simple_ordered.js
+    clean > vaccine_simple.js
 vaccine_minimal > vaccine_minimal.js
 
 

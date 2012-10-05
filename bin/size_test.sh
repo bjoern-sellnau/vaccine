@@ -42,7 +42,6 @@ build_without() {
 build vaccine.js > $v/with_vaccine.js
 build vaccine_ordered.js > $v/with_ordered.js
 build vaccine_simple.js > $v/with_simple.js
-build vaccine_simple_ordered.js > $v/with_simple_ordered.js
 build_without > $v/without_vaccine.js
 
 cp "$v/original.js" "$v/with_minimal.js"
@@ -56,13 +55,11 @@ without=$($vaccine built-size without_vaccine.js)
 with=$($vaccine built-size with_vaccine.js)
 with_ordered=$($vaccine built-size with_ordered.js)
 with_simple=$($vaccine built-size with_simple.js)
-with_simple_ordered=$($vaccine built-size with_simple_ordered.js)
 with_minimal=$($vaccine built-size with_minimal.js)
 
 size_vaccine=$($vaccine built-size vaccine.js)
 size_ordered=$($vaccine built-size vaccine_ordered.js)
 size_simple=$($vaccine built-size vaccine_simple.js)
-size_simple_ordered=$($vaccine built-size vaccine_simple_ordered.js)
 
 compare() {
   if test "X$1" = "X--text"
@@ -80,7 +77,6 @@ compare() {
 comp_vaccine=$(compare --text "$size_vaccine" $with $without)
 comp_ordered=$(compare --text "$size_ordered" $with_ordered $without)
 comp_simple=$(compare --text "$size_simple" $with_simple $without)
-comp_simple_ordered=$(compare --text "$size_simple_ordered" $with_simple_ordered $without)
 comp_minimal=$(compare $with_minimal $original)
 
 out() {
@@ -102,9 +98,6 @@ out '(integrated) ordered' $comp_ordered
 echo ''
 out 'simple' $size_simple -
 out '(integrated) simple' $comp_simple
-echo ''
-out 'simple_ordered' $size_simple_ordered -
-out '(integrated) simple_ordered' $comp_simple_ordered
 echo ''
 out 'minimal' $($vaccine built-size vaccine_minimal.js) -
 out '(integrated) minimal' $comp_minimal

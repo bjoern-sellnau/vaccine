@@ -46,6 +46,9 @@
 
     function require(reqId) {
 
+################### SIMPLE_RELATIVE START ###################
+      reqId = reqId.replace('.', '{{{ APP_NAME }}}');
+>>>>>>>>>>>>>>>>>>>> SIMPLE_RELATIVE END >>>>>>>>>>>>>>>>>>>>
 ###################### RELATIVE START ######################
       var matching = /(\.?\.\/?)*/.exec(reqId)[0],
           // Some code golf to get the number of "directories" back we want to go
@@ -76,7 +79,7 @@
       globalVaccine.s(id, module.exports);
 ######################## INDEX START ########################
       if (id.match(/\/index$/)) {
-        globalVaccine.s(id.replace(/\/index$/,''), module.exports);
+        globalVaccine.s(id.replace(/\/index$/, ''), module.exports);
       }
 >>>>>>>>>>>>>>>>>>>>>>>>> INDEX END >>>>>>>>>>>>>>>>>>>>>>>>>
 #################### OUT_OF_ORDER START ####################
