@@ -46,6 +46,6 @@ function define(id, defn) {
     defn(require, module.exports, module);
     globalVaccine.s(id, module.exports);
     if (id.match(/\/index$/)) {
-      globalVaccine.s(id.replace(/\/index$/,''), module.exports);
+      globalVaccine.s(id.replace(/\/index$/, ''), module.exports);
     }
 }
