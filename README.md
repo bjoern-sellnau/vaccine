@@ -362,16 +362,31 @@ call to `require` must be to a module that has already been defined.
 
 ### vaccine_simple.js ###
 
-This version is vaccine.js but without support for relative requires and
-the "/index" hook. To use this, every module id must be typed out in full
-when calling `require`. Also, defining "my_app/index" does not also define
-"my_app".
+This version is vaccine_ordered.js with limited support for relative requires and
+without the "/index" hook.
 
-### vaccine_simple_ordered.js ###
+The only relative require that works is `./module` to `my_app/module`. In fact,
+it just replaces the `.` with your app name. This is even the case for
+the `my_app` module, which is different than how the full relative require
+version works.
 
-This is the combination of the above two versions. You must use full module
-ids for `require`, not rely on the "/index" trick, and define everything in
-order.
+While defining "my_app/index" does not also define "my_app", this is not needed
+due to how the `.` is replaced with your app name. So this works (but only
+with the limited relative require):
+
+```javascript
+define('my_app', function(require, exports, module) {
+
+  // Require 'my_app/module' using limited relative require. If you
+  // later switch to full relative requires, you must change this module
+  // to 'my_app/index', or else this would require 'module' not 'my_app/module'.
+  var module = require('./module');
+  ...
+});
+```
+
+If you are using CommonJS modules, then use vaccine_simple.js with
+`build_node_simple`, as this renames `my_app/index` to `my_app`.
 
 ### vaccine_(*Your vaccine type here*).js ###
 
@@ -402,20 +417,17 @@ Running this on [DataZooka](http://www.datazooka.com), a tool I am developing
 that uses vaccine, I get the following output: (the size is ~12k gzipped)
 
 ```sh
-vaccine size src --app datazooka
+$ vaccine size src --app datazooka
                  size types:  text  min   gz   gz-%
 
-                 vaccine.js:  1761  591  363      -
-    (integrated) vaccine.js:  1761  580  259  2.19%
+                 vaccine.js:  1760  591  363      -
+    (integrated) vaccine.js:  1760  580  259  2.19%
 
-                    ordered:  1456  482  310      -
-       (integrated) ordered:  1456  476  201  1.70%
+                    ordered:  1455  482  310      -
+       (integrated) ordered:  1455  476  201  1.70%
 
-                     simple:  1209  338  221      -
-        (integrated) simple:  1209  327  137  1.16%
-
-             simple_ordered:   904  229  167      -
-(integrated) simple_ordered:   904  223   85  0.72%
+                     simple:   944  255  188      -
+        (integrated) simple:   944  249  102  0.86%
 
                     minimal:   609  116  109      -
        (integrated) minimal:   583  143   55  0.47%
