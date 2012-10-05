@@ -297,6 +297,9 @@ start_server $standalone_server_src | insert_node_wrap |
 start $build_src > build
 chmod +x build
 
-start $build_node_src > build_node
+start $build_node_src | remove_sections RENAME_MAIN > build_node
 chmod +x build_node
+
+start $build_node_src | clean > build_node_simple
+chmod +x build_node_simple
 

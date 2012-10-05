@@ -11,6 +11,9 @@ cat vaccine.js   # Output vaccine.js separately
 for file in $(find $source_dir -type f)
 do
   name="$app_name/$(echo "$file" | sed -e "s#^$source_dir/##" -e 's/\.js//')"
+#################### RENAME_MAIN START ####################
+  test "X$name" = "X$app_name/index" && name=$app_name
+>>>>>>>>>>>>>>>>>>>>> RENAME_MAIN END >>>>>>>>>>>>>>>>>>>>>
   echo "define('$name', function(require, exports, module) {"
   cat $file
   echo '});'
