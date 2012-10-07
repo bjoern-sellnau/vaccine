@@ -18,13 +18,13 @@ app.get(/^\/build[\/\w]*\.?\w*$/, function(req, res) {
 });
 
 app.get(new RegExp('^/' + sourceDir + '/.*'), function(req, res) {
-  findFile(req.path, function(err, fileText, path) {
+  findFile(req.path, function(err, fileBufferOrText, path) {
     if (err) return notFound(err, req.path, res);
     res.type('application/javascript');
 ####################### NODE START #######################
-    fileText = nodeWrap(path, fileText);
+    fileBufferOrText = nodeWrap(path, fileBufferOrText);
 >>>>>>>>>>>>>>>>>>>>>>>> NODE END >>>>>>>>>>>>>>>>>>>>>>>>
-    res.send(fileText);
+    res.send(fileBufferOrText);
   });
 });
 
@@ -36,3 +36,4 @@ app.get(new RegExp('^/' + sourceDir + '/.*'), function(req, res) {
 app.use(express.static(__dirname));
 
 app.listen(3000);
+console.log('Serving localhost:3000');

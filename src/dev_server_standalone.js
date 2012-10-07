@@ -7,6 +7,7 @@ var appName = '{{{ APP_NAME }}}',       // Change this to your app name.
 var http = require('http'),
     fs = require('fs'),
     exec = require('child_process').exec,
+    server,
     types;
 
 types = {
@@ -19,9 +20,10 @@ types = {
   jpg: 'image/jpeg',
   jpeg: 'image/jpeg',
   gif: 'image/gif',
+  ico: 'image/x-icon',
 };
 
-http.createServer(function (req, res) {
+server = http.createServer(function (req, res) {
   if (req.url.match(/^\/build[\/\w]*\.?\w*$/)) {
     exec('.' + req.url, {maxBuffer: 1024*1024}, function(err, stdout) {
       if (err) return notFound(err, req.url, res);
@@ -29,7 +31,7 @@ http.createServer(function (req, res) {
       res.end(stdout);
     });
   } else {
-    findFile(req.url, function(err, fileText, path) {
+    findFile(req.url, function(err, fileBufferOrText, path) {
       if (err) return notFound(err, req.url, res);
       var ext = path.split('.').pop();
       if (ext === path) ext = 'html';
@@ -37,14 +39,18 @@ http.createServer(function (req, res) {
       if (!type) type = 'text/plain';
 ####################### NODE START #######################
       if (path.match(new RegExp('^.' + sourceDir + '/'))) {
-        fileText = nodeWrap(path, fileText);
+        fileBufferOrText = nodeWrap(path, fileBufferOrText);
       }
 >>>>>>>>>>>>>>>>>>>>>>>> NODE END >>>>>>>>>>>>>>>>>>>>>>>>
       res.writeHead(200, {'Content-Type': type});
-      res.end(fileText);
+      res.end(fileBufferOrText);
     });
   }
-}).listen(3000, 'localhost');
+});
+
+server.listen(3000, 'localhost');
+console.log('Serving localhost:3000');
+server.on('error', console.log);
 
 --------------------- COMMON INSERT ---------------------
 

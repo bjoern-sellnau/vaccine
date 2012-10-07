@@ -1,6 +1,6 @@
 function notFound(err, path, res) {
   if (err !== true) console.log(err);
-  console.log('404: ' + path);
+  if (!path.match(/favicon\.ico/)) console.log('404: ' + path);
   res.writeHead(404, {'Content-Type': 'text/plain'});
   res.end('404 Not Found\n');
 }
@@ -25,8 +25,8 @@ function findFile(path, callback, lastCheck) {
     }
 >>>>>>>>>>>>>>>>>>>>> STANDALONE END >>>>>>>>>>>>>>>>>>>>>
 
-    fs.readFile('.' + path, 'utf8', function(err, fileText) {
-      callback(err, fileText, path);
+    fs.readFile('.' + path, function(err, buffer) {
+      callback(err, buffer, path);
     });
   });
 }
