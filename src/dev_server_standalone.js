@@ -7,6 +7,8 @@ var appName = '{{{ APP_NAME }}}',       // Change this to your app name.
 var http = require('http'),
     fs = require('fs'),
     exec = require('child_process').exec,
+    port = 3000,
+    rootUrl = 'http://localhost:' + port,
     server,
     types;
 
@@ -38,7 +40,7 @@ server = http.createServer(function (req, res) {
       var type = types[ext];
       if (!type) type = 'text/plain';
 ####################### NODE START #######################
-      if (path.match(new RegExp('^.' + sourceDir + '/'))) {
+      if (path.match(new RegExp('^/' + sourceDir + '/'))) {
         fileBufferOrText = nodeWrap(path, fileBufferOrText);
       }
 >>>>>>>>>>>>>>>>>>>>>>>> NODE END >>>>>>>>>>>>>>>>>>>>>>>>
@@ -48,8 +50,8 @@ server = http.createServer(function (req, res) {
   }
 });
 
-server.listen(3000, 'localhost');
-console.log('Serving localhost:3000');
+server.listen(port, 'localhost');
+console.log('Serving ' + rootUrl);
 server.on('error', console.log);
 
 --------------------- COMMON INSERT ---------------------

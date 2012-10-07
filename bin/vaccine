@@ -265,6 +265,7 @@ cd vaccines
 # Vaccines
 
 start $vaccine_src | relative | clean > vaccine_loader.js
+start $vaccine_src | simplify | clean > vaccine_loader_simple.js
 vaccine_intermediate | relative | clean > vaccine.js
 ordered_intermediate | relative | clean > vaccine_ordered.js
 ordered_intermediate | simplify |
@@ -282,14 +283,24 @@ insert_node_wrap() {
   insert_section NODE_WRAP $node_wrap_src
 }
 
+express_node() {
+  start_server $express_server_src | remove_sections STANDALONE |
+      insert_node_wrap
+}
+
+standalone_node() {
+  start_server $standalone_server_src | insert_node_wrap
+}
+
 start_server $express_server_src | remove_sections STANDALONE |
     remove_sections NODE | clean > dev_server_express.js
-start_server $express_server_src | remove_sections STANDALONE |
-    insert_node_wrap | clean > dev_server_express_node.js
+express_node | remove_sections RENAME_MAIN | clean > dev_server_express_node.js
+express_node | clean > dev_server_express_node_simple.js
 start_server $standalone_server_src | remove_sections NODE |
     clean > dev_server_standalone.js
-start_server $standalone_server_src | insert_node_wrap |
+standalone_node | remove_sections RENAME_MAIN |
     clean > dev_server_standalone_node.js
+standalone_node | clean > dev_server_standalone_node_simple.js
 
 
 # Builds

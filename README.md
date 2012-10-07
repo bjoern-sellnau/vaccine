@@ -220,6 +220,7 @@ Then use it in your html files like this:
 
 Things to know:
 
+* The `my_app/index` module will appear as `/.js` in the sources list.
 * This loader is for development purposes only! When you go to combine your
   files, make sure you are not using vaccine_loader.js.
 * The loader is meant to be used with any of the development servers (described

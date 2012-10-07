@@ -17,7 +17,7 @@ app.get(/^\/build[\/\w]*\.?\w*$/, function(req, res) {
   });
 });
 
-app.get(new RegExp('^/' + sourceDir + '/.*'), function(req, res) {
+app.get(new RegExp('^/' + sourceDir + '/'), function(req, res) {
   findFile(req.path, function(err, fileBufferOrText, path) {
     if (err) return notFound(err, req.path, res);
     res.type('application/javascript');
