@@ -55,6 +55,7 @@ function nodeWrap(path, buffer) {
       module = path.slice(1).replace(prefix, '').replace(/\.js$/, ''),
       fullModule = appName + '/' + module,
       compiled;
+  if (module === 'index') fullModule = appName;
   compiled = 'define("' + fullModule + '", function(require, exports, module) {\n';
   compiled += buffer.toString('utf8');
   compiled += '\n});';

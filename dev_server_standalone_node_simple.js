@@ -1,3 +1,7 @@
+var appName = 'my_app',       // Change this to your app name.
+    sourceDir = 'src';   // Change this to... uh, your source directory.
+
+
 var http = require('http'),
     fs = require('fs'),
     exec = require('child_process').exec,
@@ -33,6 +37,9 @@ server = http.createServer(function (req, res) {
       if (ext === path) ext = 'html';
       var type = types[ext];
       if (!type) type = 'text/plain';
+      if (path.match(new RegExp('^/' + sourceDir + '/'))) {
+        fileBufferOrText = nodeWrap(path, fileBufferOrText);
+      }
       res.writeHead(200, {'Content-Type': type});
       res.end(fileBufferOrText);
     });
@@ -74,3 +81,14 @@ function findFile(path, callback, lastCheck) {
   });
 }
 
+function nodeWrap(path, buffer) {
+  var prefix = new RegExp('^' + sourceDir + '/'),
+      module = path.slice(1).replace(prefix, '').replace(/\.js$/, ''),
+      fullModule = appName + '/' + module,
+      compiled;
+  if (module === 'index') fullModule = appName;
+  compiled = 'define("' + fullModule + '", function(require, exports, module) {\n';
+  compiled += buffer.toString('utf8');
+  compiled += '\n});';
+  return compiled;
+}

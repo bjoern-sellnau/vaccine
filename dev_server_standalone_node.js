@@ -5,6 +5,9 @@ var appName = 'my_app',       // Change this to your app name.
 var http = require('http'),
     fs = require('fs'),
     exec = require('child_process').exec,
+    port = 3000,
+    rootUrl = 'http://localhost:' + port,
+    server,
     types;
 
 types = {
@@ -17,9 +20,10 @@ types = {
   jpg: 'image/jpeg',
   jpeg: 'image/jpeg',
   gif: 'image/gif',
+  ico: 'image/x-icon',
 };
 
-http.createServer(function (req, res) {
+server = http.createServer(function (req, res) {
   if (req.url.match(/^\/build[\/\w]*\.?\w*$/)) {
     exec('.' + req.url, {maxBuffer: 1024*1024}, function(err, stdout) {
       if (err) return notFound(err, req.url, res);
@@ -27,24 +31,28 @@ http.createServer(function (req, res) {
       res.end(stdout);
     });
   } else {
-    findFile(req.url, function(err, fileText, path) {
+    findFile(req.url, function(err, fileBufferOrText, path) {
       if (err) return notFound(err, req.url, res);
       var ext = path.split('.').pop();
       if (ext === path) ext = 'html';
       var type = types[ext];
       if (!type) type = 'text/plain';
-      if (path.match(new RegExp('^.' + sourceDir + '/'))) {
-        fileText = nodeWrap(path, fileText);
+      if (path.match(new RegExp('^/' + sourceDir + '/'))) {
+        fileBufferOrText = nodeWrap(path, fileBufferOrText);
       }
       res.writeHead(200, {'Content-Type': type});
-      res.end(fileText);
+      res.end(fileBufferOrText);
     });
   }
-}).listen(3000, 'localhost');
+});
+
+server.listen(port, 'localhost');
+console.log('Serving ' + rootUrl);
+server.on('error', console.log);
 
 function notFound(err, path, res) {
   if (err !== true) console.log(err);
-  console.log('404: ' + path);
+  if (!path.match(/favicon\.ico/)) console.log('404: ' + path);
   res.writeHead(404, {'Content-Type': 'text/plain'});
   res.end('404 Not Found\n');
 }
@@ -67,19 +75,19 @@ function findFile(path, callback, lastCheck) {
       return;
     }
 
-    fs.readFile('.' + path, 'utf8', function(err, fileText) {
-      callback(err, fileText, path);
+    fs.readFile('.' + path, function(err, buffer) {
+      callback(err, buffer, path);
     });
   });
 }
 
-function nodeWrap(path, rawFileText) {
+function nodeWrap(path, buffer) {
   var prefix = new RegExp('^' + sourceDir + '/'),
       module = path.slice(1).replace(prefix, '').replace(/\.js$/, ''),
       fullModule = appName + '/' + module,
       compiled;
-  compiled = 'define("' + fullModule + '", function(require, exports, module) {';
-  compiled += rawFileText;
-  compiled += '});';
+  compiled = 'define("' + fullModule + '", function(require, exports, module) {\n';
+  compiled += buffer.toString('utf8');
+  compiled += '\n});';
   return compiled;
 }

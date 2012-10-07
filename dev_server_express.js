@@ -14,17 +14,17 @@ app.get(/^\/build[\/\w]*\.?\w*$/, function(req, res) {
   });
 });
 
-app.get(new RegExp('^/' + sourceDir + '/.*'), function(req, res) {
-  findFile(req.path, function(err, fileText, path) {
+app.get(new RegExp('^/' + sourceDir + '/'), function(req, res) {
+  findFile(req.path, function(err, fileBufferOrText, path) {
     if (err) return notFound(err, req.path, res);
     res.type('application/javascript');
-    res.send(fileText);
+    res.send(fileBufferOrText);
   });
 });
 
 function notFound(err, path, res) {
   if (err !== true) console.log(err);
-  console.log('404: ' + path);
+  if (!path.match(/favicon\.ico/)) console.log('404: ' + path);
   res.writeHead(404, {'Content-Type': 'text/plain'});
   res.end('404 Not Found\n');
 }
@@ -42,8 +42,8 @@ function findFile(path, callback, lastCheck) {
       return;
     }
 
-    fs.readFile('.' + path, 'utf8', function(err, fileText) {
-      callback(err, fileText, path);
+    fs.readFile('.' + path, function(err, buffer) {
+      callback(err, buffer, path);
     });
   });
 }
@@ -53,3 +53,4 @@ function findFile(path, callback, lastCheck) {
 app.use(express.static(__dirname));
 
 app.listen(3000);
+console.log('Serving localhost:3000');
