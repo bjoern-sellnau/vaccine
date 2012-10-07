@@ -134,12 +134,14 @@
     initialScripts.forEach(function(src) { loadScript(src); });
   });
 
-  window.vaccine_load = function(src) {
-    if (loaded) {
-      loadScript(src);
-    } else {
-      initialScripts.push(src);
-    }
+  window.vaccine_load = function() {
+    Array.prototype.slice.apply(arguments).forEach(function(src) {
+      if (loaded) {
+        loadScript(src);
+      } else {
+        initialScripts.push(src);
+      }
+    });
   };
 
 }());
