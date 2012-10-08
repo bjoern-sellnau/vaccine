@@ -6,8 +6,51 @@ Vaccine is a temporary treatment
 to JavaScript's modularity problem that works by injecting a small script into
 your code (like how a vaccine uses a virus). It is small enough to be used in
 libraries, so that library developers do not have to depend on the application
-using it. Vaccine includes support for Node/CommonJS modules. It also handles
-library-to-library or application-to-library "requires".
+using it (or conversely, applications aren't forced to use vaccine when a
+library uses it).
+
+*How small?*
+
+100 to 300 bytes (minified and gzipped), depending on how vaccine is configured.
+
+*What do I get by using vaccine?*
+
+Vaccine includes support for Node/CommonJS modules. This means you can write
+your combination browser and Node.js library with the same source files.
+
+Vaccine also handles library-to-library or application-to-library "requires".
+So you can require
+[underscore](https://github.com/documentcloud/underscore/pull/817) with
+`var _ = require('underscore');`
+
+*Doesn't this add a build step, so I can't just refresh?*
+
+Yes and No.
+
+Yes, you do need to build. If your app or library is only used in the browser,
+the [build](https://github.com/jakesandlund/vaccine/blob/master/build) step
+could be as simple as wrapping the concatenated sources in `(function() { ...
+}());`. Otherwise, the
+[build](https://github.com/jakesandlund/vaccine/blob/master/build_node) script
+does a bit more to wrap the node modules in `define` calls.
+
+No, you don't have to manually build every time. A small
+[development server](https://github.com/jakesandlund/vaccine/blob/master/dev_server_standalone_node.js)
+makes it so a simple reload is all that's needed. Along with that, a
+[script loader](https://github.com/jakesandlund/vaccine/blob/master/vaccine_loader.js)
+can load files automatically whenever there is a `require(<module id>)`.
+
+*How is it so small?*
+
+Vaccine keeps a
+[minimal](https://github.com/jakesandlund/vaccine/blob/master/vaccine_minimal.js)
+global API constant while varying `define` and `require` functionality (which
+is local to the app/lib) to suit different needs. In other words, vaccine scales
+with the size of your app/lib. If your lib is small, use the
+[simplified](https://github.com/jakesandlund/vaccine#vaccine_simplejs)
+(and smaller) version. If your app is large, some of the functionality in
+the [full](https://github.com/jakesandlund/vaccine/blob/master/vaccine.js)
+version might be useful.
 
 Simple Install
 --------------
