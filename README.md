@@ -52,67 +52,15 @@ with the size of your app/lib. If your lib is small, use the
 the [full](https://github.com/jakesandlund/vaccine/blob/master/vaccine.js)
 version might be useful.
 
-Simple Install
---------------
-
-The simplest installation is to copy `vaccine.js` into your project and
-concatenate all your source files with it to make your single app/lib file.
-Let's say you have all your source files (and only source files) under `src/`.
-Then from your project's root directory:
-
-```sh
-$ curl https://raw.github.com/jakesandlund/vaccine/master/vaccine.js > src/vaccine.js
-```
-
-Now to build your app's (or lib's) compiled javascript file, do something like
-this (or use the provided
-[build script](https://github.com/jakesandlund/vaccine/blob/master/build)):
-
-```sh
-$ file=my_app.js          # Whatever you want your compiled file to be called
-$ echo '(function() {' > $file
-$ cat src/* > $file       # Concatenate all source files and vaccine.js
-$ echo '}());' > $file
-```
-
-Your compiled app now works with vaccine's module syntax. It's that easy!
-
-NPM Install
------------
-
-You can also install vaccine with `npm`. This creates a binary that lets
-you configure vaccine scripts for your app. Calling `vaccine configure
-my_app_name` will create a directory called `vaccines` with various scripts you
-can use. See `vaccine --help` to get a list of options.
-
-```sh
-# Install the vaccine binary
-$ npm install -g vaccine
-
-# Configure vaccine for your app (--src defaults to src/, --lib to lib)
-$ vaccine configure my_app_name --src path/to/my/sources --lib libraries
-
-# Pick out scripts to use
-$ cp vaccines/vaccine.js path/to/my/sources
-$ cp vaccines/build .
-$ cp vaccines/vaccine_loader.js .
-$ cp vaccines/dev_server_standlone.js .
-
-# Remove vaccines when you're done
-$ rm -r vaccines
-```
-
-In other places in this README I will make reference to copying a file.
-This can be done by `curl`ing github or by creating a `vaccines` folder with
-the binary. The [root](https://github.com/jakesandlund/vaccine) directory for
-vaccine is actually built using the `vaccine` binary.
-
 Define and Require
 ------------------
 
 To make a module, simply wrap your module in a call to `define` with the
 module's name, and a function that accepts three arguments (require, exports,
-module):
+module). If you want node-style modules, simply leave out the `define`
+call (it's done for you as part of the
+[build script](https://github.com/jakesandlund/vaccine/blob/master/build_node)),
+and use require, exports, and module as you would in Node.js.
 
 * `require`: Used to require other modules. A call to require with a
   module's string id will return that module's api object.
@@ -150,7 +98,7 @@ the name of your app or lib, separated by a slash (e. g.
 ### Relative require ###
 
 `require` can accept relative module "paths" to compute the module id based
-off of the current module being defined.
+off the current module being defined.
 
 ```javascript
 define('my_app/math/add', function(require, exports, module) {
@@ -180,7 +128,8 @@ If you define a module that ends in `/index`, then it will also set the
 module without that suffix to the same object. It is best practice to require
 the id *without* the `/index`, but define the module *with* it. The advantage
 of doing it this way is that you can use a relative require within the
-index module, and it will work as expected.
+index module, and it will work as expected. Leaving off the `/index` is also
+necessary if you used the simplified vaccine.
 
 ```javascript
 // define with '/index'
@@ -217,6 +166,62 @@ define('my_lib/index', function(require, exports, module) {
   means that you should not have any side effects before a `require` call
   for a module that isn't yet defined. This shouldn't be a problem,
   as it is common practice to keep requires at the top of a module anyway.
+  This doesn't apply to the ordered or simplified versions.
+
+Simple Install
+--------------
+
+The simplest installation is to copy `vaccine.js` into your project and
+concatenate all your source files with it to make your single app/lib file.
+Let's say you have all your source files (and only source files) under `src/`.
+Then from your project's root directory:
+
+```sh
+$ curl https://raw.github.com/jakesandlund/vaccine/master/vaccine.js > src/vaccine.js
+```
+
+Now, to build your app's (or lib's) compiled javascript file, do something like
+this (or use the provided
+[build script](https://github.com/jakesandlund/vaccine/blob/master/build)):
+
+```sh
+$ file=my_app.js          # Whatever you want your compiled file to be called
+$ echo '(function() {' > $file
+$ cat src/* >> $file       # Concatenate all source files and vaccine.js
+$ echo '}());' >> $file
+```
+
+Your compiled app now works with vaccine's module syntax. It's that easy!
+
+NPM Install
+-----------
+
+You can also install vaccine with `npm`. This creates a binary that lets
+you configure vaccine scripts for your app. Calling `vaccine configure
+my_app_name` will create a directory called `vaccines` with various scripts you
+can use. See `vaccine --help` to get a list of options.
+
+```sh
+# Install the vaccine binary
+$ npm install -g vaccine
+
+# Configure vaccine for your app (--src defaults to src/, --lib to lib)
+$ vaccine configure my_app_name --src path/to/my/sources --lib libraries
+
+# Pick out scripts to use
+$ cp vaccines/vaccine.js path/to/my/sources
+$ cp vaccines/build .
+$ cp vaccines/vaccine_loader.js .
+$ cp vaccines/dev_server_standlone.js .
+
+# Remove vaccines when you're done
+$ rm -r vaccines
+```
+
+In other places in this README I will make reference to copying a file.
+This can be done by `curl`ing github or by creating a `vaccines` folder with
+the binary. The [root](https://github.com/jakesandlund/vaccine) directory for
+vaccine is actually built using the `vaccine` binary.
 
 Developing With Vaccine
 -----------------------
@@ -330,7 +335,7 @@ more complicated (but still only ~13 lines of code) way to
 app/lib.
 
 With this build script, simply leave out the `define` wrapper and use
-require, exports, and module as you would in any other CommonJS file. The module
+require, exports, and module as you would in any other node file. The module
 id is determined by each file's path on your file system, prefixed by your
 app name. Also make sure that the string passed to `require` does not end in
 ".js", and that it would work when you wrap the file in a `define` call.
@@ -429,7 +434,7 @@ define('my_app', function(require, exports, module) {
 });
 ```
 
-If you are using CommonJS modules, then use vaccine_simple.js with
+If you are using node modules, then use vaccine_simple.js with
 `build_node_simple`, as this renames `my_app/index` to `my_app`.
 
 ### vaccine_(*Your vaccine type here*).js ###
@@ -490,16 +495,6 @@ Note that the gz-% column shows the percentage increase of your gzipped
 app when adding vaccine. The percentage of bytes that make up vaccine
 in the gzipped app would be slightly smaller, depending on the initial
 size of your app.
-
-Conversion Tool
----------------
-
-Vaccine comes with a conversion tool (`vaccine convert`) to help you convert
-your code base to vaccine format, or between absolute and relative requires.
-
-**This tool is destructive. Back up your code.**
-
-**This tool is a work in progress.**
 
 LICENSE
 -------
