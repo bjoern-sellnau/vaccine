@@ -149,11 +149,9 @@ done
 
 if test "X$dep_names" != X
 then
-  if $(echo "$dep_names" | grep -q -v ',')
-  then
-    dep_name=$dep_names
-  fi
-  dep_names=$(echo "$dep_names" | sed -e "s/,/','/g" -e "s/^/['/" -e "s/$/']/")
+  dep_name=$dep_names
+  dep_names=$(echo "$dep_names" | sed -e "s/,/\",\"/g" \
+                                      -e "s/^/[\"/" -e "s/$/\"]/")
 fi
 
 if test $command = size -o $command = inject
@@ -292,7 +290,10 @@ ordered_intermediate | relative | clean > vaccine_ordered.js
 ordered_intermediate | simplify |
     clean > vaccine_simple.js
 vaccine_minimal > vaccine_minimal.js
-vaccine_per_lib_intermediate | clean > vaccine_per_lib_single_dep.js
+vaccine_per_lib_intermediate | remove_sections MULTIPLE_DEPS |
+    simplify | clean > vaccine_per_lib_deps_single.js
+vaccine_per_lib_intermediate | remove_sections SINGLE_DEP |
+    simplify | clean > vaccine_per_lib_deps_multiple.js
 
 
 # Servers
