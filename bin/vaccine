@@ -204,16 +204,12 @@ unindent() {
 }
 
 remove_sections() {
-  sed "/### $1 START ###/,/>>> $1 END >>>/d"
-}
-
-choose_section() {
-  sed -e "1,/### $1 START ###/d" -e "/>>> $1 END >>>/,\$d"
+  sed "/vvvvv $1$/,/\^\^\^\^\^ $1$/d"
 }
 
 insert_section() {
   file=$2
-  sed -e "/--- $1 INSERT ---/r $file" -e "/--- $1 INSERT ---/d"
+  sed -e "/----- $1$/r $file" -e "/----- $1$/d"
 }
 
 replace_vars() {
@@ -232,7 +228,7 @@ start() {
 }
 
 clean() {
-  sed -e '/### .* START ###/d' -e '/>>> .* END >>>/d' -e '/--- .* INSERT ---/d'
+  sed -e '/vvvvv/d' -e '/\^\^\^\^\^/d' -e '/-----/d'
 }
 
 per_lib() {

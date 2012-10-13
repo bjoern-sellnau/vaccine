@@ -17,13 +17,13 @@ function findFile(path, callback, lastCheck) {
       findFile(path.replace(re, replace), callback, true);
       return;
     }
-#################### STANDALONE START ####################
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv STANDALONE
 
     if (stats.isDirectory()) {
       findFile(path + '/index.html', callback, true);
       return;
     }
->>>>>>>>>>>>>>>>>>>>> STANDALONE END >>>>>>>>>>>>>>>>>>>>>
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ STANDALONE
 
     fs.readFile('.' + path, function(err, buffer) {
       callback(err, buffer, path);

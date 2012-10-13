@@ -1,4 +1,4 @@
-####################### LOADER START #######################
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv LOADER
 (function() {
 
   var appName = '{{{ APP_NAME }}}',       // Change this to your app name.
@@ -11,34 +11,34 @@
   // The scripts that are currently loading. Don't touch this.
   var loading = {};
 
->>>>>>>>>>>>>>>>>>>>>>>> LOADER END >>>>>>>>>>>>>>>>>>>>>>>>
-##################### PER_LIB_DEPS START #####################
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ LOADER
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv PER_LIB_DEPS
     var
-##################### SINGLE_DEP START #####################
+  vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv SINGLE_DEP
         vaccineSingleDependency = '{{{ DEP_NAME }}}',
->>>>>>>>>>>>>>>>>>>>>> SINGLE_DEP END >>>>>>>>>>>>>>>>>>>>>>
+  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ SINGLE_DEP
         globalVaccine =
------------------------ MINIMAL INSERT -----------------------
->>>>>>>>>>>>>>>>>>>>>> PER_LIB_DEPS END >>>>>>>>>>>>>>>>>>>>>>
+  ----------------------------------------------------------------- MINIMAL
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ PER_LIB_DEPS
   function define(id, defn) {
 
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv PER_MODULE_DEPS
     var globalVaccine =
-#################### PER_MODULE_DEPS START ####################
------------------------- MINIMAL INSERT -----------------------
->>>>>>>>>>>>>>>>>>>>> PER_MODULE_DEPS END >>>>>>>>>>>>>>>>>>>>>
+  ----------------------------------------------------------------- MINIMAL
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ PER_MODULE_DEPS
 
-###################### RELATIVE START ######################
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv RELATIVE
     var parts = id.split('/');
->>>>>>>>>>>>>>>>>>>>>>> RELATIVE END >>>>>>>>>>>>>>>>>>>>>>>
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ RELATIVE
 
     var module = {exports: {}};
 
     function require(reqId) {
 
-################### SIMPLE_RELATIVE START ###################
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv SIMPLE_RELATIVE
       reqId = reqId.replace('.', '{{{ APP_NAME }}}');
->>>>>>>>>>>>>>>>>>>> SIMPLE_RELATIVE END >>>>>>>>>>>>>>>>>>>>
-###################### RELATIVE START ######################
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ SIMPLE_RELATIVE
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv RELATIVE
       var matching = /(\.?\.\/?)*/.exec(reqId)[0],
           // Some code golf to get the number of "directories" back we want to go
           back = Math.floor(matching.replace(/\//g, '').length / 1.9 + 0.99),
@@ -49,32 +49,32 @@
         reqId = base + reqId.slice(matching.length);
       }
       reqId = reqId.replace(/\/$/, '');
->>>>>>>>>>>>>>>>>>>>>>> RELATIVE END >>>>>>>>>>>>>>>>>>>>>>>
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ RELATIVE
       var mod = globalVaccine.m[reqId];
-#################### OUT_OF_ORDER START ####################
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv OUT_OF_ORDER
       if (!mod) {
         require.id = reqId;
         throw require;  // Throw require, to ensure correct error gets handled
       }
->>>>>>>>>>>>>>>>>>>>> OUT_OF_ORDER END >>>>>>>>>>>>>>>>>>>>>
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ OUT_OF_ORDER
 
       return mod;
     }
 
-#################### OUT_OF_ORDER START ####################
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv OUT_OF_ORDER
     try {
->>>>>>>>>>>>>>>>>>>>> OUT_OF_ORDER END >>>>>>>>>>>>>>>>>>>>>
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ OUT_OF_ORDER
       defn(require, module.exports, module);
       globalVaccine.s(id, module.exports);
-######################## INDEX START ########################
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv INDEX
       if (id.match(/\/index$/)) {
         globalVaccine.s(id.replace(/\/index$/, ''), module.exports);
       }
->>>>>>>>>>>>>>>>>>>>>>>>> INDEX END >>>>>>>>>>>>>>>>>>>>>>>>>
-#################### OUT_OF_ORDER START ####################
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ INDEX
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv OUT_OF_ORDER
     } catch (e) {
       if (e != require) throw e;
-  ##################### LOADER START #####################
+  vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv LOADER
 
       var split = require.id.split('/'),
           root = split.shift(),
@@ -86,20 +86,20 @@
         src = libraryDir + '/' + root;
       }
       loadScript('/' + src + '.js');
-  >>>>>>>>>>>>>>>>>>>>>> LOADER END >>>>>>>>>>>>>>>>>>>>>>
+  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ LOADER
       (globalVaccine.w[require.id] || (globalVaccine.w[require.id] = []))
           .push(function() { define(id, defn); });
     }
->>>>>>>>>>>>>>>>>>>>> OUT_OF_ORDER END >>>>>>>>>>>>>>>>>>>>>
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ OUT_OF_ORDER
   }
-##################### PER_LIB_DEPS START #####################
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv PER_LIB_DEPS
 
   if (globalVaccine.m[vaccineSingleDependency]) vaccineDefines();
   else  (globalVaccine.w[vaccineSingleDependency] ||
           (globalVaccine.w[vaccineSingleDependency] = [])
         ).push(vaccineDefines);
->>>>>>>>>>>>>>>>>>>>>> PER_LIB_DEPS END >>>>>>>>>>>>>>>>>>>>>>
-####################### LOADER START #######################
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ PER_LIB_DEPS
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv LOADER
 
 
   function loadScript(src) {
@@ -141,4 +141,4 @@
   };
 
 }());
->>>>>>>>>>>>>>>>>>>>>>>> LOADER END >>>>>>>>>>>>>>>>>>>>>>>>
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ LOADER

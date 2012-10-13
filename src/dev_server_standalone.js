@@ -1,9 +1,9 @@
-####################### NODE START #######################
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv NODE
 var appName = '{{{ APP_NAME }}}',       // Change this to your app name.
     sourceDir = '{{{ SOURCE_DIR }}}';   // Change this to... uh, your source directory.
 
 
->>>>>>>>>>>>>>>>>>>>>>>> NODE END >>>>>>>>>>>>>>>>>>>>>>>>
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ NODE
 var http = require('http'),
     fs = require('fs'),
     exec = require('child_process').exec,
@@ -39,11 +39,11 @@ server = http.createServer(function (req, res) {
       if (ext === path) ext = 'html';
       var type = types[ext];
       if (!type) type = 'text/plain';
-####################### NODE START #######################
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv NODE
       if (path.match(new RegExp('^/' + sourceDir + '/'))) {
         fileBufferOrText = nodeWrap(path, fileBufferOrText);
       }
->>>>>>>>>>>>>>>>>>>>>>>> NODE END >>>>>>>>>>>>>>>>>>>>>>>>
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ NODE
       res.writeHead(200, {'Content-Type': type});
       res.end(fileBufferOrText);
     });
@@ -54,6 +54,6 @@ server.listen(port, 'localhost');
 console.log('Serving ' + rootUrl);
 server.on('error', console.log);
 
---------------------- COMMON INSERT ---------------------
+------------------------------------------------------------------------ COMMON
 
--------------------- NODE_WRAP INSERT --------------------
+--------------------------------------------------------------------- NODE_WRAP

@@ -1,7 +1,7 @@
 var sourceDir = '{{{ SOURCE_DIR }}}';   // Change this to... uh, your source directory.
-####################### NODE START #######################
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv NODE
 var appName = '{{{ APP_NAME }}}';       // Change this to your app name.
->>>>>>>>>>>>>>>>>>>>>>>> NODE END >>>>>>>>>>>>>>>>>>>>>>>>
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ NODE
 
 
 var express = require('express'),
@@ -21,16 +21,16 @@ app.get(new RegExp('^/' + sourceDir + '/'), function(req, res) {
   findFile(req.path, function(err, fileBufferOrText, path) {
     if (err) return notFound(err, req.path, res);
     res.type('application/javascript');
-####################### NODE START #######################
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv NODE
     fileBufferOrText = nodeWrap(path, fileBufferOrText);
->>>>>>>>>>>>>>>>>>>>>>>> NODE END >>>>>>>>>>>>>>>>>>>>>>>>
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ NODE
     res.send(fileBufferOrText);
   });
 });
 
---------------------- COMMON INSERT ---------------------
+------------------------------------------------------------------------ COMMON
 
--------------------- NODE_WRAP INSERT --------------------
+--------------------------------------------------------------------- NODE_WRAP
 
 
 app.use(express.static(__dirname));
