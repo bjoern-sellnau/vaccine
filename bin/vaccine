@@ -16,6 +16,9 @@ Options:
         --lib <dir>       # The directory for your libraries (default: lib).
         --global <name>   # The global variable for the file being injected.
                           # (default: app name)
+        --deps <d1,...>   # Comma separated lib/app dependencies. Used for
+                          # "per_lib" versions.
+        --dep <d1>        # Single dependency for lib/app.
         --to <type>       # Conversion types: vaccine, relative, absolute.
         --globals-list <file>
                           # List of globals when converting to vaccine.
@@ -50,6 +53,7 @@ then
 fi
 
 vaccine_src=$vaccine_src_dir/vaccine.js
+vaccine_minimal_src=$vaccine_src_dir/vaccine_minimal.js
 standalone_server_src=$vaccine_src_dir/dev_server_standalone.js
 express_server_src=$vaccine_src_dir/dev_server_express.js
 node_wrap_src=$vaccine_src_dir/dev_server_node_wrap.js
@@ -63,7 +67,7 @@ global_var=
 source_dir=src
 library_dir=lib
 
-vars_list='app_name source_dir library_dir global_var'
+vars_list='app_name source_dir library_dir global_var dep_name dep_names'
 
 
 fail() {
@@ -128,6 +132,7 @@ do
     --src) dir_or_file=$2; source_dir=$2 ;;
     --lib) library_dir=$2 ;;
     --global) global_var=$2 ;;
+    --deps | --dep) dep_names=$2 ;;
     --globals-list) globals_list=$2 ;;
     --sources-list) sources_list=$2 ;;
     --write-exports) write_exports=true ;;
@@ -141,6 +146,15 @@ do
     shift 2
   fi
 done
+
+if test "X$dep_names" != X
+then
+  if $(echo "$dep_names" | grep -q -v ',')
+  then
+    dep_name=$dep_names
+  fi
+  dep_names=$(echo "$dep_names" | sed -e "s/,/','/g" -e "s/^/['/" -e "s/$/']/")
+fi
 
 if test $command = size -o $command = inject
 then
@@ -221,8 +235,24 @@ clean() {
   sed -e '/### .* START ###/d' -e '/>>> .* END >>>/d' -e '/--- .* INSERT ---/d'
 }
 
+per_lib() {
+  remove_sections PER_MODULE_DEPS | insert_section MINIMAL $vaccine_minimal_src
+}
+
+per_module() {
+  remove_sections PER_LIB_DEPS | insert_section MINIMAL $vaccine_minimal_src
+}
+
+loader_intermediate() {
+  start $vaccine_src | per_module
+}
+
 vaccine_intermediate() {
-  start $vaccine_src | remove_sections LOADER | unindent
+  start $vaccine_src | remove_sections LOADER | unindent | per_module
+}
+
+vaccine_per_lib_intermediate() {
+  start $vaccine_src | remove_sections LOADER | unindent | per_lib
 }
 
 ordered_intermediate() {
@@ -230,8 +260,8 @@ ordered_intermediate() {
 }
 
 vaccine_minimal() {
-  vaccine_intermediate | choose_section MINIMAL |
-      unindent | clean
+  start $vaccine_minimal_src | sed -e '1s/^/(/' \
+                                   -e "\$s#;#).s('$app_name', $global_var);#"
 }
 
 relative() {
@@ -242,18 +272,13 @@ simplify() {
   remove_sections RELATIVE | remove_sections INDEX
 }
 
-inject_vaccine() {
-  vaccine_minimal | sed '$d' | sed "\$s#;#).s('$app_name', $global_var);#" |
-      sed '1s/^/(/'
-}
-
 if test $command = inject
 then
   if grep -q "window\.vaccine *=" "$dir_or_file"
   then
     echo 'vaccine already found'
   else
-    inject_vaccine >> "$dir_or_file"
+    vaccine_minimal >> "$dir_or_file"
   fi
   exit $?
 fi
@@ -264,13 +289,14 @@ cd vaccines
 
 # Vaccines
 
-start $vaccine_src | relative | clean > vaccine_loader.js
-start $vaccine_src | simplify | clean > vaccine_loader_simple.js
+loader_intermediate | relative | clean > vaccine_loader.js
+loader_intermediate | simplify | clean > vaccine_loader_simple.js
 vaccine_intermediate | relative | clean > vaccine.js
 ordered_intermediate | relative | clean > vaccine_ordered.js
 ordered_intermediate | simplify |
     clean > vaccine_simple.js
 vaccine_minimal > vaccine_minimal.js
+vaccine_per_lib_intermediate | clean > vaccine_per_lib_single_dep.js
 
 
 # Servers

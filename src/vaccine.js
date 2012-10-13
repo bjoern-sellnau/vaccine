@@ -12,31 +12,20 @@
   var loading = {};
 
 >>>>>>>>>>>>>>>>>>>>>>>> LOADER END >>>>>>>>>>>>>>>>>>>>>>>>
+##################### PER_LIB_DEPS START #####################
+    var
+##################### SINGLE_DEP START #####################
+        vaccineSingleDependency = '{{{ DEP_NAME }}}',
+>>>>>>>>>>>>>>>>>>>>>> SINGLE_DEP END >>>>>>>>>>>>>>>>>>>>>>
+        globalVaccine =
+----------------------- MINIMAL INSERT -----------------------
+>>>>>>>>>>>>>>>>>>>>>> PER_LIB_DEPS END >>>>>>>>>>>>>>>>>>>>>>
   function define(id, defn) {
 
     var globalVaccine =
-####################### MINIMAL START #######################
-    window.vaccine || (window.vaccine = {
-      // The minimal code required to be vaccine compliant.
-
-      // w = waiting: Functions to be called when a modules
-      // gets defined. w[moduleId] = [array of functions];
-      w: {},
-
-      // m = modules: Modules that have been fully defined.
-      // m[moduleId] = module.exports value
-      m: {},
-
-      // s = set: When a module becomes fully defined, set
-      // the module.exports value here.
-      // s(moduleId, module.exports)
-      s: function(id, val) {
-        this.m[id] = val;
-        (this.w[id] || []).forEach(function(w) { w(); });
-      }
-    });
-    // Set your library with vaccine.s('{{{ APP_NAME }}}', {{{ GLOBAL_VAR }}});
->>>>>>>>>>>>>>>>>>>>>>>> MINIMAL END >>>>>>>>>>>>>>>>>>>>>>>>
+#################### PER_MODULE_DEPS START ####################
+------------------------ MINIMAL INSERT -----------------------
+>>>>>>>>>>>>>>>>>>>>> PER_MODULE_DEPS END >>>>>>>>>>>>>>>>>>>>>
 
 ###################### RELATIVE START ######################
     var parts = id.split('/');
@@ -103,6 +92,13 @@
     }
 >>>>>>>>>>>>>>>>>>>>> OUT_OF_ORDER END >>>>>>>>>>>>>>>>>>>>>
   }
+##################### PER_LIB_DEPS START #####################
+
+  if (globalVaccine.m[vaccineSingleDependency]) vaccineDefines();
+  else  (globalVaccine.w[vaccineSingleDependency] ||
+          (globalVaccine.w[vaccineSingleDependency] = [])
+        ).push(vaccineDefines);
+>>>>>>>>>>>>>>>>>>>>>> PER_LIB_DEPS END >>>>>>>>>>>>>>>>>>>>>>
 ####################### LOADER START #######################
 
 
