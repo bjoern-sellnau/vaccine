@@ -55,7 +55,6 @@ vaccine_src=$vaccine_src_dir/vaccine.js
 standalone_server_src=$vaccine_src_dir/dev_server_standalone.js
 express_server_src=$vaccine_src_dir/dev_server_express.js
 node_wrap_src=$vaccine_src_dir/dev_server_node_wrap.js
-common_server_src=$vaccine_src_dir/dev_server_common.js
 build_src=$vaccine_src_dir/build
 
 # Variables
@@ -297,32 +296,22 @@ simple_intermediate | remove_sections SINGLE_DEP |
 
 # Servers
 
+express() {
+  start_server $express_server_src
+}
+
+standalone() {
+  start_server $standalone_server_src
+}
+
 start_server() {
-  start $1 | insert_section COMMON $common_server_src
+  start $1 | insert_section NODE_WRAP $node_wrap_src
 }
 
-insert_node_wrap() {
-  insert_section NODE_WRAP $node_wrap_src
-}
-
-express_node() {
-  start_server $express_server_src | remove_sections STANDALONE |
-      insert_node_wrap
-}
-
-standalone_node() {
-  start_server $standalone_server_src | insert_node_wrap
-}
-
-start_server $express_server_src | remove_sections STANDALONE |
-    remove_sections NODE | clean > dev_server_express.js
-express_node | remove_sections RENAME_MAIN | clean > dev_server_express_node.js
-express_node | clean > dev_server_express_node_simple.js
-start_server $standalone_server_src | remove_sections NODE |
-    clean > dev_server_standalone.js
-standalone_node | remove_sections RENAME_MAIN |
-    clean > dev_server_standalone_node.js
-standalone_node | clean > dev_server_standalone_node_simple.js
+express | remove_sections NODE | clean > dev_server_express.js
+express | clean > dev_server_express_node.js
+standalone | remove_sections NODE | clean > dev_server_standalone.js
+standalone | clean > dev_server_standalone_node.js
 
 
 # Builds

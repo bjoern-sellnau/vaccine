@@ -54,6 +54,31 @@ server.listen(port, 'localhost');
 console.log('Serving ' + rootUrl);
 server.on('error', console.log);
 
------------------------------------------------------------------------- COMMON
+function notFound(err, path, res) {
+  console.log(err);
+  if (!path.match(/favicon\.ico/)) console.log('404: ' + path);
+  res.writeHead(404, {'Content-Type': 'text/plain'});
+  res.end('404 Not Found\n');
+}
 
+function findFile(path, callback) {
+  fs.stat('.' + path, function(err, stats) {
+    if (err) return callback(err);
+
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv STANDALONE
+
+    if (stats.isDirectory()) {
+      findFile(path + '/index.html', callback);
+      return;
+    }
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ STANDALONE
+
+    fs.readFile('.' + path, function(err, buffer) {
+      callback(err, buffer, path);
+    });
+  });
+}
+
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv NODE
 --------------------------------------------------------------------- NODE_WRAP
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ NODE

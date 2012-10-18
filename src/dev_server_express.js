@@ -18,19 +18,24 @@ app.get(/^\/build[\/\w]*\.?\w*$/, function(req, res) {
 });
 
 app.get(new RegExp('^/' + sourceDir + '/'), function(req, res) {
-  findFile(req.path, function(err, fileBufferOrText, path) {
+  fs.readFile('.' + req.path, function(err, fileBufferOrText) {
     if (err) return notFound(err, req.path, res);
     res.type('application/javascript');
 vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv NODE
-    fileBufferOrText = nodeWrap(path, fileBufferOrText);
+    fileBufferOrText = nodeWrap('.' + req.path, fileBufferOrText);
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ NODE
     res.send(fileBufferOrText);
   });
 });
 
------------------------------------------------------------------------- COMMON
+function notFound(err, path, res) {
+  console.log(err);
+  res.send('404 Not Found\n', 404);
+}
 
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv NODE
 --------------------------------------------------------------------- NODE_WRAP
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ NODE
 
 
 app.use(express.static(__dirname));
