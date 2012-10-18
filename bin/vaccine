@@ -57,7 +57,6 @@ express_server_src=$vaccine_src_dir/dev_server_express.js
 node_wrap_src=$vaccine_src_dir/dev_server_node_wrap.js
 common_server_src=$vaccine_src_dir/dev_server_common.js
 build_src=$vaccine_src_dir/build
-build_node_src=$vaccine_src_dir/build_node
 
 # Variables
 app_name=
@@ -328,12 +327,10 @@ standalone_node | clean > dev_server_standalone_node_simple.js
 
 # Builds
 
-start $build_src > build
+start $build_src | remove_sections NODE | remove_sections HAS_DEPS |
+    clean > build
 chmod +x build
 
-start $build_node_src | remove_sections RENAME_MAIN > build_node
+start $build_src | remove_sections PRE_WRAPPED | remove_sections HAS_DEPS |
+    clean > build_node
 chmod +x build_node
-
-start $build_node_src | clean > build_node_simple
-chmod +x build_node_simple
-
