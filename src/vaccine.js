@@ -12,67 +12,43 @@ vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv LOADER
   var loading = {};
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ LOADER
-  function define(id, defn) {
 
-vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv PER_MODULE_DEPS
-    var globalVaccine =
-  ----------------------------------------------------------------- MINIMAL
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ PER_MODULE_DEPS
+  function define(id, factory) {
+    (vaccineFactories = vaccineFactories || {})[id] = factory;
+  }
 
+
+  function require(id) {
+
+    var
 vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv COMPLEX_RELATIVE
-    var parts = id.split('/');
+        parts = id.split('/'),
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ COMPLEX_RELATIVE
+        module = {exports: {}};
 
-    var module = {exports: {}};
-
-vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv SIMPLE_REQUIRE
-    function require(reqId) {
-      return globalVaccine.m[reqId.replace('.', '{{{ APP_NAME }}}')];
+    if (!vaccineLocalModules[id] && !vaccineGlobal.m[id]) {
+      vaccineFactories[id](function(reqId) {
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv SIMPLE_RELATIVE
+        return require(reqId.replace('.', vaccineAppName));
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ SIMPLE_RELATIVE
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv COMPLEX_RELATIVE
+        var matching = /(\.?\.\/?)*/.exec(reqId)[0],
+            // Some code golf to get the number of "directories" back we want to go
+            back = Math.floor(matching.replace(/\//g, '').length / 1.9 + 0.99),
+            base;
+        if (back) {
+          base = parts.slice(0, parts.length - back).join('/');
+          if (base) base += '/';
+          reqId = base + reqId.slice(matching.length);
+        }
+        return require(reqId.replace(/\/$/, ''));
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ COMPLEX_RELATIVE
+      }, module.exports, module);
+      vaccineLocalModules[id] = module.exports;
     }
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ SIMPLE_REQUIRE
-vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv COMPLEX_REQUIRE
-    function require(reqId) {
-  vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv SIMPLE_RELATIVE
-      reqId = reqId.replace('.', '{{{ APP_NAME }}}');
-  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ SIMPLE_RELATIVE
-  vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv COMPLEX_RELATIVE
-      var matching = /(\.?\.\/?)*/.exec(reqId)[0],
-          // Some code golf to get the number of "directories" back we want to go
-          back = Math.floor(matching.replace(/\//g, '').length / 1.9 + 0.99),
-          base;
-      if (back) {
-        base = parts.slice(0, parts.length - back).join('/');
-        if (base) base += '/';
-        reqId = base + reqId.slice(matching.length);
-      }
-      reqId = reqId.replace(/\/$/, '');
-  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ COMPLEX_RELATIVE
-      var mod = globalVaccine.m[reqId];
-  vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv OUT_OF_ORDER
-      if (!mod) {
-        require.id = reqId;
-        throw require;  // Throw require, to ensure correct error gets handled
-      }
-  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ OUT_OF_ORDER
+    return vaccineLocalModules[id] || vaccineGlobal.m[id];
+  }
 
-      return mod;
-    }
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ COMPLEX_REQUIRE
-
-
-vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv OUT_OF_ORDER
-    try {
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ OUT_OF_ORDER
-      defn(require, module.exports, module);
-      globalVaccine.s(id, module.exports);
-vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv INDEX_HOOK
-      if (id.match(/\/index$/)) {
-        globalVaccine.s(id.replace(/\/index$/, ''), module.exports);
-      }
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ INDEX_HOOK
-vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv OUT_OF_ORDER
-    } catch (e) {
-      if (e != require) throw e;
   vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv LOADER
 
       var split = require.id.split('/'),
@@ -86,41 +62,66 @@ vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv OUT_OF_ORDER
       }
       loadScript('/' + src + '.js');
   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ LOADER
-      (globalVaccine.w[require.id] || (globalVaccine.w[require.id] = []))
-          .push(function() { define(id, defn); });
-    }
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ OUT_OF_ORDER
-  }
-vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv PER_LIB_DEPS
-vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv PER_LIB_DEPS
 
-  var
-  vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv SINGLE_DEP
+  var vaccineFactories,
+      vaccineAppName = '{{{ APP_NAME }}}',
+      vaccineLocalModules = {},
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv SINGLE_DEP
       vaccineDependency = '{{{ DEP_NAME }}}',
-  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ SINGLE_DEP
-  vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv MULTIPLE_DEPS
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ SINGLE_DEP
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv MULTIPLE_DEPS
       vaccineDependencies = {{{ DEP_NAMES }}},
       vaccineRemainingDeps = vaccineDependencies.length,
-      vaccineRunDefines = function() { --vaccineRemainingDeps || vaccineDefines(); },
-  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ MULTIPLE_DEPS
-      globalVaccine =
-  ----------------------------------------------------------------- MINIMAL
-  vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv SINGLE_DEP
-  if (globalVaccine.m[vaccineDependency]) vaccineDefines();
-  else  (globalVaccine.w[vaccineDependency] ||
-          (globalVaccine.w[vaccineDependency] = [])
-        ).push(vaccineDefines);
-  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ SINGLE_DEP
-  vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv MULTIPLE_DEPS
+      vaccineRunDefines = function() { --vaccineRemainingDeps || vaccineSetApp(); },
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ MULTIPLE_DEPS
+      vaccineGlobal =
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv MINIMAL
+      window.vaccine || (window.vaccine = {
+        // The minimal code required to be vaccine compliant.
+
+        // w = waiting: Functions to be called when a modules
+        // gets defined. w[moduleId] = [array of functions];
+        w: {},
+
+        // m = modules: Modules that have been fully defined.
+        // m[moduleId] = module.exports value
+        m: {},
+
+        // s = set: When a module becomes fully defined, set
+        // the module.exports value here.
+        // s(moduleId, module.exports)
+        s: function(id, val) {
+          this.m[id] = val;
+          (this.w[id] || []).forEach(function(w) { w(); });
+        }
+      });
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ MINIMAL
+
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv HAS_DEPS
+  function vaccineSetApp() {
+    vaccineDefines();
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ HAS_DEPS
+  vaccineGlobal.s(vaccineAppName, require(vaccineAppName));
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv HAS_DEPS
+  }
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ HAS_DEPS
+
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv SINGLE_DEP
+  if (vaccineGlobal.m[vaccineDependency]) vaccineSetApp();
+  else  (vaccineGlobal.w[vaccineDependency] ||
+          (vaccineGlobal.w[vaccineDependency] = [])
+        ).push(vaccineSetApp);
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ SINGLE_DEP
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv MULTIPLE_DEPS
   vaccineDependencies.forEach(function(d) {
-    if (globalVaccine.m[d]) --vaccineRemainingDeps;
-    else  (globalVaccine.w[d] ||
-            (globalVaccine.w[d] = [])
+    if (vaccineGlobal.m[d]) --vaccineRemainingDeps;
+    else  (vaccineGlobal.w[d] ||
+            (vaccineGlobal.w[d] = [])
           ).push(vaccineRunDefines);
   });
-  if (!vaccineRemainingDeps) vaccineDefines();
-  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ MULTIPLE_DEPS
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ PER_LIB_DEPS
+  if (!vaccineRemainingDeps) vaccineSetApp();
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ MULTIPLE_DEPS
+
 vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv LOADER
 
 

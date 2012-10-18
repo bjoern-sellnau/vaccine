@@ -16,8 +16,7 @@ Options:
         --lib <dir>       # The directory for your libraries (default: lib).
         --global <name>   # The global variable for the file being injected.
                           # (default: app name)
-        --deps <d1,...>   # Comma separated lib/app dependencies. Used for
-                          # "per_lib" versions.
+        --deps <d1,...>   # Comma separated lib/app dependencies.
         --dep <d1>        # Single dependency for lib/app.
         --to <type>       # Conversion types: vaccine, relative, absolute.
         --globals-list <file>
@@ -53,7 +52,6 @@ then
 fi
 
 vaccine_src=$vaccine_src_dir/vaccine.js
-vaccine_minimal_src=$vaccine_src_dir/vaccine_minimal.js
 standalone_server_src=$vaccine_src_dir/dev_server_standalone.js
 express_server_src=$vaccine_src_dir/dev_server_express.js
 node_wrap_src=$vaccine_src_dir/dev_server_node_wrap.js
@@ -205,6 +203,10 @@ remove_sections() {
   sed "/vvvvv $1$/,/\^\^\^\^\^ $1$/d"
 }
 
+choose_section() {
+  sed -e "1,/vvvvv $1$/d" -e "/\^\^\^\^\^ $1$/,\$d"
+}
+
 insert_section() {
   file=$2
   sed -e "/----- $1$/r $file" -e "/----- $1$/d"
@@ -216,7 +218,7 @@ replace_vars() {
   do
     eval value=\$$var
     name=$(echo $var | tr '[a-z]' '[A-Z]')
-    sed_string="$sed_string -e 's#{{{ $name }}}#$value#'"
+    sed_string="$sed_string -e 's#{{{ $name }}}#$value#g'"
   done
   eval sed $sed_string
 }
@@ -229,42 +231,37 @@ clean() {
   sed -e '/vvvvv/d' -e '/\^\^\^\^\^/d' -e '/-----/d'
 }
 
-per_lib() {
-  remove_sections PER_MODULE_DEPS | insert_section MINIMAL $vaccine_minimal_src
-}
-
-per_module() {
-  remove_sections PER_LIB_DEPS | insert_section MINIMAL $vaccine_minimal_src
-}
-
 loader_intermediate() {
-  start $vaccine_src | per_module
+  start $vaccine_src
 }
 
 vaccine_intermediate() {
-  start $vaccine_src | remove_sections LOADER | unindent | per_module
+  start $vaccine_src | remove_sections LOADER | unindent
 }
 
-vaccine_per_lib_intermediate() {
-  start $vaccine_src | remove_sections LOADER | unindent | per_lib
+complex_intermediate() {
+  vaccine_intermediate | complex
 }
 
-ordered_intermediate() {
-  vaccine_intermediate | remove_sections OUT_OF_ORDER
+simple_intermediate() {
+  vaccine_intermediate | simple
 }
 
 vaccine_minimal() {
-  start $vaccine_minimal_src | sed -e '1s/^/(/' \
-                                   -e "\$s#;#).s('$app_name', $global_var);#"
+  vaccine_intermediate | choose_section MINIMAL |
+      sed -e '1s/^/(/' -e "\$s#;#).s('$app_name', $global_var);#"
 }
 
-relative() {
-  remove_sections SIMPLE_REQUIRE | remove_sections SIMPLE_RELATIVE
+complex() {
+  remove_sections SIMPLE_RELATIVE
 }
 
-simplify() {
-  remove_sections COMPLEX_REQUIRE | remove_sections COMPLEX_RELATIVE |
-      remove_sections OUT_OF_ORDER | remove_sections INDEX_HOOK
+simple() {
+  remove_sections COMPLEX_RELATIVE
+}
+
+no_deps() {
+  remove_sections HAS_DEPS | remove_sections SINGLE_DEP | remove_sections MULTIPLE_DEPS
 }
 
 if test $command = inject
@@ -284,17 +281,19 @@ cd vaccines
 
 # Vaccines
 
-loader_intermediate | relative | clean > vaccine_loader.js
-loader_intermediate | simplify | clean > vaccine_loader_simple.js
-vaccine_intermediate | relative | clean > vaccine.js
-ordered_intermediate | relative | clean > vaccine_ordered.js
-ordered_intermediate | simplify |
-    clean > vaccine_simple.js
+loader_intermediate | complex | clean > vaccine_loader.js
+loader_intermediate | simple | clean > vaccine_loader_simple.js
 vaccine_minimal > vaccine_minimal.js
-vaccine_per_lib_intermediate | remove_sections MULTIPLE_DEPS |
-    simplify | clean > vaccine_per_lib_deps_single.js
-vaccine_per_lib_intermediate | remove_sections SINGLE_DEP |
-    simplify | clean > vaccine_per_lib_deps_multiple.js
+complex_intermediate | no_deps | clean > vaccine.js
+simple_intermediate | no_deps | clean > vaccine_simple.js
+complex_intermediate | remove_sections MULTIPLE_DEPS |
+    clean > vaccine_single_dep.js
+simple_intermediate | remove_sections MULTIPLE_DEPS |
+    clean > vaccine_simple_single_dep.js
+complex_intermediate | remove_sections SINGLE_DEP |
+    clean > vaccine_multiple_deps.js
+simple_intermediate | remove_sections SINGLE_DEP |
+    clean > vaccine_simple_multiple_deps.js
 
 
 # Servers
