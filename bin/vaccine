@@ -259,11 +259,12 @@ vaccine_minimal() {
 }
 
 relative() {
-  remove_sections SIMPLE_RELATIVE
+  remove_sections SIMPLE_REQUIRE | remove_sections SIMPLE_RELATIVE
 }
 
 simplify() {
-  remove_sections RELATIVE | remove_sections INDEX
+  remove_sections COMPLEX_REQUIRE | remove_sections COMPLEX_RELATIVE |
+      remove_sections OUT_OF_ORDER | remove_sections INDEX_HOOK
 }
 
 if test $command = inject
