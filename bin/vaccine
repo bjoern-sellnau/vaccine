@@ -251,11 +251,11 @@ vaccine_minimal() {
 }
 
 complex() {
-  remove_sections SIMPLE_RELATIVE
+  remove_sections SIMPLE
 }
 
 simple() {
-  remove_sections COMPLEX_RELATIVE
+  remove_sections COMPLEX
 }
 
 no_deps() {

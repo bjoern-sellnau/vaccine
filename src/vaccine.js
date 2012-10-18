@@ -14,36 +14,45 @@ vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv LOADER
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ LOADER
 
   function define(id, factory) {
-    (vaccineFactories = vaccineFactories || {})[id] = factory;
+    (vaccineFactories = vaccineFactories || {})[
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv SIMPLE
+      './' + id
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ SIMPLE
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv COMPLEX
+      id
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ COMPLEX
+    ] = factory;
   }
 
 
   function require(id) {
 
     var
-vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv COMPLEX_RELATIVE
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv COMPLEX
         parts = id.split('/'),
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ COMPLEX_RELATIVE
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ COMPLEX
         module = {exports: {}};
 
     if (!vaccineLocalModules[id] && !vaccineGlobal.m[id]) {
-      vaccineFactories[id](function(reqId) {
-vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv SIMPLE_RELATIVE
-        return require(reqId.replace('.', vaccineAppName));
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ SIMPLE_RELATIVE
-vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv COMPLEX_RELATIVE
-        var matching = /(\.?\.\/?)*/.exec(reqId)[0],
-            // Some code golf to get the number of "directories" back we want to go
-            back = Math.floor(matching.replace(/\//g, '').length / 1.9 + 0.99),
-            base;
-        if (back) {
-          base = parts.slice(0, parts.length - back).join('/');
-          if (base) base += '/';
-          reqId = base + reqId.slice(matching.length);
-        }
-        return require(reqId.replace(/\/$/, ''));
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ COMPLEX_RELATIVE
-      }, module.exports, module);
+      vaccineFactories[id](
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv SIMPLE
+          require,
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ SIMPLE
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv COMPLEX
+          function(reqId) {
+            var matching = /(\.?\.\/?)*/.exec(reqId)[0],
+                // Some code golf to get the number of "directories" back we want to go
+                back = Math.floor(matching.replace(/\//g, '').length / 1.9 + 0.99),
+                base;
+            if (back) {
+              base = parts.slice(0, parts.length - back).join('/');
+              if (base) base += '/';
+              reqId = base + reqId.slice(matching.length);
+            }
+            return require(reqId.replace(/\/$/, ''));
+          },
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ COMPLEX
+          module.exports, module);
       vaccineLocalModules[id] = module.exports;
     }
     return vaccineLocalModules[id] || vaccineGlobal.m[id];
@@ -64,7 +73,6 @@ vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv COMPLEX_RELATIVE
   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ LOADER
 
   var vaccineFactories,
-      vaccineAppName = '{{{ APP_NAME }}}',
       vaccineLocalModules = {},
 vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv SINGLE_DEP
       vaccineDependency = '{{{ DEP_NAME }}}',
@@ -101,7 +109,14 @@ vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv SET_APP
 vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv HAS_DEPS
   function vaccineSetApp() {
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ HAS_DEPS
-  vaccineGlobal.s(vaccineAppName, require(vaccineAppName));
+  vaccineGlobal.s('{{{ APP_NAME }}}',
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv SIMPLE
+    require('./index')
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ SIMPLE
+vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv COMPLEX
+    require('index')
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ COMPLEX
+  );
 vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv HAS_DEPS
   }
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ HAS_DEPS
