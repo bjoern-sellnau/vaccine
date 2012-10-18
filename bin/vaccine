@@ -129,7 +129,7 @@ do
     --src) dir_or_file=$2; source_dir=$2 ;;
     --lib) library_dir=$2 ;;
     --global) global_var=$2 ;;
-    --deps | --dep) dep_names=$2 ;;
+    --deps | --dep) dep_names_raw=$2 ;;
     --globals-list) globals_list=$2 ;;
     --sources-list) sources_list=$2 ;;
     --write-exports) write_exports=true ;;
@@ -144,11 +144,11 @@ do
   fi
 done
 
-if test "X$dep_names" != X
+if test "X$dep_names_raw" != X
 then
-  dep_name=$dep_names
-  dep_names=$(echo "$dep_names" | sed -e "s/,/\",\"/g" \
-                                      -e "s/^/[\"/" -e "s/$/\"]/")
+  dep_name=$dep_names_raw
+  dep_names=$(echo "$dep_names_raw" | sed -e "s/,/\",\"/g" \
+                                          -e "s/^/[\"/" -e "s/$/\"]/")
 fi
 
 if test $command = size -o $command = inject
@@ -166,7 +166,7 @@ fi
 
 if test $command = size
 then
-  $vaccine_bin_dir/size_test.sh "$dir_or_file" "$app_name" "$global_var"
+  $vaccine_bin_dir/size_test.sh "$dir_or_file" "$app_name" "$global_var" "$dep_names_raw"
   exit $?
 fi
 
