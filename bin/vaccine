@@ -283,7 +283,11 @@ loader_intermediate | complex | clean > vaccine_loader.js
 loader_intermediate | simple | clean > vaccine_loader_simple.js
 vaccine_minimal > vaccine_minimal.js
 complex_intermediate | no_deps | clean > vaccine.js
+complex_intermediate | no_deps | remove_sections SET_APP |
+    clean > vaccine_test.js
 simple_intermediate | no_deps | clean > vaccine_simple.js
+simple_intermediate | no_deps | remove_sections SET_APP |
+    clean > vaccine_simple_test.js
 complex_intermediate | remove_sections MULTIPLE_DEPS |
     clean > vaccine_single_dep.js
 simple_intermediate | remove_sections MULTIPLE_DEPS |
