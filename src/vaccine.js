@@ -33,7 +33,7 @@ vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv COMPLEX
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ COMPLEX
         module = {exports: {}};
 
-    if (!vaccineLocalModules[id] && !vaccineGlobal.m[id]) {
+    if (!vaccineLocalModules[id] && !vaccineWindow[id]) {
       vaccineFactories[id](
 vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv SIMPLE
           require,
@@ -55,88 +55,57 @@ vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv COMPLEX
           module.exports, module);
       vaccineLocalModules[id] = module.exports;
     }
-    return vaccineLocalModules[id] || vaccineGlobal.m[id];
+    return vaccineLocalModules[id] || vaccineWindow[id];
   }
 
-  vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv LOADER
-
-      var split = require.id.split('/'),
-          root = split.shift(),
-          src,
-          script;
-      if (root === appName) {
-        src = sourceDir + '/' + split.join('/');
-      } else {
-        src = libraryDir + '/' + root;
-      }
-      loadScript('/' + src + '.js');
-  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ LOADER
 
   var vaccineFactories,
       vaccineLocalModules = {},
-vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv SINGLE_DEP
-      vaccineDependency = '{{{ DEP_NAME }}}',
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ SINGLE_DEP
 vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv MULTIPLE_DEPS
-      vaccineDependencies = {{{ DEP_NAMES }}},
-      vaccineRemainingDeps = vaccineDependencies.length,
-      vaccineRunDefines = function() { --vaccineRemainingDeps || vaccineSetApp(); },
+      vaccineDependencies = [{{{ DEP_NAMES }}}],
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ MULTIPLE_DEPS
-      vaccineGlobal =
-vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv MINIMAL
-      window.vaccine || (window.vaccine = {
-        // The minimal code required to be vaccine compliant.
-
-        // w = waiting: Functions to be called when a modules
-        // gets defined. w[moduleId] = [array of functions];
-        w: {},
-
-        // m = modules: Modules that have been fully defined.
-        // m[moduleId] = module.exports value
-        m: {},
-
-        // s = set: When a module becomes fully defined, set
-        // the module.exports value here.
-        // s(moduleId, module.exports)
-        s: function(id, val) {
-          this.m[id] = val;
-          (this.w[id] || []).forEach(function(w) { w(); });
-        }
-      });
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ MINIMAL
+      vaccineWindow = window;
 
 vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv SET_APP
-vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv HAS_DEPS
-  function vaccineSetApp() {
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ HAS_DEPS
-  vaccineGlobal.s('{{{ APP_NAME }}}',
-vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv SIMPLE
-    require('./index')
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ SIMPLE
-vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv COMPLEX
-    require('index')
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ COMPLEX
-  );
-vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv HAS_DEPS
+ vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv AMD
+  if (typeof vaccineWindow.define == 'function' &&
+      vaccineWindow.define.amd) {
+    define('{{{ APP_NAME }}}',
+  vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv SINGLE_DEP
+        [{{{ DEP_NAMES }}}],
+        function(vaccineSingleDep) {
+          vaccineLocalModules.{{{ DEP_NAME }}} = vaccineSingleDep;
+  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ SINGLE_DEP
+  vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv MULTIPLE_DEPS
+        vaccineDependencies,
+        function() {
+          for (var i = 0, args = arguments; i < args.length; ++i) {
+            vaccineLocalModules[vaccineDependencies[i]] = args[i];
+          }
+  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ MULTIPLE_DEPS
+  vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv NO_DEPS
+        function() {
+  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ NO_DEPS
+  vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv SIMPLE
+          return require('./index');
+  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ SIMPLE
+  vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv COMPLEX
+          return require('index');
+  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ COMPLEX
+        });
+  } else {
+ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ AMD
+    vaccineWindow.{{{ APP_NAME }}} =
+ vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv SIMPLE
+        require('./index');
+ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ SIMPLE
+ vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv COMPLEX
+        require('index');
+ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ COMPLEX
+ vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv AMD
   }
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ HAS_DEPS
+ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ AMD
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ SET_APP
-
-vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv SINGLE_DEP
-  if (vaccineGlobal.m[vaccineDependency]) vaccineSetApp();
-  else  (vaccineGlobal.w[vaccineDependency] ||
-          (vaccineGlobal.w[vaccineDependency] = [])
-        ).push(vaccineSetApp);
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ SINGLE_DEP
-vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv MULTIPLE_DEPS
-  vaccineDependencies.forEach(function(d) {
-    if (vaccineGlobal.m[d]) --vaccineRemainingDeps;
-    else  (vaccineGlobal.w[d] ||
-            (vaccineGlobal.w[d] = [])
-          ).push(vaccineRunDefines);
-  });
-  if (!vaccineRemainingDeps) vaccineSetApp();
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ MULTIPLE_DEPS
 
 vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv LOADER
 
