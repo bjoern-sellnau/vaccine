@@ -1,18 +1,3 @@
-vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv LOADER
-(function() {
-
-  var appName = '{{{ APP_NAME }}}',       // Change this to your app name.
-      sourceDir = '{{{ SOURCE_DIR }}}';   // Change this to... uh, your source directory.
-
-  // Change libraryDir to the directory of your pre-built library dependencies.
-  var libraryDir = '{{{ LIBRARY_DIR }}}';
-
-
-  // The scripts that are currently loading. Don't touch this.
-  var loading = {};
-
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ LOADER
-
   function define(id, factory) {
     (vaccineFactories = vaccineFactories || {})[
 vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv SIMPLE
@@ -106,47 +91,3 @@ vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv SET_APP
   }
  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ AMD
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ SET_APP
-
-vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv LOADER
-
-
-  function loadScript(src) {
-    if (!loading[src]) {
-      loading[src] = src;
-      script = document.createElement('script');
-      script.src = src;
-      document.head.appendChild(script);
-    }
-  }
-
-  window.define = define;
-
-
-  var initialScripts = [],
-      loaded = false;
-
-  // The first define, which will trigger the loading of your app,
-  // and any other initial scripts.
-  define('initial_scripts', function(require) {
-
-    // Pull in your app and all it's dependencies.
-    require(appName);
-
-    loaded = true;
-
-    // Load initial scripts after the main app is loaded.
-    initialScripts.forEach(function(src) { loadScript(src); });
-  });
-
-  window.vaccine_load = function() {
-    Array.prototype.slice.apply(arguments).forEach(function(src) {
-      if (loaded) {
-        loadScript(src);
-      } else {
-        initialScripts.push(src);
-      }
-    });
-  };
-
-}());
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ LOADER

@@ -1,13 +1,7 @@
 #!/bin/sh
 
 help() {
-  echo 'vaccine <verb> <verb-argument> [options]
-
-Verbs: (Can be shortened if unambiguous)
-        configure <app>   # Build vaccines configured for app name.
-        convert <app>     # Convert app to vaccine format, relative requires, etc.
-        size <file/dir>   # Calculate sizes for sources in dir, or for file.
-        built-size <file> [compare]  # Compute file sizes for .min, .gz versions.
+  echo 'vaccine [options]
 
 Options:
         --app <app>       # Your app or lib name.
@@ -16,18 +10,8 @@ Options:
         --global <name>   # The global variable name (default: app name)
         --deps <d1,...>   # Comma separated lib/app dependencies.
         --dep <d1>        # Single dependency for lib/app.
-        --to <type>       # Conversion types: vaccine, relative, absolute.
-        --globals-list <file>
-                          # List of globals when converting to vaccine.
-        --sources-list <file>
-                          # List of sources that need to be converted
-        --write-exports   # Convert globals to exports [dangerous]
-
-Examples:
-  vaccine configure datazooka --src src --lib lib   # src and lib are defaults
-  vaccine size src --app datazooka
-  vaccine convert crossfilter --to relative
 '
+  exit 0
 }
 
 if test "X$vaccine_bin_dir" = X
@@ -50,13 +34,9 @@ fi
 
 vaccine_src=$vaccine_src_dir/vaccine.js
 standalone_server_src=$vaccine_src_dir/dev_server_standalone.js
-express_server_src=$vaccine_src_dir/dev_server_express.js
-node_wrap_src=$vaccine_src_dir/dev_server_node_wrap.js
 build_src=$vaccine_src_dir/build
 
 # Variables
-app_name=
-global_var=
 source_dir=src
 library_dir=lib
 
@@ -68,64 +48,15 @@ fail() {
   exit 1
 }
 
-case $1 in
-  --help | -h)
-    help
-    exit 0
-    ;;
-  conv | conve | conver | convert)
-    command=convert
-    ;;
-  conf | confi | config | configu | configur | configure)
-    command=configure
-    ;;
-  s | si | siz | size)
-    command=size
-    ;;
-  b | bu | bui | buil | built | built- | built-s | built-si | built-siz | built-size)
-    command=built-size
-    ;;
-  *)
-    fail "Unrecognized command: $1"
-    ;;
-esac
-
-shift
-
-if test $command = built-size
-then
-  $vaccine_bin_dir/size.sh $@
-  exit $?
-fi
-
-if ! $(echo "$1" | grep -q "^-")
-then
-  argument=$1
-  shift
-fi
-
-if test "X$argument" != X
-then
-  case $command in
-    configure) app_name=$argument ;;
-    convert) app_name=$argument ;;
-    size) dir_or_file=$argument ;;
-  esac
-fi
-
-
 while test $# -gt 0
 do
   case $1 in
+    --help | -h) help ;;
     --app) app_name=$2 ;;
     --src) dir_or_file=$2; source_dir=$2 ;;
     --lib) library_dir=$2 ;;
     --global) global_var=$2 ;;
     --deps | --dep) dep_names_raw=$2 ;;
-    --globals-list) globals_list=$2 ;;
-    --sources-list) sources_list=$2 ;;
-    --write-exports) write_exports=true ;;
-    --to) convert_to=$2 ;;
     *) fail "Unrecognized option: $1" ;;
   esac
   if test "X$1" = "X--write-exports"
@@ -136,8 +67,9 @@ do
   fi
 done
 
-has_deps=
-multi_deps=
+
+test "X$app_name" = X && fail 'Must provide the name of app (vaccine --app [name])'
+
 if test "X$dep_names_raw" != X
 then
   has_deps=true
@@ -147,47 +79,7 @@ then
   echo "$dep_names" | grep -q ',' && multi_deps=true
 fi
 
-if test $command = size
-then
-  if test "X$app_name" = X
-  then
-    app_name=$(echo "$dir_or_file" | sed -e 's#.*/##' -e 's/\..*$//')
-  fi
-fi
-
-if test "X$global_var" = X
-then
-  global_var=$app_name
-fi
-
-if test $command = size
-then
-  $vaccine_bin_dir/size_test.sh "$dir_or_file" "$app_name" "$global_var" "$dep_names_raw"
-  exit $?
-fi
-
-if test $command = convert
-then
-  case $convert_to in
-    relative | absolute)
-      $vaccine_bin_dir/convert_requires.sh "$convert_to" \
-                                           "$app_name" "$source_dir"
-      ;;
-    vaccine)
-      $vaccine_bin_dir/convert.sh "$app_name" "$global_var" "$source_dir" \
-                                  "$globals_list" "$sources_list" "$write_exports"
-      ;;
-    *)
-      fail "Unrecognized convert to type (--to): $convert_to"
-      ;;
-  esac
-  exit $?
-fi
-
-if test $command = configure
-then
-  test "X$app_name" = X && fail 'Must provide the name of app (vaccine configure app)'
-fi
+test "X$global_var" = X && global_var=$app_name
 
 
 unindent() {
@@ -245,7 +137,7 @@ start_vaccine() {
 }
 
 vaccine_intermediate() {
-  start_vaccine | remove_sections LOADER | unindent
+  start_vaccine | unindent
 }
 
 complex_intermediate() {
@@ -264,36 +156,18 @@ simple() {
   remove_sections COMPLEX
 }
 
-test -d vaccines || mkdir vaccines
-cd vaccines
 
 # Vaccines
 
-start_vaccine | complex | clean > vaccine_loader.js
-start_vaccine | simple | clean > vaccine_loader_simple.js
 complex_intermediate | clean > vaccine.js
 simple_intermediate | clean > vaccine_simple.js
 complex_intermediate | remove_sections AMD | clean > vaccine_no_amd.js
 simple_intermediate | remove_sections AMD | clean > vaccine_simple_no_amd.js
 
-# Servers
 
-express() {
-  start_server $express_server_src
-}
+# Server
 
-standalone() {
-  start_server $standalone_server_src
-}
-
-start_server() {
-  start $1 | insert_section NODE_WRAP $node_wrap_src
-}
-
-express | remove_sections NODE | clean > dev_server_express.js
-express | clean > dev_server_express_node.js
-standalone | remove_sections NODE | clean > dev_server_standalone.js
-standalone | clean > dev_server_standalone_node.js
+start $standalone_server_src | clean > dev_server_standalone_node.js
 
 
 # Builds
