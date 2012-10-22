@@ -1,4 +1,4 @@
-var appName = '{{{ APP_NAME }}}',       // Change this to your app name.
+var libName = '{{{ LIB_NAME }}}',       // Change this to your library's name.
     sourceDir = '{{{ SOURCE_DIR }}}';   // Change this to... uh, your source directory.
 
 
@@ -67,7 +67,7 @@ function findFile(path, callback) {
 function nodeWrap(path, buffer) {
   var prefix = new RegExp('^' + sourceDir + '/'),
       module = path.slice(1).replace(prefix, '').replace(/\.js$/, ''),
-      fullModule = appName + '/' + module,
+      fullModule = libName + '/' + module,
       compiled;
   compiled = 'define("' + fullModule + '", function(require, exports, module) {\n';
   compiled += buffer.toString('utf8');

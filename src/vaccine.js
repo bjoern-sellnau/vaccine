@@ -55,7 +55,7 @@ vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv SET_APP
  vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv AMD
     if (typeof vaccineWindow.define == 'function' &&
         vaccineWindow.define.amd) {
-      define('{{{ APP_NAME }}}',
+      define('{{{ LIB_NAME }}}',
   vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv SINGLE_DEP
           [{{{ DEP_NAMES }}}],
           function(vaccineSingleDep) {
@@ -80,7 +80,7 @@ vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv SET_APP
           });
     } else {
  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ AMD
-      vaccineWindow.{{{ APP_NAME }}} =
+      vaccineWindow.{{{ LIB_NAME }}} =
 vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv SIMPLE
           require('./index');
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ SIMPLE

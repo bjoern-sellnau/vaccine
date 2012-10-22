@@ -1,16 +1,16 @@
 #!/bin/sh
 
 help() {
-  echo 'vaccine [options]
+  echo "vaccine [options]
 
 Options:
-        --app <app>       # Your app or lib name.
+        --name <name>     # Your library's name.
         --src <dir>       # The directory for your sources (default: src).
         --lib <dir>       # The directory for your libraries (default: lib).
-        --global <name>   # The global variable name (default: app name)
-        --deps <d1,...>   # Comma separated lib/app dependencies.
-        --dep <d1>        # Single dependency for lib/app.
-'
+        --global <name>   # The global variable name (default: --name)
+        --deps <d1,...>   # Comma separated dependencies.
+        --dep <d1>        # Single dependency.
+"
   exit 0
 }
 
@@ -40,7 +40,7 @@ build_src=$vaccine_src_dir/build
 source_dir=src
 library_dir=lib
 
-vars_list='app_name source_dir library_dir global_var dep_name dep_names'
+vars_list='lib_name source_dir library_dir global_var dep_name dep_names'
 
 
 fail() {
@@ -52,7 +52,7 @@ while test $# -gt 0
 do
   case $1 in
     --help | -h) help ;;
-    --app) app_name=$2 ;;
+    --name) lib_name=$2 ;;
     --src) dir_or_file=$2; source_dir=$2 ;;
     --lib) library_dir=$2 ;;
     --global) global_var=$2 ;;
@@ -68,7 +68,7 @@ do
 done
 
 
-test "X$app_name" = X && fail 'Must provide the name of app (vaccine --app [name])'
+test "X$lib_name" = X && fail 'Must provide the name (vaccine --name [name])'
 
 if test "X$dep_names_raw" != X
 then
@@ -79,7 +79,7 @@ then
   echo "$dep_names" | grep -q ',' && multi_deps=true
 fi
 
-test "X$global_var" = X && global_var=$app_name
+test "X$global_var" = X && global_var=$lib_name
 
 
 unindent() {
