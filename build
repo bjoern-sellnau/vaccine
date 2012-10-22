@@ -1,4 +1,0 @@
-#!/bin/sh
-echo '(function() {"use strict";' # You can remove "use strict" if you like
-cat $(find 'src' -type f)   # vaccine.js MUST be in the source list.
-echo '}());'
