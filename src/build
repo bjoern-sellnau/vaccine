@@ -1,24 +1,23 @@
-#!/bin/sh
-vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv NODE
+    #!/bin/sh
+?????????????????????????????????????????????????????????????????????????? NODE
 
-# vaccine.js must NOT be in the source list.
-source_dir='{{{ SOURCE_DIR }}}'
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ NODE
+    # vaccine.js must NOT be in the source list.
+    source_dir='{{{ SOURCE_DIR }}}'
+########################################################################## NODE
 
-echo '(function() {"use strict";' # You can remove "use strict" if you like.
+    echo '(function() {"use strict";' # You can remove "use strict" if you like.
 
-vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv PRE_WRAPPED
-cat $(find '{{{ SOURCE_DIR }}}' -type f)   # vaccine.js must NOT be in the source list.
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ PRE_WRAPPED
-vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv NODE
-for file in $(find $source_dir -type f)
-do
-  name=$(echo "$file" | sed -e "s#^$source_dir/##" -e 's/\.js//')
-  echo "define('$name', function(require, exports, module) {"
-  cat $file
-  echo '});'
-done
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ NODE
+?????????????????????????????????????????????????????????????????????????? NODE
+    for file in $(find $source_dir -type f)
+    do
+      name=$(echo "$file" | sed -e "s#^$source_dir/##" -e 's/\.js//')
+      echo "define('$name', function(require, exports, module) {"
+      cat $file
+      echo '});'
+    done
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! NODE
+    cat $(find '{{{ SOURCE_DIR }}}' -type f)   # vaccine.js must NOT be in the source list.
+########################################################################## NODE
 
-cat vaccine.js  # Must be last.
-echo '}());'
+    cat vaccine.js  # Must be last.
+    echo '}());'

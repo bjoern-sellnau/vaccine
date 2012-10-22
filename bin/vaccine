@@ -82,21 +82,18 @@ fi
 test "X$global_var" = X && global_var=$lib_name
 
 
-unindent() {
-  sed 's/^  //'
+conditional() {
+  section=$1
+  if test "X$2" = 'Xtrue'
+  then
+    sed "/!!!!! $1$/,/##### $1$/d"
+  else
+    sed "/????? $1$/,/!!!!! $1$/d" | sed "/????? $1$/,/##### $1$/d"
+  fi
 }
 
-remove_sections() {
-  sed "/vvvvv $1$/,/\^\^\^\^\^ $1$/d"
-}
-
-choose_section() {
-  sed -e "1,/vvvvv $1$/d" -e "/\^\^\^\^\^ $1$/,\$d"
-}
-
-insert_section() {
-  file=$2
-  sed -e "/----- $1$/r $file" -e "/----- $1$/d"
+clean() {
+  sed -e '/?????/d' -e '/!!!!!/d' -e '/#####/d'
 }
 
 replace_vars() {
@@ -114,8 +111,8 @@ start() {
   cat $1 | replace_vars
 }
 
-clean() {
-  sed -e '/vvvvv/d' -e '/\^\^\^\^\^/d' -e '/-----/d'
+unindent_start() {
+  start $1 | sed 's/^    //'
 }
 
 set_dependencies() {
@@ -133,36 +130,24 @@ set_dependencies() {
 }
 
 start_vaccine() {
-  start $vaccine_src | set_dependencies
-}
-
-vaccine_intermediate() {
-  start_vaccine | unindent | unindent
+  unindent_start $vaccine_src | set_dependencies
 }
 
 complex_intermediate() {
-  vaccine_intermediate | complex
+  start_vaccine | conditional SIMPLE false
 }
 
 simple_intermediate() {
-  vaccine_intermediate | simple
-}
-
-complex() {
-  remove_sections SIMPLE
-}
-
-simple() {
-  remove_sections COMPLEX
+  start_vaccine | conditional SIMPLE true
 }
 
 
 # Vaccines
 
-complex_intermediate | clean > vaccine.js
-simple_intermediate | clean > vaccine_simple.js
-complex_intermediate | remove_sections AMD | clean > vaccine_no_amd.js
-simple_intermediate | remove_sections AMD | clean > vaccine_simple_no_amd.js
+complex_intermediate | conditional AMD true | clean > vaccine.js
+simple_intermediate | conditional AMD true | clean > vaccine_simple.js
+complex_intermediate | conditional AMD false | clean > vaccine_no_amd.js
+simple_intermediate | conditional AMD false | clean > vaccine_simple_no_amd.js
 
 
 # Server
@@ -172,8 +157,8 @@ start $standalone_server_src | clean > dev_server_standalone_node.js
 
 # Builds
 
-start $build_src | remove_sections NODE | clean > build
+unindent_start $build_src | conditional NODE true | clean > build
 chmod +x build
 
-start $build_src | remove_sections PRE_WRAPPED | clean > build_node
+unindent_start $build_src | remove_sections PRE_WRAPPED | clean > build_node
 chmod +x build_node
