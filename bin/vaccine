@@ -137,7 +137,7 @@ start_vaccine() {
 }
 
 vaccine_intermediate() {
-  start_vaccine | unindent
+  start_vaccine | unindent | unindent
 }
 
 complex_intermediate() {
