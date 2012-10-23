@@ -39,7 +39,7 @@ then
 fi
 
 vaccine_src=$vaccine_src_dir/vaccine.js
-standalone_server_src=$vaccine_src_dir/dev_server_standalone.js
+dev_server_src=$vaccine_src_dir/dev_server.js
 build_src=$vaccine_src_dir/build
 
 
@@ -233,7 +233,7 @@ configure $vaccine_src > vaccine.js
 
 # Server
 
-cat $standalone_server_src | replace_vars | clean > dev_server_standalone_node.js
+cat $dev_server_src | replace_vars | clean > dev_server.js
 
 
 # Builds
