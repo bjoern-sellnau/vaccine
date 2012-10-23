@@ -40,7 +40,7 @@ fi
 
 vaccine_src=$vaccine_src_dir/vaccine.js
 dev_server_src=$vaccine_src_dir/dev_server.js
-build_src=$vaccine_src_dir/build
+build_src=$vaccine_src_dir/build.sh
 makefile_src=$vaccine_src_dir/Makefile
 
 
@@ -236,5 +236,5 @@ makefile_target=Makefile
 test -f Makefile && makefile_target=Makefile.example
 configure $makefile_src > $makefile_target
 
-configure $build_src > build
-chmod +x build
+configure $build_src > build.sh
+chmod +x build.sh

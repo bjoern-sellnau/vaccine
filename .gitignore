@@ -1,5 +1,5 @@
 node_modules
 /vaccine.js
-/build
+/build.sh
 /dev_server.js
 /Makefile.example
