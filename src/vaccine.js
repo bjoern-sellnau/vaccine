@@ -9,13 +9,13 @@
       vaccineFirstDefineTime = vaccineFirstDefineTime || Date.now();
 /////////////////////////////////////////////////////////////////////// PERFORM
 ????????????????????????????????????????????????????????????????????????? DEBUG
-      if ((vaccineFactories || {})[@@ multi_DIRS ?? id :: './' + id @@]) {
+      if ((vaccineFactories || {})[##[ multi_DIRS ?? id :: './' + id ]##]) {
         throw 'Attempting to redefine: ' + id;
       } else {
         console.log('Defining: ' + id);
       }
 ///////////////////////////////////////////////////////////////////////// DEBUG
-      (vaccineFactories = vaccineFactories || {})[@@ multi_DIRS ?? id :: './' + id @@] = factory;
+      (vaccineFactories = vaccineFactories || {})[##[ multi_DIRS ?? id :: './' + id ]##] = factory;
     }
 
 
@@ -50,7 +50,7 @@
           throw 'Missing module factory. Cannot execute: ' + id;
         }
  ////////////////////////////////////////////////////////////////////// DEBUG
-        @@ RETURN_EXPORTS ?? vaccineLocalModules[id] =  @@vaccineFactories[id](
+        ##[ RETURN_EXPORTS ?? vaccineLocalModules[id] =  ]##vaccineFactories[id](
 ???????????????????????????????????????????????????????????????????? multi_DIRS
             function(reqId) {
  ?????????????????????????????????????????????????????????????????????? DEBUG
@@ -66,7 +66,7 @@
                 reqId = base + reqId.slice(matching.length);
               }
               return require(reqId.replace(/\/$/, ''));
-            }@@ EXPORTS ?? , :: ); @@
+            }##[ EXPORTS ?? , :: ); ]##
 :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: multi_DIRS
             require,
 //////////////////////////////////////////////////////////////////// multi_DIRS
@@ -79,8 +79,8 @@
   ///////////////////////////////////////////////////////////////// EXPORTS
  ///////////////////////////////////////////////////////////// MODULE_EXPORTS
 :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: RETURN_EXPORTS
-            @@ MODULE_EXPORTS ?? module.exports, module :: exports @@);
-        vaccineLocalModules[id] = @@ MODULE_EXPORTS ?? module.exports :: exports @@;
+            ##[ MODULE_EXPORTS ?? module.exports, module :: exports ]##);
+        vaccineLocalModules[id] = ##[ MODULE_EXPORTS ?? module.exports :: exports ]##;
 //////////////////////////////////////////////////////////////// RETURN_EXPORTS
       }
 ????????????????????????????????????????????????????????????????????????? DEBUG
@@ -102,7 +102,7 @@
     var vaccineFactories,
         vaccineLocalModules = {},
 ???????????????????????????????????????????????????????????? multi_DEPS_and_AMD
-        vaccineDependencies = [$$ DEP_NAMES $$],
+        vaccineDependencies = [$$[ DEP_NAMES ]$$],
 //////////////////////////////////////////////////////////// multi_DEPS_and_AMD
         vaccineWindow = window;
 
@@ -111,13 +111,13 @@
     if (typeof vaccineWindow.define == 'function' &&
         vaccineWindow.define.amd) {
  ///////////////////////////////////////////////////////////////////// WINDOW
-      define('$$ LIB_NAME $$',
+      define('$$[ LIB_NAME ]$$',
  ===================================================================== 0 DEPS
              function() {
  ===================================================================== 1 DEPS
-             [$$ DEP_NAMES $$],
+             [$$[ DEP_NAMES ]$$],
              function(vaccineSingleDep) {
-               vaccineLocalModules.$$ DEP_NAME $$ = vaccineSingleDep;
+               vaccineLocalModules.$$[ DEP_NAME ]$$ = vaccineSingleDep;
  ===================================================================== > DEPS
              vaccineDependencies,
              function() {
@@ -125,11 +125,11 @@
                  vaccineLocalModules[vaccineDependencies[i]] = args[i];
                }
  ==================================================================== // DEPS
-               return require(@@ multi_DIRS ?? 'index' :: './index' @@);
+               return require(##[ multi_DIRS ?? 'index' :: './index' ]##);
              });
-    @@ WINDOW ?? } else { @@
+    ##[ WINDOW ?? } else { ]##
 /////////////////////////////////////////////////////////////////////////// AMD
 ???????????????????????????????????????????????????????????????????????? WINDOW
-      vaccineWindow.$$ LIB_NAME $$ = require(@@ multi_DIRS ?? 'index' :: './index' @@);
-    @@ AMD ?? } @@
+      vaccineWindow.$$[ LIB_NAME ]$$ = require(##[ multi_DIRS ?? 'index' :: './index' ]##);
+    ##[ AMD ?? } ]##
 //////////////////////////////////////////////////////////////////////// WINDOW

@@ -1,21 +1,21 @@
     #!/bin/sh
-    echo '(function() {@@ USE_STRICT ?? "use strict"; @@'
+    echo '(function() {##[ USE_STRICT ?? "use strict"; ]##'
 
 ?????????????????????????????????????????????????????????????????????????? NODE
     # vaccine.js must NOT be in the source list.
-    source_dir='$$ SOURCE_DIR $$'
+    source_dir='$$[ SOURCE_DIR ]$$'
 
 
     for file in $(find $source_dir -type f)
     do
       name=$(echo "$file" | sed -e "s#^$source_dir/##" -e 's/\.js//')
-      echo "define('$name', function(require, @@ MODULE_EXPORTS ?? exports, module :: exports @@) {"
+      echo "define('$name', function(require, ##[ MODULE_EXPORTS ?? exports, module :: exports ]##) {"
       cat $file
       echo '});'
     done
 :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: NODE
-    cat $(find '$$ SOURCE_DIR $$' -type f)   # vaccine.js must NOT be in the source list.
+    cat $(find $$[ SOURCE_DIR ]$$ -type f)   # vaccine.js must NOT be in the source list.
 ////////////////////////////////////////////////////////////////////////// NODE
 
-    cat vaccine.js  # Must be last.
+    cat vaccine.js  # Must be after sources.
     echo '}());'
