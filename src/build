@@ -9,7 +9,7 @@
     for file in $(find $source_dir -type f)
     do
       name=$(echo "$file" | sed -e "s#^$source_dir/##" -e 's/\.js//')
-      echo "define('$name', function(require, exports, module) {"
+      echo "define('$name', function(require, @@ MODULE_EXPORTS ?? exports, module :: exports @@) {"
       cat $file
       echo '});'
     done
