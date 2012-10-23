@@ -159,7 +159,7 @@ test "X$GLOBAL_VAR" = X && GLOBAL_VAR=$LIB_NAME
 
 
 switch() {
-  awk "/===== .* $1/{p=1} /===== $2 $1/{p=0} /===== \/ $1/{p=0} p == 0 {print}"
+  awk "/===== .* $1/{p=1} /===== $2 $1/{p=0} /===== \/\/ $1/{p=0} p == 0 {print}"
 }
 
 conditional() {
