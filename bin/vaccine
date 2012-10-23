@@ -41,20 +41,19 @@ SOURCE_DIR=src
 LIBRARY_DIR=lib
 DIR_LEVELS=1
 EXPORTS=amd,window
-DEPS=0
 
 vars_list='LIB_NAME SOURCE_DIR LIBRARY_DIR GLOBAL_VAR DEP_NAME DEP_NAMES'
-
 
 # Conditionals
 COMPLEX=false
 AMD=false
-NO_DEPS=true
-ONE_DEP=false
-MULTI_DEPS=false
 
-conditionals='COMPLEX AMD NO_DEPS ONE_DEP MULTI_DEPS NODE'
+conditionals='COMPLEX AMD NODE'
 
+# Switches
+DEPS=0
+
+switches='DEPS'
 
 fail() {
   echo $1 >&2
@@ -93,6 +92,7 @@ then
   DEPS=$(echo "$dep_names_raw" | sed 's/[^,]//g' | wc -c)
   if test $DEPS -gt 1
   then
+    DEPS='>'
     MULTI_DEPS=true
   else
     ONE_DEP=true
@@ -117,17 +117,21 @@ fi
 test "X$GLOBAL_VAR" = X && GLOBAL_VAR=$LIB_NAME
 
 
+switch() {
+  awk "/===== .* $1/{p=1} /===== $2 $1/{p=0} /===== \/ $1/{p=0} p == 0 {print}"
+}
+
 conditional() {
   if test "X$2" = 'Xtrue'
   then
     sed "/::::: $1$/,/##### $1$/d" | sed "/!!!!! $1$/,/##### $1$/d"
   else
-    awk "/\?\?\?\?\? $1/{f=1} /##### $1/{f=0} /::::: $1/{f=0} f == 0 {print}"
+    awk "/\?\?\?\?\? $1/{p=1} /##### $1/{p=0} /::::: $1/{p=0} p == 0 {print}"
   fi
 }
 
 clean() {
-  sed -e '/?????/d' -e '/!!!!!/d' -e '/:::::/d' -e '/#####/d'
+  sed -e '/?????/d' -e '/!!!!!/d' -e '/:::::/d' -e '/#####/d' -e '/=====/d'
 }
 
 replace_vars() {
@@ -140,7 +144,7 @@ replace_vars() {
   eval sed $sed_string
 }
 
-set_conditionals() {
+pick_conditionals() {
   cond_string=''
   for cond in $conditionals
   do
@@ -150,8 +154,19 @@ set_conditionals() {
   eval $cond_string
 }
 
+pick_switches() {
+  switch_string=''
+  for sw in $switches
+  do
+    switch_string="$switch_string | switch $sw \$$sw"
+  done
+  switch_string=$(echo "$switch_string" | cut -c 4-)
+  eval $switch_string
+}
+
 configure() {
-  cat $1 | replace_vars | sed 's/^    //' | set_conditionals | clean
+  cat $1 | replace_vars | sed 's/^    //' |
+      pick_conditionals | pick_switches | clean
 }
 
 
