@@ -2,3 +2,4 @@ node_modules
 /vaccine.js
 /build
 /dev_server.js
+/Makefile.example

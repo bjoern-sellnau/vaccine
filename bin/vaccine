@@ -41,6 +41,7 @@ fi
 vaccine_src=$vaccine_src_dir/vaccine.js
 dev_server_src=$vaccine_src_dir/dev_server.js
 build_src=$vaccine_src_dir/build
+makefile_src=$vaccine_src_dir/Makefile
 
 
 # Variables
@@ -65,8 +66,9 @@ RETURN_EXPORTS=false
 EXPORTS=true
 DEBUG=false
 PERFORM=false
+COMMONJS=false
 
-conditionals='multi_DIRS AMD WINDOW NODE USE_STRICT no_DEPS one_DEPS multi_DEPS'
+conditionals='multi_DIRS AMD WINDOW COMMONJS USE_STRICT no_DEPS one_DEPS multi_DEPS'
 conditionals="$conditionals multi_DEPS_and_AMD MODULE_EXPORTS RETURN_EXPORTS"
 conditionals="$conditionals EXPORTS DEBUG PERFORM"
 
@@ -88,7 +90,7 @@ do
     --no-perf | --no-perform) PERFORM=false; perform_set=true; ;;
     --export | --exports) exports=$2; shift ;;
     --use-strict) USE_STRICT=true; ;;
-    --node) NODE=true; ;;
+    --commonjs) COMMONJS=true; ;;
     --src) SOURCE_DIR=$2; shift ;;
     --lib) LIBRARY_DIR=$2; shift ;;
     --global) GLOBAL_VAR=$2; shift ;;
@@ -229,6 +231,10 @@ configure() {
 configure $vaccine_src > vaccine.js
 
 configure $dev_server_src > dev_server.js
+
+makefile_target=Makefile
+test -f Makefile && makefile_target=Makefile.example
+configure $makefile_src > $makefile_target
 
 configure $build_src > build
 chmod +x build
