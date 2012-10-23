@@ -83,17 +83,17 @@ test "X$global_var" = X && global_var=$lib_name
 
 
 conditional() {
-  section=$1
   if test "X$2" = 'Xtrue'
   then
-    sed "/!!!!! $1$/,/##### $1$/d"
+    sed "/::::: $1$/,/##### $1$/d" | sed "/!!!!! $1$/,/##### $1$/d"
   else
-    sed "/????? $1$/,/!!!!! $1$/d" | sed "/????? $1$/,/##### $1$/d"
+    #sed "/????? $1$/,/::::: $1$/d" | sed "/????? $1$/,/##### $1$/d"
+    awk "/\?\?\?\?\? $1/{f=1} /##### $1/{f=0} /::::: $1/{f=0} f == 0 {print}"
   fi
 }
 
 clean() {
-  sed -e '/?????/d' -e '/!!!!!/d' -e '/#####/d'
+  sed -e '/?????/d' -e '/!!!!!/d' -e '/:::::/d' -e '/#####/d'
 }
 
 replace_vars() {
@@ -118,13 +118,13 @@ unindent_start() {
 set_dependencies() {
   if test "X$has_deps" = X
   then
-    remove_sections MULTIPLE_DEPS | remove_sections SINGLE_DEP
+    conditional MULTI_DEPS false | conditional ONE_DEP false | conditional NO_DEPS true
   else
     if test "X$multi_deps" = X
     then
-      remove_sections NO_DEPS | remove_sections MULTIPLE_DEPS
+      conditional MULTI_DEPS false | conditional ONE_DEP true | conditional NO_DEPS false
     else
-      remove_sections NO_DEPS | remove_sections SINGLE_DEP
+      conditional MULTI_DEPS true | conditional ONE_DEP false | conditional NO_DEPS false
     fi
   fi
 }
@@ -160,5 +160,5 @@ start $standalone_server_src | clean > dev_server_standalone_node.js
 unindent_start $build_src | conditional NODE true | clean > build
 chmod +x build
 
-unindent_start $build_src | remove_sections PRE_WRAPPED | clean > build_node
+unindent_start $build_src | conditional NODE false | clean > build_node
 chmod +x build_node
