@@ -51,7 +51,7 @@ DIR_LEVELS=1
 vars_list='LIB_NAME SOURCE_DIR LIBRARY_DIR GLOBAL_VAR DEP_NAME DEP_NAMES'
 
 # Conditionals
-COMPLEX=false
+multi_DIRS=false
 supports=amd,window
 AMD=true
 WINDOW=true
@@ -63,10 +63,11 @@ multi_DEPS_and_AMD=false
 MODULE_EXPORTS=true
 RETURN_EXPORTS=false
 EXPORTS=true
+DEBUG=false
 
-conditionals='COMPLEX AMD WINDOW NODE USE_STRICT no_DEPS one_DEPS multi_DEPS'
+conditionals='multi_DIRS AMD WINDOW NODE USE_STRICT no_DEPS one_DEPS multi_DEPS'
 conditionals="$conditionals multi_DEPS_and_AMD MODULE_EXPORTS RETURN_EXPORTS"
-conditionals="$conditionals EXPORTS"
+conditionals="$conditionals EXPORTS DEBUG"
 
 # Switches
 DEPS=0
@@ -81,6 +82,7 @@ do
     --name) LIB_NAME=$2; shift ;;
     --dir-levels) DIR_LEVELS=$2; shift ;;
     --support | --supports) supports=$2; shift ;;
+    --debug) DEBUG=true; supports=''; ;;
     --export | --exports) exports=$2; shift ;;
     --use-strict) USE_STRICT=true; ;;
     --node) NODE=true; ;;
@@ -96,7 +98,7 @@ done
 
 test "X$LIB_NAME" = X && fail 'Must provide the name (vaccine --name [name])'
 
-test $DIR_LEVELS -gt 1 && COMPLEX=true
+test $DIR_LEVELS -gt 1 && multi_DIRS=true
 
 if test "X$dep_names_raw" != X
 then
@@ -163,12 +165,12 @@ switch() {
 conditional() {
   if test "X$2" = 'Xtrue'
   then
-    sed "/::::: $1$/,/##### $1$/d" | sed "/!!!!! $1$/,/##### $1$/d" |
+    sed "/::::: $1$/,/\/\/\/\/\/ $1$/d" | sed "/!!!!! $1$/,/\/\/\/\/\/ $1$/d" |
         sed -e "s/@@ $1 ?? \(.*\) :: .* @@/\1/" \
             -e "s/@@ $1 ?? \(.*\) @@/\1/" \
             -e "s/@@ $1 !! .* @@//"
   else
-    awk "/\?\?\?\?\? $1/{p=1} /##### $1/{p=0} /::::: $1/{p=0} p == 0 {print}" |
+    awk "/\?\?\?\?\? $1/{p=1} /\/\/\/\/\/ $1/{p=0} /::::: $1/{p=0} p == 0 {print}" |
         sed -e "s/@@ $1 ?? .* :: \(.*\) @@/\1/" \
             -e "s/@@ $1 !! \(.*\) @@/\1/" \
             -e "s/@@ $1 ?? .* @@//"
@@ -176,7 +178,7 @@ conditional() {
 }
 
 clean() {
-  sed -e '/?????/d' -e '/!!!!!/d' -e '/:::::/d' -e '/#####/d' -e '/=====/d'
+  sed -e '/?????/d' -e '/!!!!!/d' -e '/:::::/d' -e '/\/\/\/\/\//d' -e '/=====/d'
 }
 
 replace_vars() {
