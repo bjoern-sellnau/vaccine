@@ -14,6 +14,12 @@ Options:
   exit 0
 }
 
+fail() {
+  echo $1 >&2
+  exit 1
+}
+
+
 if test "X$vaccine_bin_dir" = X
 then
   SOURCE="$0"
@@ -36,6 +42,7 @@ vaccine_src=$vaccine_src_dir/vaccine.js
 standalone_server_src=$vaccine_src_dir/dev_server_standalone.js
 build_src=$vaccine_src_dir/build
 
+
 # Variables
 SOURCE_DIR=src
 LIBRARY_DIR=lib
@@ -47,18 +54,15 @@ vars_list='LIB_NAME SOURCE_DIR LIBRARY_DIR GLOBAL_VAR DEP_NAME DEP_NAMES'
 # Conditionals
 COMPLEX=false
 AMD=false
+USE_STRICT=false
 
-conditionals='COMPLEX AMD NODE'
+conditionals='COMPLEX AMD NODE USE_STRICT'
 
 # Switches
 DEPS=0
 
 switches='DEPS'
 
-fail() {
-  echo $1 >&2
-  exit 1
-}
 
 while test $# -gt 0
 do
@@ -68,6 +72,7 @@ do
     --dir-levels) DIR_LEVELS=$2; shift ;;
     --export | --exports) exports_raw=$2; shift ;;
     --amd) AMD=true; ;;
+    --use-strict) USE_STRICT=true; ;;
     --node) NODE=true; ;;
     --src) SOURCE_DIR=$2; shift ;;
     --lib) LIBRARY_DIR=$2; shift ;;
@@ -125,10 +130,14 @@ conditional() {
   if test "X$2" = 'Xtrue'
   then
     sed "/::::: $1$/,/##### $1$/d" | sed "/!!!!! $1$/,/##### $1$/d" |
-        sed -e "s/@@ $1 ?? \(.*\) :: .* @@/\1/" -e "s/@@ $1 ?? \(.*\) @@/\1/"
+        sed -e "s/@@ $1 ?? \(.*\) :: .* @@/\1/" \
+            -e "s/@@ $1 ?? \(.*\) @@/\1/" \
+            -e "s/@@ $1 !! .* @@//"
   else
     awk "/\?\?\?\?\? $1/{p=1} /##### $1/{p=0} /::::: $1/{p=0} p == 0 {print}" |
-        sed -e "s/@@ $1 ?? .* :: \(.*\) @@/\1/" -e "s/@@ $1 !! \(.*\) @@/\1/"
+        sed -e "s/@@ $1 ?? .* :: \(.*\) @@/\1/" \
+            -e "s/@@ $1 !! \(.*\) @@/\1/" \
+            -e "s/@@ $1 ?? .* @@//"
   fi
 }
 
