@@ -52,17 +52,21 @@ vars_list='LIB_NAME SOURCE_DIR LIBRARY_DIR GLOBAL_VAR DEP_NAME DEP_NAMES'
 
 # Conditionals
 COMPLEX=false
+supports=amd,window
 AMD=true
 WINDOW=true
 USE_STRICT=false
-NO_DEPS=true
-ONE_DEP=false
-MULTI_DEPS=false
-MULTI_DEPS_and_AMD=false
-SET_APP=true
+no_DEPS=true
+one_DEPS=false
+multi_DEPS=false
+multi_DEPS_and_AMD=false
+MODULE_EXPORTS=true
+RETURN_EXPORTS=false
+EXPORTS=true
 
-conditionals='COMPLEX AMD WINDOW NODE USE_STRICT NO_DEPS ONE_DEP MULTI_DEPS'
-conditionals="$conditionals MULTI_DEPS_and_AMD SET_APP"
+conditionals='COMPLEX AMD WINDOW NODE USE_STRICT no_DEPS one_DEPS multi_DEPS'
+conditionals="$conditionals multi_DEPS_and_AMD MODULE_EXPORTS RETURN_EXPORTS"
+conditionals="$conditionals EXPORTS"
 
 # Switches
 DEPS=0
@@ -76,6 +80,7 @@ do
     --help | -h) help ;;
     --name) LIB_NAME=$2; shift ;;
     --dir-levels) DIR_LEVELS=$2; shift ;;
+    --support | --supports) supports=$2; shift ;;
     --export | --exports) exports=$2; shift ;;
     --use-strict) USE_STRICT=true; ;;
     --node) NODE=true; ;;
@@ -95,7 +100,7 @@ test $DIR_LEVELS -gt 1 && COMPLEX=true
 
 if test "X$dep_names_raw" != X
 then
-  NO_DEPS=false
+  no_DEPS=false
   DEP_NAME=$dep_names_raw
   DEP_NAMES=$(echo "$dep_names_raw" | sed -e "s/,/\",\"/g" \
                                           -e "s/^/\"/" -e "s/$/\"/")
@@ -103,28 +108,49 @@ then
   if test $DEPS -gt 1
   then
     DEPS='>'
-    MULTI_DEPS=true
+    multi_DEPS=true
   else
-    ONE_DEP=true
+    one_DEPS=true
   fi
 fi
 
 if test "X$exports" != X
 then
-  if echo "$exports" | grep -i -q 'amd'
+  MODULE_EXPORTS=false
+  EXPORTS=false
+  RETURN_EXPORTS=false
+  if echo "$exports" | grep -i -q 'exports'
   then
-    if echo "$exports" | grep -i -q 'window'
-    then
-      AMD=true
-      WINDOW=true
-    else
-      AMD=true
-      WINDOW=false
-    fi
+    EXPORTS=true
   else
-    AMD=false
-    WINDOW=true
+    EXPORTS=false
   fi
+  if echo "$exports" | grep -i -q 'module'
+  then
+    MODULE_EXPORTS=true
+    EXPORTS=true
+  else
+    MODULE_EXPORTS=false
+  fi
+  if echo "$exports" | grep -i -q 'return'
+  then
+    RETURN_EXPORTS=true
+  else
+    RETURN_EXPORTS=false
+  fi
+fi
+
+if echo "$supports" | grep -i -q 'amd'
+then
+  AMD=true
+else
+  AMD=false
+fi
+if echo "$supports" | grep -i -q 'window'
+then
+  WINDOW=true
+else
+  WINDOW=false
 fi
 
 test "X$GLOBAL_VAR" = X && GLOBAL_VAR=$LIB_NAME
