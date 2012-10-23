@@ -47,16 +47,22 @@ build_src=$vaccine_src_dir/build
 SOURCE_DIR=src
 LIBRARY_DIR=lib
 DIR_LEVELS=1
-EXPORTS=amd,window
 
 vars_list='LIB_NAME SOURCE_DIR LIBRARY_DIR GLOBAL_VAR DEP_NAME DEP_NAMES'
 
 # Conditionals
 COMPLEX=false
-AMD=false
+AMD=true
+WINDOW=true
 USE_STRICT=false
+NO_DEPS=true
+ONE_DEP=false
+MULTI_DEPS=false
+MULTI_DEPS_and_AMD=false
+SET_APP=true
 
-conditionals='COMPLEX AMD NODE USE_STRICT'
+conditionals='COMPLEX AMD WINDOW NODE USE_STRICT NO_DEPS ONE_DEP MULTI_DEPS'
+conditionals="$conditionals MULTI_DEPS_and_AMD SET_APP"
 
 # Switches
 DEPS=0
@@ -70,8 +76,7 @@ do
     --help | -h) help ;;
     --name) LIB_NAME=$2; shift ;;
     --dir-levels) DIR_LEVELS=$2; shift ;;
-    --export | --exports) exports_raw=$2; shift ;;
-    --amd) AMD=true; ;;
+    --export | --exports) exports=$2; shift ;;
     --use-strict) USE_STRICT=true; ;;
     --node) NODE=true; ;;
     --src) SOURCE_DIR=$2; shift ;;
@@ -104,18 +109,21 @@ then
   fi
 fi
 
-if test "X$exports_raw" != X
+if test "X$exports" != X
 then
-  if echo "$exports_raw" | grep -i -q 'amd'
+  if echo "$exports" | grep -i -q 'amd'
   then
-    if echo "$exports_raw" | grep -i -q 'window'
+    if echo "$exports" | grep -i -q 'window'
     then
-      EXPORTS=amd,window
+      AMD=true
+      WINDOW=true
     else
-      EXPORTS=amd
+      AMD=true
+      WINDOW=false
     fi
   else
-    EXPORTS=window
+    AMD=false
+    WINDOW=true
   fi
 fi
 
