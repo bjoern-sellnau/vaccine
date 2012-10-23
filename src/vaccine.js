@@ -90,9 +90,9 @@
 ??????????????????????????????????????????????????????????????????????? PERFORM
       if (firstRequire) {
         vaccineRequireEnd = Date.now();
-        console.log('Defined in: ' + vaccineRequireStart - vaccineFirstDefineTime + ' ms');
-        console.log('Executed in: ' + vaccineRequireEnd - vaccineRequireStart + ' ms');
-        console.log('Overall time: ' + vaccineRequireEnd - vaccineFirstDefineTime + ' ms');
+        console.log('Defined in: ' + (vaccineRequireStart - vaccineFirstDefineTime) + ' ms');
+        console.log('Executed in: ' + (vaccineRequireEnd - vaccineRequireStart) + ' ms');
+        console.log('Overall time: ' + (vaccineRequireEnd - vaccineFirstDefineTime) + ' ms');
       }
 /////////////////////////////////////////////////////////////////////// PERFORM
       return vaccineLocalModules[id] || vaccineWindow[id];

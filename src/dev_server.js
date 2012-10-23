@@ -1,5 +1,4 @@
-    var libName = '$$ LIB_NAME $$',       // Change this to your library's name.
-        sourceDir = '$$ SOURCE_DIR $$';   // Change this to... uh, your source directory.
+    var sourceDir = '$$ SOURCE_DIR $$';   // Change this to... uh, your source directory.
 
 
     var http = require('http'),
@@ -67,9 +66,8 @@
     function nodeWrap(path, buffer) {
       var prefix = new RegExp('^' + sourceDir + '/'),
           module = path.slice(1).replace(prefix, '').replace(/\.js$/, ''),
-          fullModule = libName + '/' + module,
           compiled;
-      compiled = 'define("' + fullModule + '", ';
+      compiled = 'define("' + module + '", ';
       compiled += 'function(require, @@ MODULE_EXPORTS ?? exports, module :: exports @@) {\n';
       compiled += buffer.toString('utf8');
       compiled += '\n});';
