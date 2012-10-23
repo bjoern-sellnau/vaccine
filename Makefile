@@ -1,4 +1,4 @@
 clean:
-	@rm dev_server*
-	@rm build*
-	@rm vaccine*
+	@rm -f dev_server*
+	@rm -f build*
+	@rm -f vaccine*

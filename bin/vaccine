@@ -37,10 +37,23 @@ standalone_server_src=$vaccine_src_dir/dev_server_standalone.js
 build_src=$vaccine_src_dir/build
 
 # Variables
-source_dir=src
-library_dir=lib
+SOURCE_DIR=src
+LIBRARY_DIR=lib
+DIR_LEVELS=1
+EXPORTS=amd,window
+DEPS=0
 
-vars_list='lib_name source_dir library_dir global_var dep_name dep_names'
+vars_list='LIB_NAME SOURCE_DIR LIBRARY_DIR GLOBAL_VAR DEP_NAME DEP_NAMES'
+
+
+# Conditionals
+COMPLEX=false
+AMD=false
+NO_DEPS=true
+ONE_DEP=false
+MULTI_DEPS=false
+
+conditionals='COMPLEX AMD NO_DEPS ONE_DEP MULTI_DEPS NODE'
 
 
 fail() {
@@ -52,34 +65,56 @@ while test $# -gt 0
 do
   case $1 in
     --help | -h) help ;;
-    --name) lib_name=$2 ;;
-    --src) dir_or_file=$2; source_dir=$2 ;;
-    --lib) library_dir=$2 ;;
-    --global) global_var=$2 ;;
-    --deps | --dep) dep_names_raw=$2 ;;
+    --name) LIB_NAME=$2; shift ;;
+    --dir-levels) DIR_LEVELS=$2; shift ;;
+    --export | --exports) exports_raw=$2; shift ;;
+    --amd) AMD=true; ;;
+    --node) NODE=true; ;;
+    --src) SOURCE_DIR=$2; shift ;;
+    --lib) LIBRARY_DIR=$2; shift ;;
+    --global) GLOBAL_VAR=$2; shift ;;
+    --deps | --dep) dep_names_raw=$2; shift ;;
     *) fail "Unrecognized option: $1" ;;
   esac
-  if test "X$1" = "X--write-exports"
-  then
-    shift 1
-  else
-    shift 2
-  fi
+  shift
 done
 
 
-test "X$lib_name" = X && fail 'Must provide the name (vaccine --name [name])'
+test "X$LIB_NAME" = X && fail 'Must provide the name (vaccine --name [name])'
+
+test $DIR_LEVELS -gt 1 && COMPLEX=true
 
 if test "X$dep_names_raw" != X
 then
-  has_deps=true
-  dep_name=$dep_names_raw
-  dep_names=$(echo "$dep_names_raw" | sed -e "s/,/\",\"/g" \
+  NO_DEPS=false
+  DEP_NAME=$dep_names_raw
+  DEP_NAMES=$(echo "$dep_names_raw" | sed -e "s/,/\",\"/g" \
                                           -e "s/^/\"/" -e "s/$/\"/")
-  echo "$dep_names" | grep -q ',' && multi_deps=true
+  DEPS=$(echo "$dep_names_raw" | sed 's/[^,]//g' | wc -c)
+  if test $DEPS -gt 1
+  then
+    MULTI_DEPS=true
+  else
+    ONE_DEP=true
+  fi
 fi
 
-test "X$global_var" = X && global_var=$lib_name
+if test "X$exports_raw" != X
+then
+  if echo "$exports_raw" | grep -i -q 'amd'
+  then
+    if echo "$exports_raw" | grep -i -q 'window'
+    then
+      EXPORTS=amd,window
+    else
+      EXPORTS=amd
+    fi
+  else
+    EXPORTS=window
+  fi
+fi
+
+test "X$GLOBAL_VAR" = X && GLOBAL_VAR=$LIB_NAME
 
 
 conditional() {
@@ -87,7 +122,6 @@ conditional() {
   then
     sed "/::::: $1$/,/##### $1$/d" | sed "/!!!!! $1$/,/##### $1$/d"
   else
-    #sed "/????? $1$/,/::::: $1$/d" | sed "/????? $1$/,/##### $1$/d"
     awk "/\?\?\?\?\? $1/{f=1} /##### $1/{f=0} /::::: $1/{f=0} f == 0 {print}"
   fi
 }
@@ -101,64 +135,37 @@ replace_vars() {
   for var in $vars_list
   do
     eval value=\$$var
-    name=$(echo $var | tr '[a-z]' '[A-Z]')
-    sed_string="$sed_string -e 's#{{{ $name }}}#$value#g'"
+    sed_string="$sed_string -e 's#{{{ $var }}}#$value#g'"
   done
   eval sed $sed_string
 }
 
-start() {
-  cat $1 | replace_vars
+set_conditionals() {
+  cond_string=''
+  for cond in $conditionals
+  do
+    cond_string="$cond_string | conditional $cond \$$cond"
+  done
+  cond_string=$(echo "$cond_string" | cut -c 4-)
+  eval $cond_string
 }
 
-unindent_start() {
-  start $1 | sed 's/^    //'
-}
-
-set_dependencies() {
-  if test "X$has_deps" = X
-  then
-    conditional MULTI_DEPS false | conditional ONE_DEP false | conditional NO_DEPS true
-  else
-    if test "X$multi_deps" = X
-    then
-      conditional MULTI_DEPS false | conditional ONE_DEP true | conditional NO_DEPS false
-    else
-      conditional MULTI_DEPS true | conditional ONE_DEP false | conditional NO_DEPS false
-    fi
-  fi
-}
-
-start_vaccine() {
-  unindent_start $vaccine_src | set_dependencies
-}
-
-complex_intermediate() {
-  start_vaccine | conditional SIMPLE false
-}
-
-simple_intermediate() {
-  start_vaccine | conditional SIMPLE true
+configure() {
+  cat $1 | replace_vars | sed 's/^    //' | set_conditionals | clean
 }
 
 
 # Vaccines
 
-complex_intermediate | conditional AMD true | clean > vaccine.js
-simple_intermediate | conditional AMD true | clean > vaccine_simple.js
-complex_intermediate | conditional AMD false | clean > vaccine_no_amd.js
-simple_intermediate | conditional AMD false | clean > vaccine_simple_no_amd.js
+configure $vaccine_src > vaccine.js
 
 
 # Server
 
-start $standalone_server_src | clean > dev_server_standalone_node.js
+cat $standalone_server_src | replace_vars | clean > dev_server_standalone_node.js
 
 
 # Builds
 
-unindent_start $build_src | conditional NODE true | clean > build
+configure $build_src > build
 chmod +x build
-
-unindent_start $build_src | conditional NODE false | clean > build_node
-chmod +x build_node
