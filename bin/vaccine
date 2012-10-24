@@ -70,4 +70,5 @@ if (argv.h) {
 argv.use_strict = argv['use-strict'];
 
 vaccine.loadFiles();
-vaccine(argv);
+var compiled = vaccine(argv);
+console.dir(compiled);

@@ -1,5 +1,14 @@
-var templates = {},
-    templateFiles = ['vaccine.js', 'Makefile', 'build.sh', 'dev_server.js'];
+var templateFiles = ['vaccine.js', 'Makefile', 'build.sh', 'dev_server.js'],
+    templateText = {},
+    conditionals = {};
+
+var templateMap = {
+  'vaccine.js': 'vaccine.js',
+  'Makefile': 'Makefile',
+  'build.sh': 'build.sh',
+  'dev_server.js': 'dev_server.js',
+  'vaccine_debug.js': 'vaccine.js',
+};
 
 var name,
     globalName,
@@ -24,6 +33,30 @@ var has = function(array, item) {
 
 module.exports = exports = function(options) {
 
+  setOptions(options);
+
+  var templates = [];
+  targets.forEach(function(tgt) {
+    var tmpl = templateMap[tgt];
+    if (!has(templates, tmpl)) templates.push(tmpl);
+  });
+
+  var compiled = {};
+  templates.forEach(function(template) {
+    compiled[template] = compileTemplate(template);
+  });
+
+  if (has(targets, 'vaccine_debug.js')) {
+    debug = true;
+    performance = true;
+    supports = [];
+    compiled['vaccine_debug.js'] = compileTemplate('vaccine.js');
+  }
+
+  return compiled;
+};
+
+var setOptions = function(options) {
   name = options.name;
   globalName = options.global || name;
   libraryDir = options.lib;
@@ -48,10 +81,16 @@ module.exports = exports = function(options) {
     sourceDir = mainSplit.join('/') || '.';
   }
   mainModule = cleanedMain.replace(new RegExp('^' + sourceDir + '/'), '');
+};
 
-  console.log(sourceDir);
-  console.log(mainModule);
-  console.dir(templates);
+
+var compileTemplate = function(templateName) {
+  var template = templateText[templateName],
+      compiled = '';
+  template.split('\n').forEach(function(line) {
+    if (!line.match(/\?\?\?\?\?/)) compiled += line + '\n';
+  });
+  return compiled;
 };
 
 
@@ -63,6 +102,6 @@ exports.loadFromObject = function(targetsObject) {
 exports.loadFiles = function() {
   var fs = require('fs');
   templateFiles.forEach(function(file) {
-    templates[file] = fs.readFileSync(__dirname + '/../templates/' + file, 'utf8');
+    templateText[file] = fs.readFileSync(__dirname + '/../templates/' + file, 'utf8');
   });
 };
