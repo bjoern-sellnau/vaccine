@@ -1,350 +1,68 @@
-#!/bin/sh
+#!/usr/bin/env node
 
-help() {
-  echo "vaccine --name <name> --main <main> [options]
+var usage = 'Generate shims to make CommonJS or AMD work in the browser.\n' +
+            'Usage: vaccine --name <name> --main <main> [options]\n\n' +
+            '[m] means it is intended to be called multiple times.';
 
-Options:                # 'M' options can be called multiple times (or as
-                        # comma separated values)
+var optimist = require('optimist')
+    .usage(usage)
+    .wrap(80)
 
-  -n | --name <name>    # Your library's name.
-  -m | --main <file>    # Your library's entry file.
-  --dirs | --dir-levels # The maximum number of directory levels under
-                        # your source dir. (e.g. src/foo/*.js + src/bar/*.js
-                        # + src/baz/*.js would be 2 directory levels)
+    .describe('name', "Your library's name.")
+    .describe('main', "Your library's entry file.")
 
-  -d | --dep[s]      M  # Your library's dependencies.
-  -s | --support[s]  M  # Choose between supporting AMD, attaching to 'window',
-                        # or both (default both).
-  -e | --export[s]   M  # How a module provides exports. Options are
-                        # 'return', 'module' (for module.exports), and
-                        # 'exports'.
-  -t | --target[s]   M  # Which files to configure. Options are:
-                        # vaccine.js, build.sh, Makefile, vaccine_debug.js,
-                        # and dev_server.js. All but dev_server.js are default.
+    .describe('dirs', 'The number of directory *levels* under your source ' +
+                      'dir. (e.g. src/foo/*.js + src/bar/*.js + src/baz/*.js ' +
+                      'would be 2 directory levels.)')
+    .describe('deps', "[m] Your library's dependencies.")
+    .describe('support', "[m] Choose between supporting AMD, attaching to " +
+                         "'window', or both (default both).")
+    .describe('export', "[m] How a module provides exports. Options are " +
+                        "'return', 'module' (for module.exports), and " +
+                        "'exports'.")
+    .describe('targets', "[m] Which files to configure. Options are: " +
+                         "vaccine.js, build.sh, Makefile, vaccine_debug.js, " +
+                         "and dev_server.js. All but dev_server.js are " +
+                         "default.")
 
-  -c | --stdout         # Write to stdout instead of to files
-  --multi-target        # (With --stdout) Always write in multi-target format.
-  --commonjs            # Write in CommonJS format. build.sh will wrap the
-                        # modules for you.
-  --perf[orm[ance]]     # Measure the load-time performance of your library.
-  --debug               # Add debugging logs.
-  --src <dir>           # The directory your sources are under. This defaults
-                        # to \$(dirname \$main)
-  --global <name>       # The global variable name (default: --name)
-  --use-strict          # Enable strict mode in built file.
-  --lib <dir>           # The directory for your libraries (default: lib).
-"
-  exit 0
+    .describe('stdout', 'Write to stdout instead of to files.')
+    .describe('multi-target', '(with --stdout) Always write in multi-target format.')
+    .describe('commonjs', 'Write in CommonJS format. build.sh will wrap the modules.')
+    .describe('performance', 'Measure the load-time performance of your library.')
+    .describe('debug', 'Add debugging logs for development.')
+    .describe('src', 'The directory your sources are under. Derived from --main.')
+    .describe('global', 'The global variable name (defaults to --name).')
+    .describe('use-strict', 'Enable strict mode in built file.')
+    .describe('lib', 'The directory for your libraries.')
+
+    .alias('name', 'n')
+    .alias('main', 'm')
+    .alias('deps', 'd')
+    .alias('support', 's')
+    .alias('export', 'e')
+    .alias('targets', 't')
+    .alias('stdout', 'c')
+    .alias('help', 'h')
+
+    .demand('name')
+    .demand('main')
+
+    .boolean('stdout')
+    .boolean('multi-target')
+    .boolean('commonjs')
+    .boolean('performance')
+    .boolean('debug')
+    .boolean('use-strict')
+
+    .default('lib', 'lib')
+;
+
+
+var argv = optimist.argv;
+
+if (argv.h) {
+  optimist.showHelp();
+  process.exit(0);
 }
 
-fail() {
-  echo $1 >&2
-  exit 1
-}
-
-
-if test "X$vaccine_bin_dir" = X
-then
-  SOURCE="$0"
-  DIR="$( dirname "$SOURCE" )"
-  while [ -h "$SOURCE" ]
-  do
-    SOURCE="$(readlink "$SOURCE")"
-    [ "$(echo "$SOURCE" | cut -c 1)" != '/' ] && SOURCE="$DIR/$SOURCE"
-    DIR="$( cd -P "$( dirname "$SOURCE"  )" && pwd )"
-  done
-  DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
-
-  vaccine_bin_dir=$DIR
-  vaccine_src_dir="$(cd "$DIR/../src" && pwd)"
-  export vaccine_bin_dir
-  export vaccine_src_dir
-fi
-
-vaccine_src=$vaccine_src_dir/vaccine.js
-dev_server_src=$vaccine_src_dir/dev_server.js
-build_src=$vaccine_src_dir/build.sh
-makefile_src=$vaccine_src_dir/Makefile
-
-
-# Variables
-SOURCE_DIR=
-LIBRARY_DIR=lib
-DIR_LEVELS=1
-MAIN=
-
-vars_list='LIB_NAME MAIN SOURCE_DIR LIBRARY_DIR GLOBAL_NAME DEP_NAME DEP_NAMES'
-
-# Setting lists
-default_supports=amd,window
-default_exports=module,exports
-default_targets=Makefile,vaccine.js,vaccine_debug.js,build.sh
-default_dependencies=
-supports=
-exports=
-targets=
-dependencies=
-
-# Conditionals
-multi_DIRS=false
-AMD=true
-WINDOW=true
-USE_STRICT=false
-DEBUG=false
-PERFORM=false
-COMMONJS=false
-
-conditionals='multi_DIRS AMD WINDOW COMMONJS USE_STRICT no_DEPS one_DEPS multi_DEPS'
-conditionals="$conditionals multi_DEPS_and_AMD MODULE_EXPORTS RETURN_EXPORTS"
-conditionals="$conditionals EXPORTS DEBUG PERFORM"
-
-# Switches
-DEPS=0
-
-switches='DEPS'
-
-
-while test $# -gt 0
-do
-  case $1 in
-    --help | -h) help ;;
-
-    -n | --name) LIB_NAME=$2; shift ;;
-    --src) SOURCE_DIR=$2; shift ;;
-    -m | --main) main_file=$2; shift ;;
-    --lib) LIBRARY_DIR=$2; shift ;;
-    --global) GLOBAL_NAME=$2; shift ;;
-    --dir-levels | --dirs) DIR_LEVELS=$2; shift ;;
-
-    -s | --support | --supports) supports="$supports,$2"; shift ;;
-    -e | --export | --exports) exports="$exports,$2"; shift ;;
-    -t | --target | --targets) targets="$targets,$2"; shift ;;
-    -d | --dep | --deps | --dependency | --dependencies) dependencies="$dependencies,$2"; shift ;;
-
-    -c | --stdout) stdout=true; ;;
-    --multi-target) force_multi_target=true; ;;
-    --perf | --perform | --performance) PERFORM=true; ;;
-    --debug) DEBUG=true; ;;
-    --use-strict) USE_STRICT=true; ;;
-    --commonjs) COMMONJS=true; ;;
-    *) fail "Unrecognized option: $1" ;;
-  esac
-  shift
-done
-
-
-test "X$LIB_NAME" = X && fail 'Must provide the name (vaccine --name [name])'
-
-test "X$main_file" = X && fail 'Must provide the main file (vaccine --main [file])'
-
-test "X$SOURCE_DIR" = X && SOURCE_DIR=$(dirname "$main_file")
-MAIN=$(echo "$main_file" | sed -e 's/\.js$//' -e "s#$SOURCE_DIR/*##")
-
-test "X$GLOBAL_NAME" = X && GLOBAL_NAME=$LIB_NAME
-
-test $DIR_LEVELS -gt 1 && multi_DIRS=true
-
-test "X$supports" = X && supports=$default_supports
-test "X$exports" = X && exports=$default_exports
-test "X$targets" = X && targets=$default_targets
-test "X$dependencies" = X && dependencies=$default_dependencies
-
-
-has() {
-  echo "$1" | grep -i -q "\<$2\>"
-}
-
-
-# Dependencies
-
-no_DEPS=true
-one_DEPS=false
-multi_DEPS=false
-dependencies=$(echo "$dependencies" | sed -e 's/,,*/,/g' -e 's/^,//' -e 's/,$//')
-if test "X$dependencies" != X
-then
-  no_DEPS=false
-  DEP_NAME=$dependencies
-  DEP_NAMES=$(echo "$dependencies" | sed -e "s/,/\",\"/g" \
-                                         -e "s/^/\"/" -e "s/$/\"/")
-  DEPS=$(echo "$dependencies" | sed 's/[^,]//g' | wc -c)
-  if test $DEPS -gt 1
-  then
-    DEPS='>'
-    multi_DEPS=true
-  else
-    one_DEPS=true
-  fi
-fi
-
-
-# Exports
-
-MODULE_EXPORTS=false
-EXPORTS=false
-RETURN_EXPORTS=false
-if has "$exports" exports
-then
-  EXPORTS=true
-else
-  EXPORTS=false
-fi
-if has "$exports" module
-then
-  MODULE_EXPORTS=true
-  EXPORTS=true
-else
-  MODULE_EXPORTS=false
-fi
-if has "$exports" 'return'
-then
-  RETURN_EXPORTS=true
-else
-  RETURN_EXPORTS=false
-fi
-
-
-# Supports
-
-set_supports() {
-  if has "$1" amd
-  then
-    AMD=true
-    if test "X$multi_DEPS" = Xtrue
-    then
-      multi_DEPS_and_AMD=true
-    else
-      multi_DEPS_and_AMD=false
-    fi
-  else
-    AMD=false
-    multi_DEPS_and_AMD=false
-  fi
-  if has "$1" window
-  then
-    WINDOW=true
-  else
-    WINDOW=false
-  fi
-}
-
-set_supports $supports
-
-
-
-switch() {
-  awk "/===== .* $1/{p=1} /===== $2 $1/{p=0} /===== \/\/ $1/{p=0} p == 0 {print}"
-}
-
-conditional() {
-  if test "X$2" = 'Xtrue'
-  then
-    sed "/::::: $1$/,/\/\/\/\/\/ $1$/d" | sed "/!!!!! $1$/,/\/\/\/\/\/ $1$/d" |
-        sed -e "s/##\[ $1 ?? \([^#]*\) :: [^#]* \]##/\1/" \
-            -e "s/##\[ $1 ?? \([^#]*\) \]##/\1/" \
-            -e "s/##\[ $1 !! [^#]* \]##//"
-  else
-    awk "/\?\?\?\?\? $1/{p=1} /\/\/\/\/\/ $1/{p=0} /::::: $1/{p=0} p == 0 {print}" |
-        sed -e "s/##\[ $1 ?? [^#]* :: \([^#]*\) \]##/\1/" \
-            -e "s/##\[ $1 !! \([^#]*\) \]##/\1/" \
-            -e "s/##\[ $1 ?? [^#]* \]##//"
-  fi
-}
-
-clean() {
-  sed -e '/?????/d' -e '/!!!!!/d' -e '/:::::/d' -e '/\/\/\/\/\//d' -e '/=====/d'
-}
-
-replace_vars() {
-  sed_string=''
-  for var in $vars_list
-  do
-    eval value=\$$var
-    sed_string="$sed_string -e 's#\\$\\$\[ $var \]\\$\\\$#$value#g'"
-  done
-  eval sed $sed_string
-}
-
-pick_conditionals() {
-  cond_string=''
-  for cond in $conditionals
-  do
-    cond_string="$cond_string | conditional $cond \$$cond"
-  done
-  cond_string=$(echo "$cond_string" | cut -c 4-)
-  eval $cond_string
-}
-
-pick_switches() {
-  switch_string=''
-  for sw in $switches
-  do
-    switch_string="$switch_string | switch $sw \$$sw"
-  done
-  switch_string=$(echo "$switch_string" | cut -c 4-)
-  eval $switch_string
-}
-
-configure() {
-  source=$1
-  tgt=$2
-  if test "X$multi_target_stdout" = Xtrue
-  then
-    echo "--------------- $tgt ---------------"
-  fi
-  if test "X$stdout" = Xtrue
-  then
-    internal_configure $source
-  else
-    internal_configure $source > $tgt
-  fi
-}
-
-internal_configure() {
-  cat $1 | replace_vars | sed 's/^    //' |
-      pick_conditionals | pick_switches | clean
-}
-
-
-
-targets=$(echo "$targets" | sed -e 's/,,*/,/g' -e 's/^,//' -e 's/,$//')
-num_targets=$(echo "$targets" | sed 's/[^,]//g' | wc -c)
-if test $num_targets -gt 1 -o "X$force_multi_target" = Xtrue
-then
-  multi_target=true
-  test "X$stdout" = Xtrue && multi_target_stdout=true
-fi
-
-if has "$targets" vaccine.js
-then
-  configure $vaccine_src vaccine.js
-fi
-
-if has "$targets" dev_server.js
-then
-  configure $dev_server_src dev_server.js
-fi
-
-if has "$targets" Makefile || has "$targets" Makefile.example
-then
-  makefile_target=Makefile
-  if test "X$stdout" = X
-  then
-    test -f Makefile && makefile_target=Makefile.example
-  fi
-  configure $makefile_src $makefile_target
-fi
-
-if has "$targets" build.sh
-then
-  configure $build_src build.sh
-  test "X$stdout" = X && chmod +x build.sh
-fi
-
-if has "$targets" vaccine_debug.js
-then
-  set_supports ''
-  PERFORM=true
-  DEBUG=true
-  configure $vaccine_src vaccine_debug.js
-fi
+console.dir(argv)

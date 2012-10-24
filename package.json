@@ -1,11 +1,12 @@
 {
   "name": "vaccine",
-  "description": "Super simple module definition for the browser",
+  "description": "CommonJS and AMD for libraries.",
   "bin": "./bin/vaccine",
   "dependencies": {
   },
   "devDependencies": {
     "express": "3.0.x",
+    "optimist": "0.3.x",
     "uglify-js": "1.3.x"
   },
   "version": "0.3.3"
