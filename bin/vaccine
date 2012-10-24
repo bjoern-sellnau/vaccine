@@ -346,5 +346,5 @@ then
   set_supports ''
   PERFORM=true
   DEBUG=true
-  configure $vaccine_src > vaccine_debug.js
+  configure $vaccine_src vaccine_debug.js
 fi
