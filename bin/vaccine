@@ -6,8 +6,8 @@ help() {
 Options:                # 'M' options can be called multiple times (or as
                         # comma separated values)
 
-  --name <name>         # Your library's name.
-  --main <file>         # Your library's entry file.
+  -n | --name <name>    # Your library's name.
+  -m | --main <file>    # Your library's entry file.
   --dirs | --dir-levels # The maximum number of directory levels under
                         # your source dir. (e.g. src/foo/*.js + src/bar/*.js
                         # + src/baz/*.js would be 2 directory levels)
@@ -22,6 +22,7 @@ Options:                # 'M' options can be called multiple times (or as
                         # vaccine.js, build.sh, Makefile, vaccine_debug.js,
                         # and dev_server.js. All but dev_server.js are default.
 
+  -c | --stdout         # Write to stdout instead of to files
   --commonjs            # Write in CommonJS format. build.sh will wrap the
                         # modules for you.
   --perf[orm[ance]]     # Measure the load-time performance of your library.
@@ -107,9 +108,9 @@ do
   case $1 in
     --help | -h) help ;;
 
-    --name) LIB_NAME=$2; shift ;;
+    -n | --name) LIB_NAME=$2; shift ;;
     --src) SOURCE_DIR=$2; shift ;;
-    --main) main_file=$2; shift ;;
+    -m | --main) main_file=$2; shift ;;
     --lib) LIBRARY_DIR=$2; shift ;;
     --global) GLOBAL_NAME=$2; shift ;;
     --dir-levels | --dirs) DIR_LEVELS=$2; shift ;;
@@ -119,6 +120,7 @@ do
     -t | --target | --targets) targets="$targets,$2"; shift ;;
     -d | --dep | --deps | --dependency | --dependencies) dependencies="$dependencies,$2"; shift ;;
 
+    -c | --stdout) stdout=true; ;;
     --perf | --perform | --performance) PERFORM=true; ;;
     --debug) DEBUG=true; ;;
     --use-strict) USE_STRICT=true; ;;
@@ -149,6 +151,7 @@ test "X$dependencies" = X && dependencies=$default_dependencies
 has() {
   echo "$1" | grep -i -q "\<$2\>"
 }
+
 
 # Dependencies
 
@@ -281,32 +284,59 @@ pick_switches() {
 }
 
 configure() {
+  source=$1
+  tgt=$2
+  if test "X$multi_target_stdout" = Xtrue
+  then
+    echo "--------------- $tgt ---------------"
+  fi
+  if test "X$stdout" = Xtrue
+  then
+    internal_configure $source
+  else
+    internal_configure $source > $tgt
+  fi
+}
+
+internal_configure() {
   cat $1 | replace_vars | sed 's/^    //' |
       pick_conditionals | pick_switches | clean
 }
 
 
+
+targets=$(echo "$targets" | sed -e 's/,,*/,/g' -e 's/^,//' -e 's/,$//')
+num_targets=$(echo "$targets" | sed 's/[^,]//g' | wc -c)
+if test $num_targets -gt 1
+then
+  multi_target=true
+  test "X$stdout" = Xtrue && multi_target_stdout=true
+fi
+
 if has "$targets" vaccine.js
 then
-  configure $vaccine_src > vaccine.js
+  configure $vaccine_src vaccine.js
 fi
 
 if has "$targets" dev_server.js
 then
-  configure $dev_server_src > dev_server.js
+  configure $dev_server_src dev_server.js
 fi
 
 if has "$targets" Makefile || has "$targets" Makefile.example
 then
   makefile_target=Makefile
-  test -f Makefile && makefile_target=Makefile.example
-  configure $makefile_src > $makefile_target
+  if test "X$stdout" = X
+  then
+    test -f Makefile && makefile_target=Makefile.example
+  fi
+  configure $makefile_src $makefile_target
 fi
 
 if has "$targets" build.sh
 then
-  configure $build_src > build.sh
-  chmod +x build.sh
+  configure $build_src build.sh
+  test "X$stdout" = X && chmod +x build.sh
 fi
 
 if has "$targets" vaccine_debug.js
