@@ -1,6 +1,8 @@
 Vaccine
 =======
 
+**This README is momentarily outdated. I hope to have it fixed soon.**
+
 Vaccine is a temporary treatment
 (until [Harmony](http://en.wikipedia.org/wiki/ECMAScript#Features_under_discussion))
 to JavaScript's modularity problem that works by injecting a small script into

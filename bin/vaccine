@@ -1,15 +1,36 @@
 #!/bin/sh
 
 help() {
-  echo "vaccine [options]
+  echo "vaccine --name <name> --main <main> [options]
 
-Options:
-        --name <name>     # Your library's name.
-        --src <dir>       # The directory for your sources (default: src).
-        --lib <dir>       # The directory for your libraries (default: lib).
-        --global <name>   # The global variable name (default: --name)
-        --deps <d1,...>   # Comma separated dependencies.
-        --dep <d1>        # Single dependency.
+Options:                # 'M' options can be called multiple times (or as
+                        # comma separated values)
+
+  --name <name>         # Your library's name.
+  --main <file>         # Your library's entry file.
+  --dirs | --dir-levels # The maximum number of directory levels under
+                        # your source dir. (e.g. src/foo/*.js + src/bar/*.js
+                        # + src/baz/*.js would be 2 directory levels)
+
+  -d | --dep[s]      M  # Your library's dependencies.
+  -s | --support[s]  M  # Choose between supporting AMD, attaching to 'window',
+                        # or both (default both).
+  -e | --export[s]   M  # How a module provides exports. Options are
+                        # 'return', 'module' (for module.exports), and
+                        # 'exports'.
+  -t | --target[s]   M  # Which files to configure. Options are:
+                        # vaccine.js, build.sh, Makefile, vaccine_debug.js,
+                        # and dev_server.js. All but dev_server.js are default.
+
+  --commonjs            # Write in CommonJS format. build.sh will wrap the
+                        # modules for you.
+  --perf[orm[ance]]     # Measure the load-time performance of your library.
+  --debug               # Add debugging logs.
+  --src <dir>           # The directory your sources are under. This defaults
+                        # to \$(dirname \$main)
+  --global <name>       # The global variable name (default: --name)
+  --use-strict          # Enable strict mode in built file.
+  --lib <dir>           # The directory for your libraries (default: lib).
 "
   exit 0
 }
