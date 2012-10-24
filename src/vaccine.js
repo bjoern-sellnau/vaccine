@@ -125,11 +125,11 @@
                  vaccineLocalModules[vaccineDependencies[i]] = args[i];
                }
  ==================================================================== // DEPS
-               return require(##[ multi_DIRS ?? 'index' :: './index' ]##);
+               return require(##[ multi_DIRS ?? '$$[ MAIN ]$$' :: './$$[ MAIN ]$$' ]##);
              });
     ##[ WINDOW ?? } else { ]##
 /////////////////////////////////////////////////////////////////////////// AMD
 ???????????????????????????????????????????????????????????????????????? WINDOW
-      vaccineWindow.$$[ LIB_NAME ]$$ = require(##[ multi_DIRS ?? 'index' :: './index' ]##);
+      vaccineWindow.$$[ GLOBAL_NAME ]$$ = require(##[ multi_DIRS ?? '$$[ MAIN ]$$' :: './$$[ MAIN ]$$' ]##);
     ##[ AMD ?? } ]##
 //////////////////////////////////////////////////////////////////////// WINDOW

@@ -45,11 +45,12 @@ makefile_src=$vaccine_src_dir/Makefile
 
 
 # Variables
-SOURCE_DIR=src
+SOURCE_DIR=
 LIBRARY_DIR=lib
 DIR_LEVELS=1
+MAIN=
 
-vars_list='LIB_NAME SOURCE_DIR LIBRARY_DIR GLOBAL_VAR DEP_NAME DEP_NAMES'
+vars_list='LIB_NAME MAIN SOURCE_DIR LIBRARY_DIR GLOBAL_NAME DEP_NAME DEP_NAMES'
 
 # Setting lists
 default_supports=amd,window
@@ -87,8 +88,9 @@ do
 
     --name) LIB_NAME=$2; shift ;;
     --src) SOURCE_DIR=$2; shift ;;
+    --main) main_file=$2; shift ;;
     --lib) LIBRARY_DIR=$2; shift ;;
-    --global) GLOBAL_VAR=$2; shift ;;
+    --global) GLOBAL_NAME=$2; shift ;;
     --dir-levels | --dirs) DIR_LEVELS=$2; shift ;;
 
     -s | --support | --supports) supports="$supports,$2"; shift ;;
@@ -108,7 +110,12 @@ done
 
 test "X$LIB_NAME" = X && fail 'Must provide the name (vaccine --name [name])'
 
-test "X$GLOBAL_VAR" = X && GLOBAL_VAR=$LIB_NAME
+test "X$main_file" = X && fail 'Must provide the main file (vaccine --main [file])'
+
+test "X$SOURCE_DIR" = X && SOURCE_DIR=$(dirname "$main_file")
+MAIN=$(echo "$main_file" | sed -e 's/\.js$//' -e "s#$SOURCE_DIR/*##")
+
+test "X$GLOBAL_NAME" = X && GLOBAL_NAME=$LIB_NAME
 
 test $DIR_LEVELS -gt 1 && multi_DIRS=true
 
