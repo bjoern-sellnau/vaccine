@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+var vaccine = require('..');
+
 var usage = 'Generate shims to make CommonJS or AMD work in the browser.\n' +
             'Usage: vaccine --name <name> --main <main> [options]\n\n' +
             '[m] means it is intended to be called multiple times.';
@@ -15,9 +17,9 @@ var optimist = require('optimist')
                       'dir. (e.g. src/foo/*.js + src/bar/*.js + src/baz/*.js ' +
                       'would be 2 directory levels.)')
     .describe('deps', "[m] Your library's dependencies.")
-    .describe('support', "[m] Choose between supporting AMD, attaching to " +
+    .describe('supports', "[m] Choose between supporting AMD, attaching to " +
                          "'window', or both (default both).")
-    .describe('export', "[m] How a module provides exports. Options are " +
+    .describe('exports', "[m] How a module provides exports. Options are " +
                         "'return', 'module' (for module.exports), and " +
                         "'exports'.")
     .describe('targets', "[m] Which files to configure. Options are: " +
@@ -65,4 +67,7 @@ if (argv.h) {
   process.exit(0);
 }
 
-console.dir(argv)
+argv.use_strict = argv['use-strict'];
+
+vaccine.loadFiles();
+vaccine(argv);

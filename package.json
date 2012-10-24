@@ -1,5 +1,6 @@
 {
   "name": "vaccine",
+  "main": "src/vaccine.js",
   "description": "CommonJS and AMD for libraries.",
   "bin": "./bin/vaccine",
   "dependencies": {
