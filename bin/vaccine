@@ -51,19 +51,21 @@ DIR_LEVELS=1
 
 vars_list='LIB_NAME SOURCE_DIR LIBRARY_DIR GLOBAL_VAR DEP_NAME DEP_NAMES'
 
+# Setting lists
+default_supports=amd,window
+default_exports=module,exports
+default_targets=Makefile,vaccine.js,vaccine_debug.js,build.sh
+default_dependencies=
+supports=
+exports=
+targets=
+dependencies=
+
 # Conditionals
 multi_DIRS=false
-supports=amd,window
 AMD=true
 WINDOW=true
 USE_STRICT=false
-no_DEPS=true
-one_DEPS=false
-multi_DEPS=false
-multi_DEPS_and_AMD=false
-MODULE_EXPORTS=true
-RETURN_EXPORTS=false
-EXPORTS=true
 DEBUG=false
 PERFORM=false
 COMMONJS=false
@@ -82,19 +84,22 @@ while test $# -gt 0
 do
   case $1 in
     --help | -h) help ;;
+
     --name) LIB_NAME=$2; shift ;;
-    --dir-levels) DIR_LEVELS=$2; shift ;;
-    --support | --supports) supports=$2; supports_set=true; shift ;;
-    --debug) DEBUG=true; ;;
-    --perf | --perform) PERFORM=true; perform_set=true; ;;
-    --no-perf | --no-perform) PERFORM=false; perform_set=true; ;;
-    --export | --exports) exports=$2; shift ;;
-    --use-strict) USE_STRICT=true; ;;
-    --commonjs) COMMONJS=true; ;;
     --src) SOURCE_DIR=$2; shift ;;
     --lib) LIBRARY_DIR=$2; shift ;;
     --global) GLOBAL_VAR=$2; shift ;;
-    --deps | --dep) dep_names_raw=$2; shift ;;
+    --dir-levels | --dirs) DIR_LEVELS=$2; shift ;;
+
+    -s | --support | --supports) supports="$supports,$2"; shift ;;
+    -e | --export | --exports) exports="$exports,$2"; shift ;;
+    -t | --target | --targets) targets="$targets,$2"; shift ;;
+    -d | --dep | --deps | --dependency | --dependencies) dependencies="$dependencies,$2"; shift ;;
+
+    --perf | --perform | --performance) PERFORM=true; ;;
+    --debug) DEBUG=true; ;;
+    --use-strict) USE_STRICT=true; ;;
+    --commonjs) COMMONJS=true; ;;
     *) fail "Unrecognized option: $1" ;;
   esac
   shift
@@ -103,21 +108,33 @@ done
 
 test "X$LIB_NAME" = X && fail 'Must provide the name (vaccine --name [name])'
 
+test "X$GLOBAL_VAR" = X && GLOBAL_VAR=$LIB_NAME
+
 test $DIR_LEVELS -gt 1 && multi_DIRS=true
 
-if test "X$DEBUG" = Xtrue
-then
-  test "X$supports_set" = X && supports=''
-  test "X$perform_set" = X && PERFORM=true
-fi
+test "X$supports" = X && supports=$default_supports
+test "X$exports" = X && exports=$default_exports
+test "X$targets" = X && targets=$default_targets
+test "X$dependencies" = X && dependencies=$default_dependencies
 
-if test "X$dep_names_raw" != X
+
+has() {
+  echo "$1" | grep -i -q "\<$2\>"
+}
+
+# Dependencies
+
+no_DEPS=true
+one_DEPS=false
+multi_DEPS=false
+dependencies=$(echo "$dependencies" | sed -e 's/,,*/,/g' -e 's/^,//' -e 's/,$//')
+if test "X$dependencies" != X
 then
   no_DEPS=false
-  DEP_NAME=$dep_names_raw
-  DEP_NAMES=$(echo "$dep_names_raw" | sed -e "s/,/\",\"/g" \
-                                          -e "s/^/\"/" -e "s/$/\"/")
-  DEPS=$(echo "$dep_names_raw" | sed 's/[^,]//g' | wc -c)
+  DEP_NAME=$dependencies
+  DEP_NAMES=$(echo "$dependencies" | sed -e "s/,/\",\"/g" \
+                                         -e "s/^/\"/" -e "s/$/\"/")
+  DEPS=$(echo "$dependencies" | sed 's/[^,]//g' | wc -c)
   if test $DEPS -gt 1
   then
     DEPS='>'
@@ -127,46 +144,59 @@ then
   fi
 fi
 
-if test "X$exports" != X
+
+# Exports
+
+MODULE_EXPORTS=false
+EXPORTS=false
+RETURN_EXPORTS=false
+if has "$exports" exports
 then
-  MODULE_EXPORTS=false
+  EXPORTS=true
+else
   EXPORTS=false
+fi
+if has "$exports" module
+then
+  MODULE_EXPORTS=true
+  EXPORTS=true
+else
+  MODULE_EXPORTS=false
+fi
+if has "$exports" 'return'
+then
+  RETURN_EXPORTS=true
+else
   RETURN_EXPORTS=false
-  if echo "$exports" | grep -i -q 'exports'
-  then
-    EXPORTS=true
-  else
-    EXPORTS=false
-  fi
-  if echo "$exports" | grep -i -q 'module'
-  then
-    MODULE_EXPORTS=true
-    EXPORTS=true
-  else
-    MODULE_EXPORTS=false
-  fi
-  if echo "$exports" | grep -i -q 'return'
-  then
-    RETURN_EXPORTS=true
-  else
-    RETURN_EXPORTS=false
-  fi
 fi
 
-if echo "$supports" | grep -i -q 'amd'
-then
-  AMD=true
-else
-  AMD=false
-fi
-if echo "$supports" | grep -i -q 'window'
-then
-  WINDOW=true
-else
-  WINDOW=false
-fi
 
-test "X$GLOBAL_VAR" = X && GLOBAL_VAR=$LIB_NAME
+# Supports
+
+set_supports() {
+  if has "$1" amd
+  then
+    AMD=true
+    if test "X$multi_DEPS" = Xtrue
+    then
+      multi_DEPS_and_AMD=true
+    else
+      multi_DEPS_and_AMD=false
+    fi
+  else
+    AMD=false
+    multi_DEPS_and_AMD=false
+  fi
+  if has "$1" window
+  then
+    WINDOW=true
+  else
+    WINDOW=false
+  fi
+}
+
+set_supports $supports
+
 
 
 switch() {
@@ -228,13 +258,33 @@ configure() {
 }
 
 
-configure $vaccine_src > vaccine.js
+if has "$targets" vaccine.js
+then
+  configure $vaccine_src > vaccine.js
+fi
 
-configure $dev_server_src > dev_server.js
+if has "$targets" dev_server.js
+then
+  configure $dev_server_src > dev_server.js
+fi
 
-makefile_target=Makefile
-test -f Makefile && makefile_target=Makefile.example
-configure $makefile_src > $makefile_target
+if has "$targets" Makefile || has "$targets" Makefile.example
+then
+  makefile_target=Makefile
+  test -f Makefile && makefile_target=Makefile.example
+  configure $makefile_src > $makefile_target
+fi
 
-configure $build_src > build.sh
-chmod +x build.sh
+if has "$targets" build.sh
+then
+  configure $build_src > build.sh
+  chmod +x build.sh
+fi
+
+if has "$targets" vaccine_debug.js
+then
+  set_supports ''
+  PERFORM=true
+  DEBUG=true
+  configure $vaccine_src > vaccine_debug.js
+fi
