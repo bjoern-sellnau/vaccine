@@ -23,6 +23,7 @@ Options:                # 'M' options can be called multiple times (or as
                         # and dev_server.js. All but dev_server.js are default.
 
   -c | --stdout         # Write to stdout instead of to files
+  --multi-target        # (With --stdout) Always write in multi-target format.
   --commonjs            # Write in CommonJS format. build.sh will wrap the
                         # modules for you.
   --perf[orm[ance]]     # Measure the load-time performance of your library.
@@ -121,6 +122,7 @@ do
     -d | --dep | --deps | --dependency | --dependencies) dependencies="$dependencies,$2"; shift ;;
 
     -c | --stdout) stdout=true; ;;
+    --multi-target) force_multi_target=true; ;;
     --perf | --perform | --performance) PERFORM=true; ;;
     --debug) DEBUG=true; ;;
     --use-strict) USE_STRICT=true; ;;
@@ -307,7 +309,7 @@ internal_configure() {
 
 targets=$(echo "$targets" | sed -e 's/,,*/,/g' -e 's/^,//' -e 's/,$//')
 num_targets=$(echo "$targets" | sed 's/[^,]//g' | wc -c)
-if test $num_targets -gt 1
+if test $num_targets -gt 1 -o "X$force_multi_target" = Xtrue
 then
   multi_target=true
   test "X$stdout" = Xtrue && multi_target_stdout=true
