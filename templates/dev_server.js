@@ -1,4 +1,4 @@
-    var sourceDir = '$$ SOURCE_DIR $$';   // Change this to... uh, your source directory.
+    var sourceDir = '$-- sourceDir --$';   // Change this to... uh, your source directory.
 
 
     var http = require('http'),
@@ -68,7 +68,7 @@
           module = path.slice(1).replace(prefix, '').replace(/\.js$/, ''),
           compiled;
       compiled = 'define("' + module + '", ';
-      compiled += 'function(require, @@ MODULE_EXPORTS ?? exports, module :: exports @@) {\n';
+      compiled += 'function(require, $-- exprts('module') ? 'exports, module' : 'exports' --$) {\n';
       compiled += buffer.toString('utf8');
       compiled += '\n});';
       return compiled;

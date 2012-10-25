@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
-var vaccine = require('..');
+var fs = require('fs'),
+    vaccine = require('..');
 
 var usage = 'Generate shims to make CommonJS or AMD work in the browser.\n' +
             'Usage: vaccine --name <name> --main <main> [options]\n\n' +
@@ -28,7 +29,6 @@ var optimist = require('optimist')
                          "default.")
 
     .describe('stdout', 'Write to stdout instead of to files.')
-    .describe('multi-target', '(with --stdout) Always write in multi-target format.')
     .describe('commonjs', 'Write in CommonJS format. build.sh will wrap the modules.')
     .describe('performance', 'Measure the load-time performance of your library.')
     .describe('debug', 'Add debugging logs for development.')
@@ -50,7 +50,6 @@ var optimist = require('optimist')
     .demand('main')
 
     .boolean('stdout')
-    .boolean('multi-target')
     .boolean('commonjs')
     .boolean('performance')
     .boolean('debug')
@@ -82,8 +81,29 @@ argv.supports = ensureArray('support');
 argv.exports = ensureArray('export');
 
 vaccine.loadFiles();
-var compiled = vaccine(argv);
-Object.keys(compiled).forEach(function(tgt) {
-  console.log('Target: ' + tgt);
-  console.log(compiled[tgt]);
-});
+var compiled = vaccine(argv),
+    targets = Object.keys(compiled);
+
+if (argv.stdout) {
+  targets.forEach(function(tgt) {
+    if (targets.length > 1) {
+      console.log('--------------- ' + tgt + ' ---------------');
+    }
+    console.log(compiled[tgt]);
+  });
+} else {
+  targets.forEach(function(name) {
+    var comp = compiled[name];
+    if (name === 'Makefile') {
+      var stats = fs.statSync(name);
+      if (stats.isFile()) name = 'Makefile.example';
+    }
+    fs.writeFile(name, comp, 'utf8', function(err) {
+      if (err) throw err;
+      if (name === 'build.sh') {
+        fs.chmod('build.sh', '755', function(err) { if (err) throw err; });
+      }
+      console.log('Completed... ' + name);
+    });
+  });
+}

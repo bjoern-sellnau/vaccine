@@ -150,8 +150,9 @@ var evaluate = function(string) {
 };
 
 
-exports.loadFromObject = function(targetsObject) {
-  rawTargets = targetsObject;
+exports.templateText = function(_) {
+  if (!_) return templateText;
+  templateText = _;
 };
 
 // Only use outside of the browser.
