@@ -40,7 +40,29 @@ var update = function(rawOptions) {
     options.commonjs = true;
   }
   var configured = vaccine(options);
-  console.log(configured);
+
+  var sources = d3.select('#sources').selectAll('.source')
+      .data(configured, function(d) { return d.name; });
+
+  sources.enter().append('div')
+      .attr('class', 'source')
+      .each(function(d) {
+        source = d3.select(this);
+        source.append('div')
+            .attr('class', 'title')
+            .text(d.name);
+        source.append('code');
+      });
+
+  sources.exit().remove();
+
+  var order = ['build.sh', 'Makefile', 'vaccine.js',
+               'vaccine_dev.js', 'dev_server.js'];
+  sources.sort(function(a, b) {
+    return order.indexOf(a.name) - order.indexOf(b.name);
+  });
+
+  sources.select('code').text(function(d) { return d.compiled; });
 };
 
 configHolder.on('click', maybeUpdate);

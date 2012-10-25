@@ -37,25 +37,34 @@ h1 {
   width: 640px;
 }
 
-#config {
-  width: 270px;
-  border-left-width: 0;
-}
-
-#config .group {
+.source, #config .group {
   margin: 5px;
   padding: 5px;
   padding-bottom: 10px;
   border-color: #ddd;
   border-style: dashed;
   border-width: 0 0 1px 0;
-  width: 250px;
 }
 
-#config .group .title {
+.source .title, #config .group .title {
   font-weight: bold;
   font-size: 16px;
   margin-bottom: 6px;
+}
+
+.source code {
+  white-space: pre;
+  font-size: 14px;
+}
+
+
+#config {
+  width: 270px;
+  border-left-width: 0;
+}
+
+#config .group {
+  width: 250px;
 }
 
 #config .group .inputs {
