@@ -11,9 +11,8 @@ var templateMap = {
 };
 
 var macroMap = {
-  '?????': 'conditional',
-  '!!!!!': 'inverse_conditional',
-  '=====': 'switch',
+  '?????': 'if',
+  '=====': 'elsif',
   '/////': 'end',
   ':::::': 'else',
 };
@@ -101,23 +100,46 @@ var setOptions = function(options) {
 var compileTemplate = function(templateName) {
   var template = templateText[templateName],
       stack = [];
+      top = {enabled: true};
+      enabled = true;
+      stackEnabled = true;
+      first = true;
       compiled = '';
 
-  var interpretMatch = function(match) {
-    var value = match[2] || '';
-    return {type: macroMap[match[1]], value: value};
-  };
-
   template.split('\n').forEach(function(line) {
-    var match = line.match(/([?\/=:!]{5})( .*)?$/);
+    var match = line.match(/([?\/=:]{5})( .*)?$/);
     if (match) {
-      var macro = interpretMatch(match);
-      compiled += JSON.stringify(macro) + '\n';
+      var type = macroMap[match[1]];
+      if (type === 'end' || type === 'if') {
+        if (type === 'end') top = stack.pop();
+        if (type === 'if') {
+          stack.push(top);
+          top = {};
+        }
+        stackEnabled = stack.every(function(d) { return d.enabled; });
+      }
+      if (stackEnabled && type !== 'end') {
+        if (top.wasTrue) {
+          top.enabled = false;
+        } else {
+          if (type === 'else') {
+            top.enabled = true;
+          } else {
+            top.enabled = evaluate(match[2]);
+          }
+        }
+        top.wasTrue = top.wasTrue || top.enabled;
+      }
+      enabled = stackEnabled && top.enabled;
     } else {
-      compiled += 'XXXXX\n';
+      if (enabled) compiled += line.replace(/^    /, '') + '\n';
     }
   });
   return compiled;
+};
+
+var evaluate = function(string) {
+  return eval(string);
 };
 
 
