@@ -9,7 +9,7 @@ var templateMap = {
   'Makefile': 'Makefile',
   'build.sh': 'build.sh',
   'dev_server.js': 'dev_server.js',
-  'vaccine_debug.js': 'vaccine.js',
+  'vaccine_dev.js': 'vaccine.js',
 };
 
 var macroMap = {
@@ -25,6 +25,9 @@ var name,
     commonJS,
     performance,
     debug,
+    dev,
+    devPerformance,
+    devDebug,
     useStrict,
     dependencies = [],
     depString,
@@ -52,23 +55,28 @@ module.exports = exports = function(options) {
 
   setOptions(options);
 
-  var templates = [];
-  targets.forEach(function(tgt) {
-    var tmpl = templateMap[tgt];
-    if (!has(templates, tmpl)) templates.push(tmpl);
-  });
-
   var compiled = {};
-  templates.forEach(function(template) {
-    compiled[template] = compileTemplate(template);
+  targets.forEach(function(target) {
+    if (target === 'vaccine_dev.js') {
+      var old = {
+        debug: debug,
+        performance: performance,
+        supportsArray: supportsArray
+      };
+      dev = true;
+      debug = devDebug;
+      performance = devPerformance;
+      supportsArray = [];
+    }
+    var template = templateMap[target];
+    compiled[target] = compileTemplate(template);
+    if (target === 'vaccine_dev.js') {
+      dev = false;
+      debug = old.debug;
+      performance = old.performance;
+      supportsArray = old.supportsArray;
+    }
   });
-
-  if (has(targets, 'vaccine_debug.js')) {
-    debug = true;
-    performance = true;
-    supportsArray = [];
-    compiled['vaccine_debug.js'] = compileTemplate('vaccine.js');
-  }
 
   return compiled;
 };
@@ -80,6 +88,8 @@ var setOptions = function(options) {
   commonJS = options.commonjs;
   performance = options.performance;
   debug = options.debug;
+  devDebug = !options.dev_no_debug;
+  devPerformance = !options.dev_no_performance;
   useStrict = options.use_strict;
   dependencies = options.dependencies || [];
   numDeps = dependencies.length;
@@ -87,7 +97,7 @@ var setOptions = function(options) {
   dirs = options.dirs;
   supportsArray = options.supports || ['amd', 'window'];
   exportsArray = options.exports || ['module', 'exports'];
-  targets = options.targets || ['vaccine.js', 'vaccine_debug.js', 'Makefile', 'build.sh'];
+  targets = options.targets || ['vaccine.js', 'build.sh'];
 
   var cleanedMain = options.main.replace(/^\.\//, '').replace(/\.js$/, '');
   if (options.src) {

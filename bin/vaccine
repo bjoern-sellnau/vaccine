@@ -24,14 +24,15 @@ var optimist = require('optimist')
                         "'return', 'module' (for module.exports), and " +
                         "'exports'.")
     .describe('target', "[m] Which files to configure. Options are: " +
-                         "vaccine.js, build.sh, Makefile, vaccine_debug.js, " +
-                         "and dev_server.js. All but dev_server.js are " +
-                         "default.")
+                         "vaccine.js, build.sh, Makefile, vaccine_dev.js, " +
+                         "and dev_server.js. vaccine.js and build.sh are default.")
 
     .describe('stdout', 'Write to stdout instead of to files.')
     .describe('commonjs', 'Write in CommonJS format. build.sh will wrap the modules.')
-    .describe('performance', 'Measure the load-time performance of your library.')
     .describe('debug', 'Add debugging logs for development.')
+    .describe('performance', 'Measure the load-time performance of your library.')
+    .describe('dev-no-debug', "Don't add debugging for vaccine_dev.js.")
+    .describe('dev-no-performance', "Don't measure performance for vaccine_dev.js")
     .describe('src', 'The directory your sources are under. Derived from --main.')
     .describe('global', 'The global variable name (defaults to --name).')
     .describe('use-strict', 'Enable strict mode in built file.')
@@ -51,8 +52,10 @@ var optimist = require('optimist')
 
     .boolean('stdout')
     .boolean('commonjs')
-    .boolean('performance')
     .boolean('debug')
+    .boolean('performance')
+    .boolean('dev-no-debug')
+    .boolean('dev-no-performance')
     .boolean('use-strict')
 
     .default('lib', 'lib')
@@ -67,6 +70,8 @@ if (argv.h) {
 }
 
 argv.use_strict = argv['use-strict'];
+argv.dev_no_debug = argv['dev-no-debug'];
+argv.dev_no_performance = argv['dev-no-performance'];
 
 var ensureArray = function(key) {
   if (typeof argv[key] !== 'undefined' && !Array.isArray(argv[key])) {
