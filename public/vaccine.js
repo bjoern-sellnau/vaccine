@@ -1,3 +1,5 @@
+(function() {
+define('vaccine', function(require, exports, module) {
 'use strict';
 
 var templateFiles = ['vaccine.js', 'Makefile', 'build.sh', 'dev_server.js'],
@@ -164,3 +166,29 @@ exports.loadFiles = function() {
     templateText[file] = fs.readFileSync(__dirname + '/../templates/' + file, 'utf8');
   });
 };
+});
+function define(id, factory) {
+  (vaccineFactories = vaccineFactories || {})['./' + id] = factory;
+}
+
+
+function require(id) {
+  var module = {exports: {}};
+
+  if (!vaccineLocalModules[id] && !vaccineWindow[id]) {
+    vaccineFactories[id](
+        require,
+        module.exports, module);
+    vaccineLocalModules[id] = module.exports;
+  }
+  return vaccineLocalModules[id] || vaccineWindow[id];
+}
+
+
+var vaccineFactories,
+    vaccineLocalModules = {},
+    vaccineWindow = window;
+
+  vaccineWindow.vaccine = require('./vaccine');
+
+}());
