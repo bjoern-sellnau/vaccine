@@ -1,6 +1,8 @@
-clean:
-	@rm -f dev_server.js
-	@rm -f build.sh
-	@rm -f vaccine.js
-	@rm -f vaccine_debug.js
-	@rm -f Makefile.example
+.PHONY: build vaccine.js
+
+build:
+	./build.sh > public/vaccine.js
+
+vaccine.js:
+	bin/vaccine --name vaccine --main src/vaccine.js --commonjs -s window -t build.sh -t vaccine.js
+	@sed -i '' -e 's/build\.sh > vaccine\.js/build.sh > public\/vaccine.js/' build.sh
