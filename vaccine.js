@@ -20,5 +20,5 @@ var vaccineFactories,
     vaccineLocalModules = {},
     vaccineWindow = window;
 
-  vaccineWindow.vaccine = require('./vaccine');
+  vaccineWindow.vaccine = require('./web');
 
