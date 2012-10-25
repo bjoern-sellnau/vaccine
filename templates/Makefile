@@ -1,3 +1,3 @@
 .PHONY: build
 build:
-	./build > $-- name --$.js
+	./build.sh > $-- name --$.js

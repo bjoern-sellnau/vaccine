@@ -95,8 +95,7 @@ if (argv.stdout) {
   targets.forEach(function(name) {
     var comp = compiled[name];
     if (name === 'Makefile') {
-      var stats = fs.statSync(name);
-      if (stats.isFile()) name = 'Makefile.example';
+      if (fs.existsSync('Makefile')) name = 'Makefile.example';
     }
     fs.writeFile(name, comp, 'utf8', function(err) {
       if (err) throw err;

@@ -142,7 +142,7 @@ var compileTemplate = function(templateName) {
       }
     }
   });
-  return compiled;
+  return compiled.slice(0, -1);   // Remove last newline.
 };
 
 var evaluate = function(string) {
