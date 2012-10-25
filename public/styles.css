@@ -3,6 +3,11 @@ html, body {
   margin: 0;
 }
 
+body {
+  font-family: Arial, sans-serif;
+  font-size: 15px;
+}
+
 header {
   height: 40px;
   background-color: #ddd;
@@ -35,4 +40,37 @@ h1 {
 #config {
   width: 270px;
   border-left-width: 0;
+}
+
+#config .group {
+  margin: 5px;
+  padding: 5px;
+  padding-bottom: 10px;
+  border-color: #ddd;
+  border-style: dashed;
+  border-width: 0 0 1px 0;
+  width: 250px;
+}
+
+#config .group .title {
+  font-weight: bold;
+  font-size: 16px;
+  margin-bottom: 6px;
+}
+
+#config .group .inputs {
+  margin-left: 15px;
+}
+
+#config label {
+  margin-right: 6px;
+}
+
+#config input[type=radio] {
+  margin-right: 4px;
+}
+
+#config input[type=text] {
+  width: 230px;
+  font-size: 14px;
 }
