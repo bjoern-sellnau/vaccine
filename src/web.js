@@ -1,4 +1,5 @@
 var d3 = require('d3'),
+    hijs = require('./hijs'),
     vaccine = require('./vaccine'),
     templateText = require('./templates');
 
@@ -62,7 +63,7 @@ var update = function(rawOptions) {
     return order.indexOf(a.name) - order.indexOf(b.name);
   });
 
-  sources.select('code').text(function(d) { return d.compiled; });
+  sources.select('code').html(function(d) { return hijs(d.compiled); });
 };
 
 configHolder.on('click', maybeUpdate);

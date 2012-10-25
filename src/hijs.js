@@ -1,13 +1,10 @@
-
-(function (hijs) {
 //
 // hijs - JavaScript Syntax Highlighter
 //
 // Copyright (c) 2010 Alexis Sellier
 //
+// Edited to suit vaccinejs.com by Jake Sandlund
 
-// All elements which match this will be syntax highlighted.
-var selector = hijs || 'code';
 
 var keywords = ('var function if else for while break switch case do new null in with void '
                +'continue delete return this true false throw catch typeof with instanceof').split(' '),
@@ -27,46 +24,29 @@ var syntax = [
   ['keyword', new(RegExp)('\\b(' + keywords.join('|') + ')\\b', 'g')],
   ['special', new(RegExp)('\\b(' + special.join('|') + ')\\b', 'g')]
 ];
-var nodes, table = {};
 
-if (/^[a-z]+$/.test(selector)) {
-    nodes = document.getElementsByTagName(selector);
-} else if (/^\.[\w-]+$/.test(selector)) {
-    nodes = document.getElementsByClassName(selector.slice(1));
-} else if (document.querySelectorAll) {
-    nodes = document.querySelectorAll(selector);
-} else {
-    nodes = [];
-}
+var table;
 
-for (var i = 0, children; i < nodes.length; i++) {
-    children = nodes[i].childNodes;
+module.exports = function(code) {
 
-    for (var j = 0, str; j < children.length; j++) {
-        code = children[j];
+  table = {};
 
-        if (code.length >= 0) { // It's a text node
-            // Don't highlight command-line snippets
-            if (! /^\$\s/.test(code.nodeValue.trim())) {
-                syntax.forEach(function (s) {
-                    var k = s[0], v = s[1];
-                    code.nodeValue = code.nodeValue.replace(v, function (_, m) {
-                        return '\u00ab' + encode(k) + '\u00b7'
-                                        + encode(m) +
-                               '\u00b7' + encode(k) + '\u00bb';
-                    });
-                });
-            }
-        }
-    }
-}
-for (var i = 0; i < nodes.length; i++) {
-    nodes[i].innerHTML =
-        nodes[i].innerHTML.replace(/\u00ab(.+?)\u00b7(.+?)\u00b7\1\u00bb/g, function (_, name, value) {
-            value = value.replace(/\u00ab[^\u00b7]+\u00b7/g, '').replace(/\u00b7[^\u00bb]+\u00bb/g, '');
-            return '<span class="' + decode(name) + '">' + escape(decode(value)) + '</span>';
-    });
-}
+  if (! /^\$\s/.test(code.trim())) {
+      syntax.forEach(function (s) {
+          var k = s[0], v = s[1];
+          code = code.replace(v, function (_, m) {
+              return '\u00ab' + encode(k) + '\u00b7'
+                              + encode(m) +
+                    '\u00b7' + encode(k) + '\u00bb';
+          });
+      });
+  }
+  return code.replace(/\u00ab(.+?)\u00b7(.+?)\u00b7\1\u00bb/g, function (_, name, value) {
+      value = value.replace(/\u00ab[^\u00b7]+\u00b7/g, '').replace(/\u00b7[^\u00bb]+\u00bb/g, '');
+      return '<span class="' + decode(name) + '">' + escape(decode(value)) + '</span>';
+  });
+};
+
 
 function escape(str) {
     return str.replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -90,5 +70,3 @@ function decode (str) {
         }).join('');
     }
 }
-
-})(window.hijs);

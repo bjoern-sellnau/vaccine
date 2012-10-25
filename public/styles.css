@@ -52,11 +52,29 @@ h1 {
   margin-bottom: 6px;
 }
 
-.source code {
+code {
   white-space: pre;
   font-size: 14px;
 }
 
+code .comment {
+  color: green;
+}
+code .string {
+  color: red;
+}
+code .regexp {
+  color: red;
+}
+code .number {
+  color: black;
+}
+code .keyword {
+  color: blue;
+}
+code .special {
+  color: purple;
+}
 
 #config {
   width: 270px;
