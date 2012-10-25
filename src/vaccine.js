@@ -25,13 +25,14 @@ var name,
     debug,
     useStrict,
     dependencies = [],
+    depString,
     numDeps,
     dirs,
     supportsArray,
     exportsArray,
     targets,
     sourceDir,
-    mainModule;
+    main;
 
 var has = function(array, item) {
   return array.indexOf(item) >= 0;
@@ -80,6 +81,7 @@ var setOptions = function(options) {
   useStrict = options.use_strict;
   dependencies = options.dependencies || [];
   numDeps = dependencies.length;
+  depString = "['" + dependencies.join("', '") + "']";
   dirs = options.dirs;
   supportsArray = options.supports || ['amd', 'window'];
   exportsArray = options.exports || ['module', 'exports'];
@@ -93,7 +95,7 @@ var setOptions = function(options) {
     mainSplit.pop();
     sourceDir = mainSplit.join('/') || '.';
   }
-  mainModule = cleanedMain.replace(new RegExp('^' + sourceDir + '/'), '');
+  main = cleanedMain.replace(new RegExp('^' + sourceDir + '/'), '');
 };
 
 
@@ -132,7 +134,12 @@ var compileTemplate = function(templateName) {
       }
       enabled = stackEnabled && top.enabled;
     } else {
-      if (enabled) compiled += line.replace(/^    /, '') + '\n';
+      if (enabled) {
+        var compiledLine = line.replace(/\$--(.*?)--\$/g, function(match, group) {
+          return eval(group);
+        });
+        compiled += compiledLine.replace(/^    /, '') + '\n';
+      }
     }
   });
   return compiled;
