@@ -1,6 +1,18 @@
 var fs = require('fs'),
+    exec = require('child_process').exec,
     express = require('express'),
+    env = process.env.NODE_ENV,
     app = express();
+
+if (env === 'development') {
+  app.get('/vaccine.js', function(req, res) {
+    exec('./build.sh', function(err, built) {
+      if (err) throw err;
+      res.type('js');
+      res.send(built);
+    });
+  });
+}
 
 app.use(express.static('public'));
 

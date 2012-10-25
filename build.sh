@@ -1,5 +1,4 @@
 #!/bin/sh
-# build with: ./build.sh > public/vaccine.js
 echo '(function() {'
 
 # vaccine.js must NOT be in the source list.
@@ -13,6 +12,11 @@ do
   cat $file
   echo '});'
 done
+
+# templates.js
+echo "define('templates', function(require, exports, module) {"
+./build_templates.js
+echo '});'
 
 cat vaccine.js  # Must be after sources.
 echo '}());'

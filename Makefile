@@ -5,8 +5,7 @@ build:
 	./build.sh > public/vaccine.js
 
 vaccine.js:
-	bin/vaccine --name vaccine --main src/web.js --commonjs -s window -t build.sh -t vaccine.js
-	@sed -i '' -e 's/build\.sh > vaccine\.js/build.sh > public\/vaccine.js/' build.sh
+	bin/vaccine --name vaccine --main src/web.js --commonjs -s window -t vaccine.js
 
 clean:
 	git checkout build.sh vaccine.js

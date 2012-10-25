@@ -4,7 +4,6 @@ var fs = require('fs'),
 
 vaccine.loadFiles();
 
-var templateText = vaccine.templateText(),
-    templatesJS = 'module.exports = (' + JSON.stringify(templateText) + ');';
+var templateText = vaccine.templateText();
 
-fs.writeFileSync(__dirname + '/src/templates.js', templatesJS, 'utf8');
+console.log('module.exports = (' + JSON.stringify(templateText) + ');');
