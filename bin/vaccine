@@ -86,23 +86,22 @@ argv.supports = ensureArray('support');
 argv.exports = ensureArray('export');
 
 vaccine.loadFiles();
-var compiled = vaccine(argv),
-    targets = Object.keys(compiled);
+var targets = vaccine(argv);
 
 if (argv.stdout) {
-  targets.forEach(function(tgt) {
+  targets.forEach(function(target) {
     if (targets.length > 1) {
-      console.log('--------------- ' + tgt + ' ---------------');
+      console.log('--------------- ' + target.name + ' ---------------');
     }
-    console.log(compiled[tgt]);
+    console.log(target.compiled);
   });
 } else {
-  targets.forEach(function(name) {
-    var comp = compiled[name];
+  targets.forEach(function(target) {
+    var name = target.name;
     if (name === 'Makefile') {
       if (fs.existsSync('Makefile')) name = 'Makefile.example';
     }
-    fs.writeFile(name, comp, 'utf8', function(err) {
+    fs.writeFile(name, target.compiled, 'utf8', function(err) {
       if (err) throw err;
       if (name === 'build.sh') {
         fs.chmod('build.sh', '755', function(err) { if (err) throw err; });

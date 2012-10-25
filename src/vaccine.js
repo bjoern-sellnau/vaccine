@@ -55,8 +55,7 @@ module.exports = exports = function(options) {
 
   setOptions(options);
 
-  var compiled = {};
-  targets.forEach(function(target) {
+  return targets.map(function(target) {
     if (target === 'vaccine_dev.js') {
       var old = {
         debug: debug,
@@ -68,17 +67,15 @@ module.exports = exports = function(options) {
       performance = devPerformance;
       supportsArray = [];
     }
-    var template = templateMap[target];
-    compiled[target] = compileTemplate(template);
+    var compiled = compileTemplate(templateMap[target]);
     if (target === 'vaccine_dev.js') {
       dev = false;
       debug = old.debug;
       performance = old.performance;
       supportsArray = old.supportsArray;
     }
+    return {name: target, compiled: compiled};
   });
-
-  return compiled;
 };
 
 var setOptions = function(options) {
