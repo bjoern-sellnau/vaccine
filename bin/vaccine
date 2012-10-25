@@ -16,13 +16,13 @@ var optimist = require('optimist')
     .describe('dirs', 'The number of directory *levels* under your source ' +
                       'dir. (e.g. src/foo/*.js + src/bar/*.js + src/baz/*.js ' +
                       'would be 2 directory levels.)')
-    .describe('deps', "[m] Your library's dependencies.")
-    .describe('supports', "[m] Choose between supporting AMD, attaching to " +
+    .describe('dep', "[m] Your library's dependencies.")
+    .describe('support', "[m] Choose between supporting AMD, attaching to " +
                          "'window', or both (default both).")
-    .describe('exports', "[m] How a module provides exports. Options are " +
+    .describe('export', "[m] How a module provides exports. Options are " +
                         "'return', 'module' (for module.exports), and " +
                         "'exports'.")
-    .describe('targets', "[m] Which files to configure. Options are: " +
+    .describe('target', "[m] Which files to configure. Options are: " +
                          "vaccine.js, build.sh, Makefile, vaccine_debug.js, " +
                          "and dev_server.js. All but dev_server.js are " +
                          "default.")
@@ -39,10 +39,10 @@ var optimist = require('optimist')
 
     .alias('name', 'n')
     .alias('main', 'm')
-    .alias('deps', 'd')
+    .alias('dep', 'd')
     .alias('support', 's')
     .alias('export', 'e')
-    .alias('targets', 't')
+    .alias('target', 't')
     .alias('stdout', 'c')
     .alias('help', 'h')
 
@@ -69,6 +69,21 @@ if (argv.h) {
 
 argv.use_strict = argv['use-strict'];
 
+var ensureArray = function(key) {
+  if (typeof argv[key] !== 'undefined' && !Array.isArray(argv[key])) {
+    return [argv[key]];
+  } else {
+    return argv[key];
+  }
+}
+argv.dependencies = ensureArray('dep');
+argv.targets = ensureArray('target');
+argv.supports = ensureArray('support');
+argv.exports = ensureArray('export');
+
 vaccine.loadFiles();
 var compiled = vaccine(argv);
-console.dir(compiled);
+Object.keys(compiled).forEach(function(tgt) {
+  console.log('Target: ' + tgt);
+  console.log(compiled[tgt]);
+});

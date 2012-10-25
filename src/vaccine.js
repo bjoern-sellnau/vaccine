@@ -10,6 +10,13 @@ var templateMap = {
   'vaccine_debug.js': 'vaccine.js',
 };
 
+var macroMap = {
+  '?????': 'conditional',
+  '!!!!!': 'conditional',
+  '=====': 'switch',
+  '/////': 'end',
+};
+
 var name,
     globalName,
     libraryDir,
@@ -86,9 +93,21 @@ var setOptions = function(options) {
 
 var compileTemplate = function(templateName) {
   var template = templateText[templateName],
+      stack = [];
       compiled = '';
+
+  var interpretMatch = function(match) {
+    return {type: macroMap[match[1]], value: match[2]};
+  };
+
   template.split('\n').forEach(function(line) {
-    if (!line.match(/\?\?\?\?\?/)) compiled += line + '\n';
+    var match = line.match(/([?\/=:!]{5})( .*)?$/);
+    if (match) {
+      var macro = interpretMatch(match);
+      compiled += JSON.stringify(macro) + '\n';
+    } else {
+      compiled += 'XXXXX\n';
+    }
   });
   return compiled;
 };
