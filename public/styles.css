@@ -1,0 +1,38 @@
+html, body {
+  padding: 0;
+  margin: 0;
+}
+
+header {
+  height: 40px;
+  background-color: #ddd;
+}
+
+h1 {
+  text-align: center;
+  margin: 0;
+  font-family: Tahoma, sans-serif;
+  font-size: 24px;
+  padding-top: 4px;
+}
+
+#main {
+  width: 920px;
+  margin: 0 auto;
+}
+
+#sources, #config {
+  border: 1px solid #ddd;
+  border-top-width: 0;
+  float: left;
+  min-height: 900px;
+}
+
+#sources {
+  width: 640px;
+}
+
+#config {
+  width: 270px;
+  border-left-width: 0;
+}

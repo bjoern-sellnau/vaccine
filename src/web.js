@@ -3,4 +3,8 @@ var vaccine = require('./vaccine'),
 
 vaccine.templateText(templateText);
 
-module.exports = vaccine;
+exports.configure = function(config) {
+  config.targets = ['vaccine.js']
+  var configured = vaccine(config);
+  document.querySelector('#sources code').innerHTML = configured['vaccine.js'];
+};
