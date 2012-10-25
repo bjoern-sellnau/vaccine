@@ -7,7 +7,8 @@
 
 
 var keywords = ('var function if else for while break switch case do new null in with void '
-               +'continue delete return this true false throw catch typeof with instanceof').split(' '),
+               +'continue delete return this true false throw catch typeof with instanceof '
+               +'echo cat find done sed').split(' '),
     special = ('eval window document undefined NaN Infinity parseInt parseFloat '
                +'encodeURI decodeURI encodeURIComponent decodeURIComponent').split(' ');
 
@@ -17,6 +18,7 @@ var keywords = ('var function if else for while break switch case do new null in
 var syntax = [
   ['comment', /(\/\*(?:[^*\n]|\*+[^\/*])*\*+\/)/g],
   ['comment', /(\/\/[^\n]*)/g],
+  ['comment', /(# [^\n]*)/g],
   ['string' , /("(?:(?!")[^\\\n]|\\.)*"|'(?:(?!')[^\\\n]|\\.)*')/g],
   ['regexp' , /(\/.+\/[mgi]*)(?!\s*\w)/g],
   ['class' , /\b([A-Z][a-zA-Z]+)\b/g],

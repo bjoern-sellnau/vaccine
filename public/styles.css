@@ -64,7 +64,7 @@ code .string {
   color: red;
 }
 code .regexp {
-  color: red;
+  color: orange;
 }
 code .number {
   color: black;
