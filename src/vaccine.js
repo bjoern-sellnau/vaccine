@@ -12,9 +12,10 @@ var templateMap = {
 
 var macroMap = {
   '?????': 'conditional',
-  '!!!!!': 'conditional',
+  '!!!!!': 'inverse_conditional',
   '=====': 'switch',
   '/////': 'end',
+  ':::::': 'else',
 };
 
 var name,
@@ -26,16 +27,23 @@ var name,
     useStrict,
     dependencies = [],
     numDeps,
-    dirLevels,
-    multiDirs,
-    supports,
-    moduleExports,
+    dirs,
+    supportsArray,
+    exportsArray,
     targets,
     sourceDir,
     mainModule;
 
 var has = function(array, item) {
   return array.indexOf(item) >= 0;
+};
+
+var exprts = function(exprtsType) {
+  return has(exportsArray, exprtsType);
+};
+
+var supports = function(supportsType) {
+  return has(supportsArray, supportsType);
 };
 
 module.exports = exports = function(options) {
@@ -56,7 +64,7 @@ module.exports = exports = function(options) {
   if (has(targets, 'vaccine_debug.js')) {
     debug = true;
     performance = true;
-    supports = [];
+    supportsArray = [];
     compiled['vaccine_debug.js'] = compileTemplate('vaccine.js');
   }
 
@@ -73,10 +81,9 @@ var setOptions = function(options) {
   useStrict = options.use_strict;
   dependencies = options.dependencies || [];
   numDeps = dependencies.length;
-  dirLevels = options.dirs;
-  multiDirs = dirLevels > 1;
-  supports = options.supports || ['amd', 'window'];
-  moduleExports = options.exports || ['module', 'exports'];
+  dirs = options.dirs;
+  supportsArray = options.supports || ['amd', 'window'];
+  exportsArray = options.exports || ['module', 'exports'];
   targets = options.targets || ['vaccine.js', 'vaccine_debug.js', 'Makefile', 'build.sh'];
 
   var cleanedMain = options.main.replace(/^\.\//, '').replace(/\.js$/, '');
@@ -97,7 +104,8 @@ var compileTemplate = function(templateName) {
       compiled = '';
 
   var interpretMatch = function(match) {
-    return {type: macroMap[match[1]], value: match[2]};
+    var value = match[2] || '';
+    return {type: macroMap[match[1]], value: value};
   };
 
   template.split('\n').forEach(function(line) {
