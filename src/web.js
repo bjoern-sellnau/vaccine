@@ -3,13 +3,19 @@ var d3 = require('d3'),
     vaccine = require('./vaccine'),
     templateText = require('./templates');
 
+var diff = function(old, next) {
+  return 'diff';    // TODO: actually diff...
+};
+
 vaccine.templateText(templateText);
 
 var configHolder = d3.select('#config'),
     currentOptions = {},
     currentCompiled,
     savedOptions,
-    savedCompiled;
+    savedCompiled,
+    savedCompiledMap,
+    diffEnabled = false;
 
 var defaultOptions = {
   format: 'amd',
@@ -38,7 +44,7 @@ var maybeUpdate = function() {
   });
   if (same) return false;
   currentOptions = options;
-  update(options);
+  update();
   return false;
 };
 
@@ -68,10 +74,10 @@ var setOptions = function(options) {
   });
 };
 
-var update = function(rawOptions) {
+var update = function() {
   configHolder.select('#save').attr('disabled', null);
-  var compiled = compile(rawOptions);
-  updateSources(compiled);
+  currentCompiled = compile(currentOptions);
+  updateSources();
 };
 
 var compile = function(rawOptions) {
@@ -89,13 +95,19 @@ var compile = function(rawOptions) {
   options.use_strict = debugging.indexOf('use-strict') >= 0;
   options.commonjs = options.format === 'commonjs';
 
-  currentCompiled = vaccine(options);
-  return currentCompiled;
+  return vaccine(options);
 };
 
-var updateSources = function(compiled) {
+var updateSources = function() {
+  currentCompiled.forEach(function(d) {
+    if (diffEnabled) {
+      d.html = diff(savedCompiledMap[d.name], d.compiled);
+    } else {
+      d.html = hijs(d.compiled);
+    }
+  });
   var sources = d3.select('#sources').selectAll('.source')
-      .data(compiled, function(d) { return d.name; });
+      .data(currentCompiled, function(d) { return d.name; });
 
   sources.enter().append('div')
       .attr('class', 'source')
@@ -117,30 +129,41 @@ var updateSources = function(compiled) {
     return order.indexOf(a.name) - order.indexOf(b.name);
   });
 
-  sources.select('code').html(function(d) { return hijs(d.compiled); });
+  sources.select('code').html(function(d) { return d.html; });
 };
 
-var updateWithSaved = function() {
-  setOptions(savedOptions);
-  updateSources(savedCompiled);
+var toggleDiff = function() {
+  diffEnabled = !diffEnabled;
+  configHolder.select('#diff').classed('active', diffEnabled);
+  updateSources();
+};
+
+var makeCompiledMap = function(compiled) {
+  var map = {};
+  compiled.forEach(function(d) { map[d.name] = d.compiled; });
+  return map;
+};
+
+var saveCurrent = function() {
+  savedCompiled = currentCompiled;
+  savedCompiledMap = makeCompiledMap(currentCompiled);
+  savedOptions = currentOptions;
+  configHolder.select('#diff').attr('disabled', null);
+  configHolder.select('#save').attr('disabled', 'disabled');
+  configHolder.select('#swap').attr('disabled', null);
 };
 
 var swapSaved = function() {
   if (!savedOptions) return;
-  updateWithSaved();
   var options = currentOptions,
       compiled = currentCompiled;
   currentOptions = savedOptions;
   currentCompiled = savedCompiled;
   savedOptions = options;
   savedCompiled = compiled;
-};
-
-var saveCurrent = function() {
-  savedCompiled = currentCompiled;
-  savedOptions = currentOptions;
-  configHolder.select('#swap').attr('disabled', null);
-  configHolder.select('#save').attr('disabled', true);
+  savedCompiledMap = makeCompiledMap(compiled);
+  setOptions(currentOptions);
+  updateSources(savedCompiled);
 };
 
 var changeFormat = function() {
@@ -159,8 +182,9 @@ configHolder.selectAll('#format input').each(function() {
 });
 configHolder.on('click', maybeUpdate);
 configHolder.on('keyup', maybeUpdate);
+configHolder.select('#diff').on('click', toggleDiff).attr('disabled', 'disabled');
 configHolder.select('#save').on('click', saveCurrent);
-configHolder.select('#swap').on('click', swapSaved).attr('disabled', true);
+configHolder.select('#swap').on('click', swapSaved).attr('disabled', 'disabled');
 
 setOptions(defaultOptions);
 maybeUpdate();
