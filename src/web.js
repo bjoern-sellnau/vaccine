@@ -69,6 +69,7 @@ var setOptions = function(options) {
 };
 
 var update = function(rawOptions) {
+  configHolder.select('#save').attr('disabled', null);
   var compiled = compile(rawOptions);
   updateSources(compiled);
 };
@@ -119,17 +120,6 @@ var updateSources = function(compiled) {
   sources.select('code').html(function(d) { return hijs(d.compiled); });
 };
 
-var restoreSaved = function() {
-  if (!savedOptions) return;
-  updateWithSaved();
-  currentOptions = savedOptions;
-  currentCompiled = savedCompiled;
-  savedOptions = null;
-  savedCompiled = null;
-  configHolder.select('#restore').attr('disabled', true);
-  configHolder.select('#swap').attr('disabled', true);
-};
-
 var updateWithSaved = function() {
   setOptions(savedOptions);
   updateSources(savedCompiled);
@@ -150,7 +140,7 @@ var saveCurrent = function() {
   savedCompiled = currentCompiled;
   savedOptions = currentOptions;
   configHolder.select('#swap').attr('disabled', null);
-  configHolder.select('#restore').attr('disabled', null);
+  configHolder.select('#save').attr('disabled', true);
 };
 
 var changeFormat = function() {
@@ -170,7 +160,6 @@ configHolder.selectAll('#format input').each(function() {
 configHolder.on('click', maybeUpdate);
 configHolder.on('keyup', maybeUpdate);
 configHolder.select('#save').on('click', saveCurrent);
-configHolder.select('#restore').on('click', restoreSaved).attr('disabled', true);
 configHolder.select('#swap').on('click', swapSaved).attr('disabled', true);
 
 setOptions(defaultOptions);
