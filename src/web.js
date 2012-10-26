@@ -22,7 +22,10 @@ var maybeUpdate = function() {
 var getOptions = function() {
   var options = {};
   configHolder.selectAll('input').each(function() {
-    if (this.type !== 'radio' || this.checked) {
+    if (this.type === 'checkbox') {
+      options[this.name] = options[this.name] || [];
+      if (this.checked) options[this.name].push(this.value);
+    } else if (this.type !== 'radio' || this.checked) {
       options[this.name] = this.value;
     }
   });
@@ -32,14 +35,21 @@ var getOptions = function() {
 var update = function(rawOptions) {
   var options = {};
   Object.keys(rawOptions).forEach(function(k) { options[k] = rawOptions[k]; });
-  options.dependencies = options.dependencies.split(/\W+/);
-  if (options['authored-in'] === 'amd') {   // TODO, move this out to click handler.
-    options.exports = ['module', 'exports', 'return'];
-    options.commonjs = false;
-  } else {
-    options.exports = ['module', 'exports'];
-    options.commonjs = true;
-  }
+  var deps = [];
+  options.dependencies.split(/\W+/).forEach(function(dep) {
+    if (dep) deps.push(dep);
+  });
+  options.dependencies = deps;
+  options.debug = options.debugging.indexOf('debug') >= 0;
+  options.performance = options.debugging.indexOf('performance') >= 0;
+  options.use_strict = options.debugging.indexOf('use-strict') >= 0;
+  //if (options['authored-in'] === 'amd') {   // TODO, move this out to click handler.
+  //  options.exports = ['module', 'exports', 'return'];
+  //  options.commonjs = false;
+  //} else {
+  //  options.exports = ['module', 'exports'];
+  //  options.commonjs = true;
+  //}
   var configured = vaccine(options);
 
   var sources = d3.select('#sources').selectAll('.source')

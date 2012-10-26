@@ -30,7 +30,7 @@ h1 {
   border: 1px solid #ddd;
   border-top-width: 0;
   float: left;
-  min-height: 900px;
+  min-height: 1400px;
 }
 
 #sources {
@@ -85,16 +85,21 @@ code .special {
   width: 250px;
 }
 
+#config .group.advanced-options {
+  margin-top: 90px;
+}
+
 #config .group .inputs {
   margin-left: 15px;
 }
 
 #config label {
   margin-right: 6px;
+  display: inline-block;
 }
 
-#config input[type=radio] {
-  margin-right: 4px;
+#config input[type=radio], #config input[type=checkbox] {
+  margin-right: 5px;
 }
 
 #config input[type=text] {

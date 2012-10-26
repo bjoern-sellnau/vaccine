@@ -10,36 +10,79 @@
       <div id="sources">
       </div>
       <div id="config">
-        <div id="format" class="group">
+        <div class="group">
           <div class="title">Format</div>
           <div class="inputs">
             <label><input type="radio" name="authored-in" value="amd" checked="checked">AMD</label>
             <label><input type="radio" name="authored-in" value="commonjs">CommonJS</label>
           </div>
         </div>
-        <div id="name" class="group">
+        <div class="group">
           <div class="title">Name</div>
           <div class="inputs">
             <input type="text" name="name" value="my_library_name">
           </div>
         </div>
-        <div id="main" class="group">
+        <div class="group">
           <div class="title">Main (entry file)</div>
           <div class="inputs">
             <input type="text" name="main" value="src/index.js">
           </div>
         </div>
-        <div id="dependencies" class="group">
+        <div class="group">
           <div class="title">Dependencies</div>
           <div class="inputs">
             <input type="text" name="dependencies" value="dep_one, dep_two">
           </div>
         </div>
-        <div id="dir-levels" class="group">
+        <div class="group">
           <div class="title">Directory Levels</div>
           <div class="inputs">
-            <label><input type="radio" name="dirs" value="1" checked="checked">One</label>
-            <label><input type="radio" name="dirs" value="10">More than one</label>
+            <label><input type="radio" name="dirs" value="1" checked="checked">one</label>
+            <label><input type="radio" name="dirs" value="10">more than one</label>
+          </div>
+        </div>
+        <div class="group advanced-options">
+          <div class="title">Advanced Options</div>
+        </div>
+        <div class="group">
+          <div class="title">Targets</div>
+          <div class="inputs">
+            <label><input type="checkbox" name="targets" value="vaccine.js">vaccine.js</label>
+            <label><input type="checkbox" name="targets" value="build.sh">build.sh</label>
+            <label><input type="checkbox" name="targets" value="Makefile">Makefile</label>
+            <label><input type="checkbox" name="targets" value="vaccine_dev.js">vaccine_dev.js</label>
+            <label><input type="checkbox" name="targets" value="dev_server.js">dev_server.js</label>
+          </div>
+        </div>
+        <div class="group">
+          <div class="title">Exports</div>
+          <div class="inputs">
+            <label><input type="checkbox" name="exports" value="exports">exports</label>
+            <label><input type="checkbox" name="exports" value="module">module.exports</label>
+            <label><input type="checkbox" name="exports" value="return">return</label>
+          </div>
+        </div>
+        <div class="group">
+          <div class="title">Supports</div>
+          <div class="inputs">
+            <label><input type="checkbox" name="supports" value="window">window</label>
+            <label><input type="checkbox" name="supports" value="amd">AMD</label>
+          </div>
+        </div>
+        <div class="group">
+          <div class="title">Debugging</div>
+          <div class="inputs">
+            <label><input type="checkbox" name="debugging" value="debug">debug</label>
+            <label><input type="checkbox" name="debugging" value="performance">performance</label>
+            <label><input type="checkbox" name="debugging" value="use-strict">"use strict";</label>
+          </div>
+        </div>
+        <div class="group">
+          <div class="title">Variable Overrides</div>
+          <div class="inputs">
+            <label>source directory<input type="text" name="src" value=""></label>
+            <label>global variable name<input type="text" name="global" value=""></label>
           </div>
         </div>
       </div>
