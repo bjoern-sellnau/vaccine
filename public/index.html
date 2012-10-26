@@ -10,35 +10,35 @@
       <div id="sources">
       </div>
       <div id="config">
-        <div class="group">
+        <div id="format" class="group">
           <div class="title">Format</div>
           <div class="inputs">
-            <label><input type="radio" name="authored-in" value="amd" checked="checked">AMD</label>
-            <label><input type="radio" name="authored-in" value="commonjs">CommonJS</label>
+            <label><input type="radio" name="format" value="amd">AMD</label>
+            <label><input type="radio" name="format" value="commonjs">CommonJS</label>
           </div>
         </div>
         <div class="group">
           <div class="title">Name</div>
           <div class="inputs">
-            <input type="text" name="name" value="my_library_name">
+            <input type="text" name="name">
           </div>
         </div>
         <div class="group">
           <div class="title">Main (entry file)</div>
           <div class="inputs">
-            <input type="text" name="main" value="src/index.js">
+            <input type="text" name="main">
           </div>
         </div>
         <div class="group">
           <div class="title">Dependencies</div>
           <div class="inputs">
-            <input type="text" name="dependencies" value="dep_one, dep_two">
+            <input type="text" name="dependencies">
           </div>
         </div>
         <div class="group">
           <div class="title">Directory Levels</div>
           <div class="inputs">
-            <label><input type="radio" name="dirs" value="1" checked="checked">one</label>
+            <label><input type="radio" name="dirs" value="1">one</label>
             <label><input type="radio" name="dirs" value="10">more than one</label>
           </div>
         </div>
@@ -81,8 +81,8 @@
         <div class="group">
           <div class="title">Variable Overrides</div>
           <div class="inputs">
-            <label>source directory<input type="text" name="src" value=""></label>
-            <label>global variable name<input type="text" name="global" value=""></label>
+            <label>source directory<input type="text" name="src"></label>
+            <label>global variable name<input type="text" name="global"></label>
           </div>
         </div>
       </div>

@@ -8,10 +8,30 @@ vaccine.templateText(templateText);
 var configHolder = d3.select('#config'),
     currentOptions = {};
 
+var defaultOptions = {
+  format: 'amd',
+  name: 'my_library_name',
+  main: 'src/index.js',
+  dependencies: ['dep_one', 'dep_two'],
+  dirs: '1',
+  targets: ['vaccine.js', 'build.sh'],
+  exports: ['exports', 'module', 'return'],
+  supports: ['amd', 'window'],
+  debugging: [],
+  src: '',
+  global: '',
+};
+
 var maybeUpdate = function() {
   var options = getOptions();
   var same = Object.keys(options).every(function(key) {
-    return options[key] === currentOptions[key];
+    var next = options[key];
+    if (!Array.isArray(next)) {
+      return next === currentOptions[key];
+    }
+    var current = currentOptions[key];
+    if (current.length !== next.length) return false;
+    return !next.filter(function(d) { return current.indexOf(d) < 0; }).length;
   });
   if (same) return false;
   currentOptions = options;
@@ -32,6 +52,19 @@ var getOptions = function() {
   return options;
 };
 
+var setOptions = function(options) {
+  configHolder.selectAll('input').each(function() {
+    var current = options[this.name];
+    if (this.type === 'checkbox') {
+      this.checked = current.indexOf(this.value) >= 0;
+    } else if (this.type === 'radio') {
+      this.checked = current === this.value;
+    } else {
+      this.value = current;
+    }
+  });
+};
+
 var update = function(rawOptions) {
   var options = {};
   Object.keys(rawOptions).forEach(function(k) { options[k] = rawOptions[k]; });
@@ -40,16 +73,13 @@ var update = function(rawOptions) {
     if (dep) deps.push(dep);
   });
   options.dependencies = deps;
-  options.debug = options.debugging.indexOf('debug') >= 0;
-  options.performance = options.debugging.indexOf('performance') >= 0;
-  options.use_strict = options.debugging.indexOf('use-strict') >= 0;
-  //if (options['authored-in'] === 'amd') {   // TODO, move this out to click handler.
-  //  options.exports = ['module', 'exports', 'return'];
-  //  options.commonjs = false;
-  //} else {
-  //  options.exports = ['module', 'exports'];
-  //  options.commonjs = true;
-  //}
+
+  var debugging = options.debugging;
+  options.debug = debugging.indexOf('debug') >= 0;
+  options.performance = debugging.indexOf('performance') >= 0;
+  options.use_strict = debugging.indexOf('use-strict') >= 0;
+  options.commonjs = options.format === 'commonjs';
+
   var configured = vaccine(options);
 
   var sources = d3.select('#sources').selectAll('.source')
@@ -76,7 +106,22 @@ var update = function(rawOptions) {
   sources.select('code').html(function(d) { return hijs(d.compiled); });
 };
 
+var changeFormat = function() {
+  var amd = (this.value === 'amd' && this.checked) || !this.checked;
+  var options = getOptions();
+  if (amd) {
+    options.exports = ['exports', 'module', 'return'];
+  } else {
+    options.exports = ['exports', 'module'];
+  }
+  setOptions(options);
+};
+
+configHolder.selectAll('#format input').each(function() {
+  d3.select(this).on('click', changeFormat);
+});
 configHolder.on('click', maybeUpdate);
 configHolder.on('keyup', maybeUpdate);
 
+setOptions(defaultOptions);
 maybeUpdate();

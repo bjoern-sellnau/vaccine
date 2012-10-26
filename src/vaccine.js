@@ -96,6 +96,9 @@ var setOptions = function(options) {
   exportsArray = options.exports || ['module', 'exports'];
   targets = options.targets || ['vaccine.js', 'build.sh'];
 
+  if (exprts('module') && !exprts('exports')) exportsArray.push('exports');
+  if (!exportsArray.length) exportsArray.push('exports');
+
   var cleanedMain = options.main.replace(/^\.\//, '').replace(/\.js$/, '');
   if (options.src) {
     sourceDir = options.src.replace(/^\.\//, '');
