@@ -11,10 +11,11 @@ var prepend = function(text, pre) {
 };
 
 var diff = function(old, next) {
-  var chunks = jsdiff.diffLines(old, next).map(function(d) {
-    if (d.added) {
+  // Reverse the next and old so that removed lines show before added.
+  var chunks = jsdiff.diffLines(next, old).map(function(d) {
+    if (d.removed) {
       return '<span class="added">' + prepend(d.value, '+') + '</span>';
-    } else if (d.removed) {
+    } else if (d.added) {
       return '<span class="removed">' + prepend(d.value, '-') + '</span>';
     } else {
       return prepend(d.value, ' ');
@@ -139,7 +140,7 @@ var updateSources = function() {
 
   sources.exit().remove();
 
-  var order = ['build.sh', 'Makefile', 'vaccine.js',
+  var order = ['vaccine.js', 'build.sh', 'Makefile',
                'vaccine_dev.js', 'dev_server.js'];
   sources.sort(function(a, b) {
     return order.indexOf(a.name) - order.indexOf(b.name);
@@ -164,9 +165,8 @@ var saveCurrent = function() {
   savedCompiled = currentCompiled;
   savedCompiledMap = makeCompiledMap(currentCompiled);
   savedOptions = currentOptions;
-  configHolder.select('#diff').attr('disabled', null);
   configHolder.select('#save').attr('disabled', 'disabled');
-  configHolder.select('#swap').attr('disabled', null);
+  if (diffEnabled) updateSources();
 };
 
 var swapSaved = function() {
@@ -179,7 +179,7 @@ var swapSaved = function() {
   savedCompiled = compiled;
   savedCompiledMap = makeCompiledMap(compiled);
   setOptions(currentOptions);
-  updateSources(savedCompiled);
+  updateSources();
 };
 
 var changeFormat = function() {
@@ -198,9 +198,10 @@ configHolder.selectAll('#format input').each(function() {
 });
 configHolder.on('click', maybeUpdate);
 configHolder.on('keyup', maybeUpdate);
-configHolder.select('#diff').on('click', toggleDiff).attr('disabled', 'disabled');
+configHolder.select('#diff').on('click', toggleDiff);
 configHolder.select('#save').on('click', saveCurrent);
-configHolder.select('#swap').on('click', swapSaved).attr('disabled', 'disabled');
+configHolder.select('#swap').on('click', swapSaved);
 
 setOptions(defaultOptions);
 maybeUpdate();
+saveCurrent();
