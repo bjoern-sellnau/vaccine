@@ -92,7 +92,9 @@ var update = function(rawOptions) {
         source.append('div')
             .attr('class', 'title')
             .text(d.name);
-        source.append('code');
+        source.append('div')
+            .attr('class', 'code-container')
+            .append('code');
       });
 
   sources.exit().remove();

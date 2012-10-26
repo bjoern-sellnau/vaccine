@@ -9,7 +9,7 @@ body {
 }
 
 header {
-  height: 40px;
+  height: 54px;
   background-color: #ddd;
 }
 
@@ -17,44 +17,48 @@ h1 {
   text-align: center;
   margin: 0;
   font-family: Tahoma, sans-serif;
-  font-size: 24px;
+  font-size: 34px;
   padding-top: 4px;
 }
 
 #main {
-  width: 920px;
+  max-width: 1200px;
   margin: 0 auto;
-}
-
-#sources, #config {
-  border: 1px solid #ddd;
-  border-top-width: 0;
-  float: left;
-  min-height: 1400px;
+  background-color: white;
+  margin-bottom: 70px;
 }
 
 #sources {
-  width: 640px;
+  margin-top: 20px;
+  min-height: 1400px;
 }
 
-.source, #config .group {
-  margin: 5px;
-  padding: 5px;
-  padding-bottom: 10px;
-  border-color: #ddd;
-  border-style: dashed;
-  border-width: 0 0 1px 0;
+.source {
+  padding: 10px;
+  margin-bottom: 10px;
 }
 
-.source .title, #config .group .title {
+.source .title {
   font-weight: bold;
-  font-size: 16px;
-  margin-bottom: 6px;
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+.source .code-container {
+  border: solid 1px #aaa;
+  margin-left: 25px;
+  width: 700px;
 }
 
 code {
   white-space: pre;
   font-size: 14px;
+  display: block;
+  padding: 2px;
+  overflow-x: auto;
+  border-style: solid;
+  border-color: #eee;
+  border-width: 0 0 0 20px;
 }
 
 code .comment {
@@ -76,13 +80,31 @@ code .special {
   color: purple;
 }
 
+
+
+
 #config {
+  float: right;
   width: 270px;
-  border-left-width: 0;
+  border-style: solid;
+  border-width: 1px;
+  border-color: #aaa;
+  background-color: white;
+  z-index: 1;
+  position: relative;
 }
 
 #config .group {
+  margin: 5px;
+  padding: 5px;
+  padding-bottom: 10px;
   width: 250px;
+}
+
+#config .group .title {
+  font-weight: bold;
+  font-size: 16px;
+  margin-bottom: 6px;
 }
 
 #config .group.advanced-options {
