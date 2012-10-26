@@ -1,5 +1,6 @@
 var d3 = require('d3'),
     hijs = require('./hijs'),
+    jsdiff = require('./jsdiff'),
     vaccine = require('./vaccine'),
     templateText = require('./templates');
 
