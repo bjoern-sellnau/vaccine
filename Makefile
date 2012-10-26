@@ -1,7 +1,6 @@
 .PHONY: build vaccine.js
 
 build:
-	./build_templates.js
 	./build.sh > public/vaccine.js
 
 vaccine.js:
