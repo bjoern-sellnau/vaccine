@@ -53,6 +53,10 @@ h1 {
   float: right;
 }
 
+#sizes .number {
+  font-size: 30px;
+}
+
 .source .code-container {
   border: solid 1px #aaa;
   margin-left: 25px;
@@ -123,12 +127,9 @@ code .special {
   margin-bottom: 6px;
 }
 
-#config .group.advanced-options {
+#config .group.controls {
   margin-top: 50px;
-}
-
-#config .group.save-and-diff {
-  margin-top: 50px;
+  margin-bottom: 50px;
 }
 
 #config .group .inputs, #config .group .controls {

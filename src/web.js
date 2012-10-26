@@ -103,8 +103,10 @@ var update = function() {
     return d.name === 'vaccine.js';
   });
   if (vaccineCompiled) {
+    vaccineCompiled = '(function() {' + vaccineCompiled[0].compiled + '})()';
     try {
-      currentSize = uglifyjs(vaccineCompiled[0].compiled).length;
+      // substract the "(function(){...})()" (16 bytes)
+      currentSize = uglifyjs(vaccineCompiled).length - 16;
     } catch (e) {
       currentSize = 1;
     }
@@ -175,12 +177,12 @@ var updateSources = function() {
 
   if (currentSize) {
     if (currentSize === 1) {
-      var sizeText = 'Oops!';
+      var min = 'Oops!';
     } else {
-      var sizeText = currentSize;
+      var min = currentSize;
     }
-    sizeText += ' bytes (minified)';
-    sources.select('#sizes').text(sizeText);
+    var sizeText = '<span class="number">' + min + '</span> bytes minified';
+    sources.select('#sizes').html(sizeText);
   }
 };
 
