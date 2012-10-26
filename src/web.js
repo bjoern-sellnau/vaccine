@@ -1,3 +1,5 @@
+// Keep these top two lines, so that the built line numbers line
+// with these.
 var d3 = require('d3'),
     hijs = require('./hijs'),
     jsdiff = require('./jsdiff'),
