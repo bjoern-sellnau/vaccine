@@ -6,7 +6,7 @@ var fs = require('fs'),
 
 if (env === 'development') {
   app.get('/vaccine.js', function(req, res) {
-    exec('./build.sh', function(err, built) {
+    exec('./build.sh', {maxBuffer: 400000}, function(err, built) {
       if (err) throw err;
       res.type('js');
       res.send(built);

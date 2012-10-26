@@ -3,6 +3,7 @@
 var d3 = require('d3'),
     hijs = require('./hijs'),
     jsdiff = require('./jsdiff'),
+    uglifyjs = require('./uglify-js'),
     vaccine = require('./vaccine'),
     templateText = require('./templates');
 
@@ -31,9 +32,11 @@ vaccine.templateText(templateText);
 var configHolder = d3.select('#config'),
     currentOptions = {},
     currentCompiled,
+    currentSize,
     savedOptions,
     savedCompiled,
     savedCompiledMap,
+    savedSize,
     diffEnabled = false;
 
 var defaultOptions = {
@@ -96,6 +99,18 @@ var setOptions = function(options) {
 var update = function() {
   configHolder.select('#save').attr('disabled', null);
   currentCompiled = compile(currentOptions);
+  var vaccineCompiled = currentCompiled.filter(function(d) {
+    return d.name === 'vaccine.js';
+  });
+  if (vaccineCompiled) {
+    try {
+      currentSize = uglifyjs(vaccineCompiled[0].compiled).length;
+    } catch (e) {
+      currentSize = 1;
+    }
+  } else {
+    currentSize = null;
+  }
   updateSources();
 };
 
@@ -132,7 +147,15 @@ var updateSources = function() {
       .attr('class', 'source')
       .each(function(d) {
         source = d3.select(this);
-        source.append('div')
+        if (d.name === 'vaccine.js') {
+          var titleContainer = source.append('div')
+              .attr('class', 'title-and-size');
+          titleContainer.append('div')
+              .attr('id', 'sizes');
+        } else {
+          var titleContainer = source;
+        }
+        titleContainer.append('div')
             .attr('class', 'title')
             .text(d.name);
         source.append('div')
@@ -149,6 +172,16 @@ var updateSources = function() {
   });
 
   sources.select('code').html(function(d) { return d.html; });
+
+  if (currentSize) {
+    if (currentSize === 1) {
+      var sizeText = 'Oops!';
+    } else {
+      var sizeText = currentSize;
+    }
+    sizeText += ' bytes (minified)';
+    sources.select('#sizes').text(sizeText);
+  }
 };
 
 var toggleDiff = function() {
@@ -167,6 +200,7 @@ var saveCurrent = function() {
   savedCompiled = currentCompiled;
   savedCompiledMap = makeCompiledMap(currentCompiled);
   savedOptions = currentOptions;
+  savedSize = currentSize;
   configHolder.select('#save').attr('disabled', 'disabled');
   if (diffEnabled) updateSources();
 };
@@ -174,12 +208,14 @@ var saveCurrent = function() {
 var swapSaved = function() {
   if (!savedOptions) return;
   var options = currentOptions,
-      compiled = currentCompiled;
+      compiled = currentCompiled,
+      size = currentSize;
   currentOptions = savedOptions;
   currentCompiled = savedCompiled;
   savedOptions = options;
   savedCompiled = compiled;
   savedCompiledMap = makeCompiledMap(compiled);
+  savedSize = size;
   setOptions(currentOptions);
   updateSources();
 };
