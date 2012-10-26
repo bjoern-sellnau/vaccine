@@ -122,7 +122,7 @@ code .special {
   margin-top: 50px;
 }
 
-#config .group .inputs {
+#config .group .inputs, #config .group .controls {
   margin-left: 15px;
 }
 
