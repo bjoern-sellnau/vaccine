@@ -4,8 +4,23 @@ var d3 = require('d3'),
     vaccine = require('./vaccine'),
     templateText = require('./templates');
 
+var prepend = function(text, pre) {
+  var split = text.split('\n');
+  split.pop();
+  return pre + split.join('\n' + pre);
+};
+
 var diff = function(old, next) {
-  return 'diff';    // TODO: actually diff...
+  var chunks = jsdiff.diffLines(old, next).map(function(d) {
+    if (d.added) {
+      return '<span class="added">' + prepend(d.value, '+') + '</span>';
+    } else if (d.removed) {
+      return '<span class="removed">' + prepend(d.value, '-') + '</span>';
+    } else {
+      return prepend(d.value, ' ');
+    }
+  });
+  return chunks.join('\n');
 };
 
 vaccine.templateText(templateText);

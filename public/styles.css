@@ -61,6 +61,12 @@ code {
   border-width: 0 0 0 20px;
 }
 
+code .added {
+  color: green;
+}
+code .removed {
+  color: red;
+}
 code .comment {
   color: green;
 }
