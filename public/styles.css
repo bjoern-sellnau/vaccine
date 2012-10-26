@@ -92,6 +92,7 @@ code .special {
   background-color: white;
   z-index: 1;
   position: relative;
+  margin-right: 10px;
 }
 
 #config .group {
@@ -108,7 +109,11 @@ code .special {
 }
 
 #config .group.advanced-options {
-  margin-top: 90px;
+  margin-top: 50px;
+}
+
+#config .group.save-and-diff {
+  margin-top: 50px;
 }
 
 #config .group .inputs {

@@ -6,7 +6,10 @@ var d3 = require('d3'),
 vaccine.templateText(templateText);
 
 var configHolder = d3.select('#config'),
-    currentOptions = {};
+    currentOptions = {},
+    currentCompiled,
+    savedOptions,
+    savedCompiled;
 
 var defaultOptions = {
   format: 'amd',
@@ -41,7 +44,7 @@ var maybeUpdate = function() {
 
 var getOptions = function() {
   var options = {};
-  configHolder.selectAll('input').each(function() {
+  configHolder.selectAll('.inputs input').each(function() {
     if (this.type === 'checkbox') {
       options[this.name] = options[this.name] || [];
       if (this.checked) options[this.name].push(this.value);
@@ -53,7 +56,7 @@ var getOptions = function() {
 };
 
 var setOptions = function(options) {
-  configHolder.selectAll('input').each(function() {
+  configHolder.selectAll('.inputs input').each(function() {
     var current = options[this.name];
     if (this.type === 'checkbox') {
       this.checked = current.indexOf(this.value) >= 0;
@@ -66,6 +69,11 @@ var setOptions = function(options) {
 };
 
 var update = function(rawOptions) {
+  var compiled = compile(rawOptions);
+  updateSources(compiled);
+};
+
+var compile = function(rawOptions) {
   var options = {};
   Object.keys(rawOptions).forEach(function(k) { options[k] = rawOptions[k]; });
   var deps = [];
@@ -80,10 +88,13 @@ var update = function(rawOptions) {
   options.use_strict = debugging.indexOf('use-strict') >= 0;
   options.commonjs = options.format === 'commonjs';
 
-  var configured = vaccine(options);
+  currentCompiled = vaccine(options);
+  return currentCompiled;
+};
 
+var updateSources = function(compiled) {
   var sources = d3.select('#sources').selectAll('.source')
-      .data(configured, function(d) { return d.name; });
+      .data(compiled, function(d) { return d.name; });
 
   sources.enter().append('div')
       .attr('class', 'source')
@@ -108,6 +119,40 @@ var update = function(rawOptions) {
   sources.select('code').html(function(d) { return hijs(d.compiled); });
 };
 
+var restoreSaved = function() {
+  if (!savedOptions) return;
+  updateWithSaved();
+  currentOptions = savedOptions;
+  currentCompiled = savedCompiled;
+  savedOptions = null;
+  savedCompiled = null;
+  configHolder.select('#restore').attr('disabled', true);
+  configHolder.select('#swap').attr('disabled', true);
+};
+
+var updateWithSaved = function() {
+  setOptions(savedOptions);
+  updateSources(savedCompiled);
+};
+
+var swapSaved = function() {
+  if (!savedOptions) return;
+  updateWithSaved();
+  var options = currentOptions,
+      compiled = currentCompiled;
+  currentOptions = savedOptions;
+  currentCompiled = savedCompiled;
+  savedOptions = options;
+  savedCompiled = compiled;
+};
+
+var saveCurrent = function() {
+  savedCompiled = currentCompiled;
+  savedOptions = currentOptions;
+  configHolder.select('#swap').attr('disabled', null);
+  configHolder.select('#restore').attr('disabled', null);
+};
+
 var changeFormat = function() {
   var amd = (this.value === 'amd' && this.checked) || !this.checked;
   var options = getOptions();
@@ -124,6 +169,9 @@ configHolder.selectAll('#format input').each(function() {
 });
 configHolder.on('click', maybeUpdate);
 configHolder.on('keyup', maybeUpdate);
+configHolder.select('#save').on('click', saveCurrent);
+configHolder.select('#restore').on('click', restoreSaved).attr('disabled', true);
+configHolder.select('#swap').on('click', swapSaved).attr('disabled', true);
 
 setOptions(defaultOptions);
 maybeUpdate();
