@@ -98,7 +98,7 @@ var setOptions = function(options) {
 
 var update = function() {
   configHolder.select('#save').attr('disabled', null);
-  currentCompiled = compile(currentOptions);
+  currentCompiled = compile();
   var vaccineCompiled = currentCompiled.filter(function(d) {
     return d.name === 'vaccine.js';
   });
@@ -116,9 +116,16 @@ var update = function() {
   updateSources();
 };
 
-var compile = function(rawOptions) {
-  var options = {};
-  Object.keys(rawOptions).forEach(function(k) { options[k] = rawOptions[k]; });
+var compile = function() {
+  var options = {},
+      current = currentOptions;
+  Object.keys(current).forEach(function(k) {
+    if (Array.isArray(current[k])) {
+      options[k] = current[k].slice();
+    } else {
+      options[k] = current[k];
+    }
+  });
   var deps = [];
   options.dependencies.split(/\W+/).forEach(function(dep) {
     if (dep) deps.push(dep);
@@ -130,6 +137,25 @@ var compile = function(rawOptions) {
   options.performance = debugging.indexOf('performance') >= 0;
   options.use_strict = debugging.indexOf('use-strict') >= 0;
   options.commonjs = options.format === 'commonjs';
+
+  var problems = vaccine.validateOptions(options);
+  d3.selectAll('.problem').classed('problem', false);
+  problems.forEach(function(problem) {
+    problem.options.forEach(function(opt) {
+      var group = d3.select('#' + opt.group);
+      if (!group) return;
+      group.select('.title').classed('problem', true);
+      var labels = group.selectAll('label');
+      labels.each(function() {
+        var label = d3.select(this),
+            input = label.select('input');
+        if (opt.parts.indexOf(input.attr('value')) >= 0) {
+          label.classed('problem', true);
+        }
+      });
+    });
+    problem.fix();
+  });
 
   return vaccine(options);
 };

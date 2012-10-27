@@ -82,38 +82,33 @@ exports.validateOptions = function(opts) {
   var problems = [];
   var setDefault = function(option, value) {
     var fix = function() { opts[option] = value; };
-    problems.push({type: 'default', option: option, value: value, fix: fix});
+    var options = [{group: option, parts: value}];
+    problems.push({type: 'default', options: options, fix: fix});
   };
   var maybeDefault = function(option, value) {
-    if (!opts[option]) setDefault(option, value);
+    if (!opts[option] || !opts[option].length) setDefault(option, value);
   };
-  var mismatch = function(id, fix) {
-    problems.push({type: 'mismatch', id: id, fix: fix});
+  var mismatch = function(options, fix) {
+    problems.push({type: 'mismatch', options: options, fix: fix});
   };
 
   var format = opts.format;
-  maybeDefault('global', opts.name);
-  maybeDefault('dependencies', []);
   switch (format) {
     case 'amd':
       maybeDefault('supports', ['amd', 'window']);
-      if (!opts.exports || !opts.exports.length) {
-        setDefault('exports', ['module', 'exports', 'return']);
-      }
+      maybeDefault('exports', ['module', 'exports', 'return']);
       maybeDefault('targets', ['vaccine.js', 'build.sh']);
       break;
     case 'commonjs':
       maybeDefault('supports', ['amd', 'window', 'commonjs']);
-      if (!opts.exports || !opts.exports.length) {
-        setDefault('exports', ['module', 'exports']);
-      }
+      maybeDefault('exports', ['module', 'exports']);
       maybeDefault('targets', ['vaccine.js', 'build.sh']);
       break;
   }
 
   if (opts.exports && has(opts.exports, 'module') &&
                       !has(opts.exports, 'exports')) {
-    mismatch('module-no-exports', function() {
+    mismatch([{group: 'exports', parts: ['module', 'exports']}], function() {
       opts.exports.push('exports');
     });
   }
@@ -122,7 +117,7 @@ exports.validateOptions = function(opts) {
 
 var setOptions = function(options) {
   name = options.name;
-  globalName = options.global;
+  globalName = options.global || options.name;
   libraryDir = options.lib;
   format = options.format;
   performance = options.performance;
@@ -130,7 +125,7 @@ var setOptions = function(options) {
   devDebug = !options.dev_no_debug;
   devPerformance = !options.dev_no_performance;
   useStrict = options.use_strict;
-  dependencies = options.dependencies;
+  dependencies = options.dependencies || [];
   numDeps = dependencies.length;
   depString = "['" + dependencies.join("', '") + "']";
   dirs = options.dirs;

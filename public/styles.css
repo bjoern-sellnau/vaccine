@@ -84,7 +84,7 @@ code {
 .added {
   color: green;
 }
-.removed {
+.removed, .problem {
   color: red;
 }
 code .comment {
