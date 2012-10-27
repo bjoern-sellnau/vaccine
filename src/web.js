@@ -102,7 +102,7 @@ var update = function() {
   var vaccineCompiled = currentCompiled.filter(function(d) {
     return d.name === 'vaccine.js';
   });
-  if (vaccineCompiled) {
+  if (vaccineCompiled.length) {
     vaccineCompiled = '(function() {' + vaccineCompiled[0].compiled + '})()';
     try {
       // substract the "(function(){...})()" (16 bytes)
@@ -178,11 +178,19 @@ var updateSources = function() {
   if (currentSize) {
     if (currentSize === 1) {
       var min = 'Oops!';
+      var gzip = min;
     } else {
       var min = currentSize;
+
+      // Calculated from 14 vaccine variations applied to converted
+      // underscore (see jakesandlund/underscore branch gzip-sizes).
+      var gzip = 7.976827711761272 + 0.4496433129841989 * min;
+      gzip = 5 * Math.round(gzip / 5);  // To the nearest 5
     }
-    var sizeText = '<span class="number">' + min + '</span> bytes minified';
-    sources.select('#sizes').html(sizeText);
+    var sizeHtml = '<span class="number">' + min + '</span> bytes minified';
+    sizeHtml += '<span class="number">~' + gzip + '</span> bytes gzipped';
+    sizeHtml += '<span class="asterisk">*</span>';
+    sources.select('#sizes').html(sizeHtml);
   }
 };
 
@@ -214,6 +222,7 @@ var swapSaved = function() {
       size = currentSize;
   currentOptions = savedOptions;
   currentCompiled = savedCompiled;
+  currentSize = savedSize;
   savedOptions = options;
   savedCompiled = compiled;
   savedCompiledMap = makeCompiledMap(compiled);

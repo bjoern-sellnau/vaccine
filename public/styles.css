@@ -55,6 +55,13 @@ h1 {
 
 #sizes .number {
   font-size: 30px;
+  width: 90px;
+  display: inline-block;
+  text-align: right;
+}
+
+#sizes .asterisk {
+  margin-left: 2px;
 }
 
 .source .code-container {
