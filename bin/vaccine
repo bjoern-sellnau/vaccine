@@ -13,6 +13,8 @@ var optimist = require('optimist')
 
     .describe('name', "Your library's name.")
     .describe('main', "Your library's entry file.")
+    .describe('format', 'The format your library is writen in: "commonjs", ' +
+                        '"amd", or "umd"')
 
     .describe('dirs', 'The number of directory *levels* under your source ' +
                       'dir. (e.g. src/foo/*.js + src/bar/*.js + src/baz/*.js ' +
@@ -28,7 +30,6 @@ var optimist = require('optimist')
                          "and dev_server.js. vaccine.js and build.sh are default.")
 
     .describe('stdout', 'Write to stdout instead of to files.')
-    .describe('commonjs', 'Write in CommonJS format. build.sh will wrap the modules.')
     .describe('debug', 'Add debugging logs for development.')
     .describe('performance', 'Measure the load-time performance of your library.')
     .describe('dev-no-debug', "Don't add debugging for vaccine_dev.js.")
@@ -40,6 +41,7 @@ var optimist = require('optimist')
 
     .alias('name', 'n')
     .alias('main', 'm')
+    .alias('format', 'f')
     .alias('dep', 'd')
     .alias('support', 's')
     .alias('export', 'e')
@@ -49,9 +51,9 @@ var optimist = require('optimist')
 
     .demand('name')
     .demand('main')
+    .demand('format')
 
     .boolean('stdout')
-    .boolean('commonjs')
     .boolean('debug')
     .boolean('performance')
     .boolean('dev-no-debug')
@@ -86,6 +88,11 @@ argv.supports = ensureArray('support');
 argv.exports = ensureArray('export');
 
 vaccine.loadFiles();
+var problems = vaccine.validateOptions(argv);
+problems.forEach(function(problem) {
+  problem.fix();
+});
+
 var targets = vaccine(argv);
 
 if (argv.stdout) {

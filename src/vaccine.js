@@ -22,7 +22,7 @@ var macroMap = {
 var name,
     globalName,
     libraryDir,
-    commonJS,
+    format,
     performance,
     debug,
     dev,
@@ -78,26 +78,65 @@ module.exports = exports = function(options) {
   });
 };
 
+exports.validateOptions = function(opts) {
+  var problems = [];
+  var setDefault = function(option, value) {
+    var fix = function() { opts[option] = value; };
+    problems.push({type: 'default', option: option, value: value, fix: fix});
+  };
+  var maybeDefault = function(option, value) {
+    if (!opts[option]) setDefault(option, value);
+  };
+  var mismatch = function(id, fix) {
+    problems.push({type: 'mismatch', id: id, fix: fix});
+  };
+
+  var format = opts.format;
+  maybeDefault('global', opts.name);
+  maybeDefault('dependencies', []);
+  switch (format) {
+    case 'amd':
+      maybeDefault('supports', ['amd', 'window']);
+      if (!opts.exports || !opts.exports.length) {
+        setDefault('exports', ['module', 'exports', 'return']);
+      }
+      maybeDefault('targets', ['vaccine.js', 'build.sh']);
+      break;
+    case 'commonjs':
+      maybeDefault('supports', ['amd', 'window', 'commonjs']);
+      if (!opts.exports || !opts.exports.length) {
+        setDefault('exports', ['module', 'exports']);
+      }
+      maybeDefault('targets', ['vaccine.js', 'build.sh']);
+      break;
+  }
+
+  if (opts.exports && has(opts.exports, 'module') &&
+                      !has(opts.exports, 'exports')) {
+    mismatch('module-no-exports', function() {
+      opts.exports.push('exports');
+    });
+  }
+  return problems;
+}
+
 var setOptions = function(options) {
   name = options.name;
-  globalName = options.global || name;
+  globalName = options.global;
   libraryDir = options.lib;
-  commonJS = options.commonjs;
+  format = options.format;
   performance = options.performance;
   debug = options.debug;
   devDebug = !options.dev_no_debug;
   devPerformance = !options.dev_no_performance;
   useStrict = options.use_strict;
-  dependencies = options.dependencies || [];
+  dependencies = options.dependencies;
   numDeps = dependencies.length;
   depString = "['" + dependencies.join("', '") + "']";
   dirs = options.dirs;
-  supportsArray = options.supports || ['amd', 'window'];
-  exportsArray = options.exports || ['module', 'exports'];
-  targets = options.targets || ['vaccine.js', 'build.sh'];
-
-  if (exprts('module') && !exprts('exports')) exportsArray.push('exports');
-  if (!exportsArray.length) exportsArray.push('exports');
+  supportsArray = options.supports;
+  exportsArray = options.exports;
+  targets = options.targets;
 
   var cleanedMain = options.main.replace(/^\.\//, '').replace(/\.js$/, '');
   if (options.src) {
