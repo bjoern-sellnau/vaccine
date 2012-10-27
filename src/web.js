@@ -41,7 +41,7 @@ var configHolder = d3.select('#config'),
 
 var defaultOptions = {
   format: 'amd',
-  name: 'my_library_name',
+  name: 'my_lib_name',
   main: 'src/index.js',
   dependencies: ['dep_one', 'dep_two'],
   dirs: '1',
@@ -176,22 +176,47 @@ var updateSources = function() {
   sources.select('code').html(function(d) { return d.html; });
 
   if (currentSize) {
-    if (currentSize === 1) {
+    if (currentSize === 1 || diffEnabled && savedSize === 1) {
       var min = 'Oops!';
       var gzip = min;
     } else {
-      var min = currentSize;
-
-      // Calculated from 14 vaccine variations applied to converted
-      // underscore (see jakesandlund/underscore branch gzip-sizes).
-      var gzip = 7.976827711761272 + 0.4496433129841989 * min;
-      gzip = 5 * Math.round(gzip / 5);  // To the nearest 5
+      if (diffEnabled) {
+        var min = currentSize - savedSize;
+        var gzip = gzipFromMin(currentSize) - gzipFromMin(savedSize);
+      } else {
+        var min = currentSize;
+        var gzip = gzipFromMin(currentSize);
+      }
+      gzip = 5 * Math.round(gzip / 5);
     }
-    var sizeHtml = '<span class="number">' + min + '</span> bytes minified';
-    sizeHtml += '<span class="number">~' + gzip + '</span> bytes gzipped';
+    var sizeHtml = numberSpan(min) + ' bytes minified';
+    sizeHtml += numberSpan(gzip, true) + ' bytes gzipped';
     sizeHtml += '<span class="asterisk">*</span>';
     sources.select('#sizes').html(sizeHtml);
   }
+};
+
+var gzipFromMin = function(min) {
+  // Calculated from 14 vaccine variations applied to converted
+  // underscore (see jakesandlund/underscore branch gzip-sizes).
+  return 7.976827711761272 + 0.4496433129841989 * min;
+};
+
+var numberSpan = function(number, approximate) {
+  if (!diffEnabled || number === 0 || number.length) {
+    var numClass = 'number';
+  } else if (number > 0) {
+    var numClass = 'number added';
+  } else {
+    var numClass = 'number removed';
+  }
+  if (number.length) {
+    var abs = number;
+  } else {
+    var abs = Math.abs(number);
+    if (approximate) abs = '~' + abs;
+  }
+  return '<span class="' + numClass + '">' + abs + '</span>';
 };
 
 var toggleDiff = function() {

@@ -81,10 +81,10 @@ code {
   border-width: 0 0 0 20px;
 }
 
-code .added {
+.added {
   color: green;
 }
-code .removed {
+.removed {
   color: red;
 }
 code .comment {
