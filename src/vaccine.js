@@ -31,6 +31,7 @@ var name,
     useStrict,
     dependencies = [],
     depString,
+    umdDepString,
     numDeps,
     dirs,
     supportsArray,
@@ -92,13 +93,17 @@ exports.validateOptions = function(opts) {
   var setDefault = function(option, value) {
     var fix = function(options) { options[option] = value; };
     var options = [{group: option, parts: value}];
-    problems.push({type: 'default', options: options, fix: fix});
+    problems.push({options: options, fix: fix});
   };
   var maybeDefault = function(option, value) {
     if (!opts[option] || !opts[option].length) setDefault(option, value);
   };
   var mismatch = function(options, fix) {
-    problems.push({type: 'mismatch', options: options, fix: fix});
+    problems.push({options: options, fix: fix});
+  };
+  var formatMismatch = function(fmt, options, fix) {
+    options.push({group: 'format', parts: [fmt]});
+    mismatch(options, fix);
   };
 
   var format = opts.format;
@@ -123,15 +128,27 @@ exports.validateOptions = function(opts) {
   }
 
   if (maybeHas(opts.supports, 'commonjs') && format === 'amd') {
-    mismatch([{group: 'format', parts: ['amd']},
-              {group: 'supports', parts: ['commonjs']}], function(options) {
+    formatMismatch('amd', [{group: 'supports', parts: ['commonjs']}],
+          function(options) {
       remove(options.supports, 'commonjs');
     });
   }
   if (!maybeHas(opts.supports, 'commonjs') && format === 'commonjs') {
-    mismatch([{group: 'format', parts: ['commonjs']},
-              {group: 'supports', parts: ['commonjs']}], function(options) {
+    formatMismatch('commonjs', [{group: 'supports', parts: ['commonjs']}],
+          function(options) {
       options.supports.push('commonjs');
+    });
+  }
+  if (opts.supports && opts.supports.length === 1 &&
+                       opts.supports[0] === 'commonjs') {
+    mismatch([{group: 'supports', parts: ['commonjs']}], function(options) {
+      options.supports.push('window');
+    });
+  }
+  if (format === 'commonjs' && maybeHas(opts.exports, 'return')) {
+    formatMismatch('commonjs', [{group: 'exports', parts: ['return']}],
+          function(options) {
+      remove(options.exports, 'return');
     });
   }
   return problems;
@@ -164,6 +181,19 @@ var setOptions = function(options) {
     sourceDir = mainSplit.join('/') || '.';
   }
   main = cleanedMain.replace(new RegExp('^' + sourceDir + '/'), '');
+
+  if (format === 'umd') {
+    umdDepString = '[';
+    if (exprts('exports')) {
+      umdDepString += "'exports'";
+      if (exprts('module')) umdDepString += ", 'module'";
+      if (numDeps > 0) umdDepString += ', ';
+    }
+    if (numDeps > 0) {
+      umdDepString += "'" + dependencies.join("', '") + "'";
+    }
+    umdDepString += ']';
+  }
 };
 
 

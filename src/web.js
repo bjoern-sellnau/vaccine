@@ -148,14 +148,9 @@ var compile = function() {
   problems.forEach(function(problem) {
     problem.options.forEach(function(opt) {
       var group = d3.select('#' + opt.group);
-      if (!group) return;
+      if (group.empty()) return;
 
-      group.select('.title')
-          .classed('problem', true)
-        .append('span')
-          .attr('class', 'fix')
-          .text('fix')
-          .on('click', problemFixer(problem.fix));
+      problemFixer(group, problem.fix);
 
       var labels = group.selectAll('label');
       labels.each(function() {
@@ -172,12 +167,25 @@ var compile = function() {
   return vaccine(options);
 };
 
-var problemFixer = function(fix) {
-  return function() {
+var problemFixer = function(group, fix) {
+  var title = group.select('.title')
+      .classed('problem', true);
+  var span = title.select('span');
+  var fixes = [fix];
+  if (span.empty()) {
+    span = title.append('span')
+        .attr('class', 'fix')
+        .text('fix');
+  } else {
+    fixes = fixes.concat(span.on('click').fixes);
+  }
+  var fixProblem = function() {
     var options = copyCurrentOptions();
-    fix(options);
+    fixes.forEach(function(fix) { fix(options); });
     setOptions(options);
   };
+  fixProblem.fixes = fixes;
+  span.on('click', fixProblem);
 };
 
 var updateSources = function() {
@@ -302,24 +310,6 @@ var swapSaved = function() {
   updateSources();
 };
 
-var changeFormat = function() {
-  var format = this.value;
-  if (currentOptions.format === format) return;
-  var options = copyCurrentOptions();
-  options.format = format;
-  if (format === 'amd') {
-    options.exports = ['exports', 'module', 'return'];
-    options.supports = ['window', 'amd'];
-  } else {
-    options.exports = ['exports', 'module'];
-    options.supports = ['window', 'amd', 'commonjs'];
-  }
-  setOptions(options);
-};
-
-configHolder.selectAll('#format input').each(function() {
-  d3.select(this).on('click', changeFormat);
-});
 configHolder.on('click', maybeUpdate);
 configHolder.on('keyup', maybeUpdate);
 configHolder.select('#diff').on('click', toggleDiff);
