@@ -195,6 +195,9 @@ exports.validateOptions = function(opts) {
                              {group: 'exports', parts: ['return']}],
                             function(options) {
         remove(options.exports, 'return');
+        if (!options.exports.length) {
+          options.exports = ['exports'];
+        }
       });
     }
   } else {
