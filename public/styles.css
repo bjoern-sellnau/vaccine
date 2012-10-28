@@ -23,15 +23,14 @@ h1 {
 
 #main {
   max-width: 1200px;
-  margin: 0 auto;
-  background-color: white;
-  margin-bottom: 70px;
+  margin: 50px auto 70px auto;
+  position: relative;
+  z-index: 1;
 }
 
 #sources {
-  margin-top: 40px;
-  margin-left: 25px;
   min-height: 1200px;
+  margin-left: 25px;
 }
 
 .source {
@@ -117,8 +116,8 @@ code .special {
   border-width: 1px;
   border-color: #aaa;
   background-color: white;
-  z-index: 1;
   position: relative;
+  z-index: 2;
   margin-right: 10px;
 }
 
