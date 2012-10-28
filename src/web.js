@@ -100,15 +100,23 @@ var update = function() {
   configHolder.select('#save').attr('disabled', null);
   currentCompiled = compile();
   var vaccineCompiled = currentCompiled.filter(function(d) {
-    return d.name === 'vaccine.js';
+    return d.name === 'vaccine.js' || d.name === 'umd.js';
   });
   if (vaccineCompiled.length) {
-    vaccineCompiled = '(function() {' + vaccineCompiled[0].compiled + '})()';
-    try {
-      // substract the "(function(){...})()" (16 bytes)
-      currentSize = uglifyjs(vaccineCompiled).length - 16;
-    } catch (e) {
-      currentSize = 1;
+    if (vaccineCompiled[0].name === 'vaccine.js') {
+      vaccineCompiled = '(function() {' + vaccineCompiled[0].compiled + '})()';
+      try {
+        // substract the "(function(){...})()" (16 bytes)
+        currentSize = uglifyjs(vaccineCompiled).length - 16;
+      } catch (e) {
+        currentSize = 1;
+      }
+    } else { // umd.js
+      try {
+        currentSize = uglifyjs(vaccineCompiled[0].compiled).length;
+      } catch (e) {
+        currentSize = 1;
+      }
     }
   } else {
     currentSize = null;
@@ -203,7 +211,7 @@ var updateSources = function() {
       .attr('class', 'source')
       .each(function(d) {
         source = d3.select(this);
-        if (d.name === 'vaccine.js') {
+        if (d.name === 'vaccine.js' || d.name === 'umd.js') {
           var titleContainer = source.append('div')
               .attr('class', 'title-and-size');
           titleContainer.append('div')
