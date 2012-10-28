@@ -183,7 +183,7 @@ exports.validateOptions = function(opts) {
   // UMD problems
   if (format === 'umd') {
     if (!maybeOnlyHas(opts.targets, 'umd.js')) {
-      var parts = opts.targets.concat('umd.js');
+      var parts = (opts.targets || []).concat('umd.js');
       formatMismatch('umd', [{group: 'targets', parts: parts}],
           function(options) {
         options.targets = ['umd.js'];

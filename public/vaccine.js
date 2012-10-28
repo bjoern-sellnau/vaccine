@@ -98,17 +98,25 @@ var setOptions = function(options) {
 
 var update = function() {
   configHolder.select('#save').attr('disabled', null);
-  currentCompiled = compile(currentOptions);
+  currentCompiled = compile();
   var vaccineCompiled = currentCompiled.filter(function(d) {
-    return d.name === 'vaccine.js';
+    return d.name === 'vaccine.js' || d.name === 'umd.js';
   });
   if (vaccineCompiled.length) {
-    vaccineCompiled = '(function() {' + vaccineCompiled[0].compiled + '})()';
-    try {
-      // substract the "(function(){...})()" (16 bytes)
-      currentSize = uglifyjs(vaccineCompiled).length - 16;
-    } catch (e) {
-      currentSize = 1;
+    if (vaccineCompiled[0].name === 'vaccine.js') {
+      vaccineCompiled = '(function() {' + vaccineCompiled[0].compiled + '})()';
+      try {
+        // substract the "(function(){...})()" (16 bytes)
+        currentSize = uglifyjs(vaccineCompiled).length - 16;
+      } catch (e) {
+        currentSize = 1;
+      }
+    } else { // umd.js
+      try {
+        currentSize = uglifyjs(vaccineCompiled[0].compiled).length;
+      } catch (e) {
+        currentSize = 1;
+      }
     }
   } else {
     currentSize = null;
@@ -116,9 +124,20 @@ var update = function() {
   updateSources();
 };
 
-var compile = function(rawOptions) {
+var copyCurrentOptions = function() {
   var options = {};
-  Object.keys(rawOptions).forEach(function(k) { options[k] = rawOptions[k]; });
+  Object.keys(currentOptions).forEach(function(k) {
+    if (Array.isArray(currentOptions[k])) {
+      options[k] = currentOptions[k].slice();
+    } else {
+      options[k] = currentOptions[k];
+    }
+  });
+  return options;
+};
+
+var compile = function() {
+  var options = copyCurrentOptions();
   var deps = [];
   options.dependencies.split(/\W+/).forEach(function(dep) {
     if (dep) deps.push(dep);
@@ -131,7 +150,50 @@ var compile = function(rawOptions) {
   options.use_strict = debugging.indexOf('use-strict') >= 0;
   options.commonjs = options.format === 'commonjs';
 
+  var problems = vaccine.validateOptions(options);
+  d3.selectAll('.problem').classed('problem', false);
+  d3.selectAll('.fix').remove();
+  problems.forEach(function(problem) {
+    problem.options.forEach(function(opt) {
+      var group = d3.select('#' + opt.group);
+      if (group.empty()) return;
+
+      problemFixer(group, problem.fix);
+
+      var labels = group.selectAll('label');
+      labels.each(function() {
+        var label = d3.select(this),
+            input = label.select('input');
+        if (opt.parts.indexOf(input.attr('value')) >= 0) {
+          label.classed('problem', true);
+        }
+      });
+    });
+    problem.fix(options);
+  });
+
   return vaccine(options);
+};
+
+var problemFixer = function(group, fix) {
+  var title = group.select('.title')
+      .classed('problem', true);
+  var span = title.select('span');
+  var fixes = [fix];
+  if (span.empty()) {
+    span = title.append('span')
+        .attr('class', 'fix')
+        .text('fix');
+  } else {
+    fixes = fixes.concat(span.on('click').fixes);
+  }
+  var fixProblem = function() {
+    var options = copyCurrentOptions();
+    fixes.forEach(function(fix) { fix(options); });
+    setOptions(options);
+  };
+  fixProblem.fixes = fixes;
+  span.on('click', fixProblem);
 };
 
 var updateSources = function() {
@@ -149,7 +211,7 @@ var updateSources = function() {
       .attr('class', 'source')
       .each(function(d) {
         source = d3.select(this);
-        if (d.name === 'vaccine.js') {
+        if (d.name === 'vaccine.js' || d.name === 'umd.js') {
           var titleContainer = source.append('div')
               .attr('class', 'title-and-size');
           titleContainer.append('div')
@@ -167,7 +229,7 @@ var updateSources = function() {
 
   sources.exit().remove();
 
-  var order = ['vaccine.js', 'build.sh', 'Makefile',
+  var order = ['vaccine.js', 'umd.js', 'build.sh', 'Makefile',
                'vaccine_dev.js', 'dev_server.js'];
   sources.sort(function(a, b) {
     return order.indexOf(a.name) - order.indexOf(b.name);
@@ -256,20 +318,6 @@ var swapSaved = function() {
   updateSources();
 };
 
-var changeFormat = function() {
-  var amd = (this.value === 'amd' && this.checked) || !this.checked;
-  var options = getOptions();
-  if (amd) {
-    options.exports = ['exports', 'module', 'return'];
-  } else {
-    options.exports = ['exports', 'module'];
-  }
-  setOptions(options);
-};
-
-configHolder.selectAll('#format input').each(function() {
-  d3.select(this).on('click', changeFormat);
-});
 configHolder.on('click', maybeUpdate);
 configHolder.on('keyup', maybeUpdate);
 configHolder.select('#diff').on('click', toggleDiff);
@@ -5518,7 +5566,8 @@ module.exports = uglify
 define('vaccine', function(require, exports, module) {
 'use strict';
 
-var templateFiles = ['vaccine.js', 'Makefile', 'build.sh', 'dev_server.js'],
+var templateFiles = ['vaccine.js', 'Makefile', 'build.sh', 'dev_server.js',
+                     'umd.js'],
     templateText = {},
     conditionals = {};
 
@@ -5528,6 +5577,7 @@ var templateMap = {
   'build.sh': 'build.sh',
   'dev_server.js': 'dev_server.js',
   'vaccine_dev.js': 'vaccine.js',
+  'umd.js': 'umd.js',
 };
 
 var macroMap = {
@@ -5540,7 +5590,7 @@ var macroMap = {
 var name,
     globalName,
     libraryDir,
-    commonJS,
+    format,
     performance,
     debug,
     dev,
@@ -5549,6 +5599,10 @@ var name,
     useStrict,
     dependencies = [],
     depString,
+    umdDepsAmd,
+    umdDepsCommonjs,
+    umdDepsWindow,
+    umdDepsFactory,
     numDeps,
     dirs,
     supportsArray,
@@ -5561,12 +5615,30 @@ var has = function(array, item) {
   return array.indexOf(item) >= 0;
 };
 
+var maybeHas = function(array, item) {
+  if (!array) return false;
+  return has(array, item);
+};
+
+var onlyHas = function(array, item) {
+  return array.length === 1 && array[0] === item;
+};
+
+var maybeOnlyHas = function(array, item) {
+  if (!array) return false;
+  return onlyHas(array, item);
+};
+
 var exprts = function(exprtsType) {
   return has(exportsArray, exprtsType);
 };
 
 var supports = function(supportsType) {
   return has(supportsArray, supportsType);
+};
+
+var remove = function(array, item) {
+  array.splice(array.indexOf(item), 1);
 };
 
 module.exports = exports = function(options) {
@@ -5596,11 +5668,124 @@ module.exports = exports = function(options) {
   });
 };
 
+exports.validateOptions = function(opts) {
+  var problems = [];
+  var setDefault = function(option, value) {
+    var fix = function(options) { options[option] = value; };
+    var options = [{group: option, parts: value}];
+    problems.push({options: options, fix: fix});
+  };
+  var maybeDefault = function(option, value) {
+    if (!opts[option] || !opts[option].length) setDefault(option, value);
+  };
+  var mismatch = function(options, fix) {
+    problems.push({options: options, fix: fix});
+  };
+  var formatMismatch = function(fmt, options, fix) {
+    options.push({group: 'format', parts: [fmt]});
+    mismatch(options, fix);
+  };
+
+  var format = opts.format;
+
+  // Defaults must come first.
+  switch (format) {
+    case 'amd':
+      maybeDefault('supports', ['amd', 'window']);
+      maybeDefault('exports', ['module', 'exports', 'return']);
+      maybeDefault('targets', ['vaccine.js', 'build.sh']);
+      break;
+    case 'commonjs':
+      maybeDefault('supports', ['amd', 'window', 'commonjs']);
+      maybeDefault('exports', ['module', 'exports']);
+      maybeDefault('targets', ['vaccine.js', 'build.sh']);
+      break;
+    case 'umd':
+      maybeDefault('supports', ['amd', 'window', 'commonjs']);
+      maybeDefault('exports', ['exports']);
+      maybeDefault('targets', ['umd.js']);
+      break;
+  }
+
+  // Extraneous problems
+  if (maybeHas(opts.exports, 'module') && !maybeHas(opts.exports, 'exports')) {
+    mismatch([{group: 'exports', parts: ['module', 'exports']}],
+             function(options) {
+      options.exports.push('exports');
+    });
+  }
+  if (maybeOnlyHas(opts.supports, 'commonjs')) {
+    mismatch([{group: 'supports', parts: ['commonjs']}], function(options) {
+      options.supports.push('window');
+    });
+  }
+
+  // AMD problems
+  if (format === 'amd') {
+    if (maybeHas(opts.supports, 'commonjs')) {
+      formatMismatch('amd', [{group: 'supports', parts: ['commonjs']}],
+            function(options) {
+        remove(options.supports, 'commonjs');
+      });
+    }
+  }
+
+  // CommonJS problems
+  if (format === 'commonjs') {
+    if (!maybeHas(opts.supports, 'commonjs')) {
+      formatMismatch('commonjs', [{group: 'supports', parts: ['commonjs']}],
+            function(options) {
+        options.supports.push('commonjs');
+      });
+    }
+    if (maybeHas(opts.exports, 'return')) {
+      formatMismatch('commonjs', [{group: 'exports', parts: ['return']}],
+            function(options) {
+        remove(options.exports, 'return');
+      });
+    }
+  }
+
+  // UMD problems
+  if (format === 'umd') {
+    if (!maybeOnlyHas(opts.targets, 'umd.js')) {
+      var parts = (opts.targets || []).concat('umd.js');
+      formatMismatch('umd', [{group: 'targets', parts: parts}],
+          function(options) {
+        options.targets = ['umd.js'];
+      });
+    }
+    if (maybeHas(opts.supports, 'commonjs') &&
+        maybeHas(opts.exports, 'return')) {
+      formatMismatch('umd', [{group: 'supports', parts: ['commonjs']},
+                             {group: 'exports', parts: ['return']}],
+                            function(options) {
+        remove(options.exports, 'return');
+        if (!options.exports.length) {
+          options.exports = ['exports'];
+        }
+      });
+    }
+  } else {
+    if (maybeHas(opts.targets, 'umd.js')) {
+      formatMismatch(format, [{group: 'targets', parts: ['umd.js']}],
+          function(options) {
+        remove(options.targets, 'umd.js');
+        if (!options.targets.length) {
+          options.targets = ['vaccine.js', 'build.sh'];
+        }
+      });
+    }
+  }
+
+  return problems;
+}
+
 var setOptions = function(options) {
   name = options.name;
-  globalName = options.global || name;
+  globalName = options.global || options.name;
   libraryDir = options.lib;
-  commonJS = options.commonjs;
+  format = options.format;
   performance = options.performance;
   debug = options.debug;
   devDebug = !options.dev_no_debug;
@@ -5610,12 +5795,9 @@ var setOptions = function(options) {
   numDeps = dependencies.length;
   depString = "['" + dependencies.join("', '") + "']";
   dirs = options.dirs;
-  supportsArray = options.supports || ['amd', 'window'];
-  exportsArray = options.exports || ['module', 'exports'];
-  targets = options.targets || ['vaccine.js', 'build.sh'];
-
-  if (exprts('module') && !exprts('exports')) exportsArray.push('exports');
-  if (!exportsArray.length) exportsArray.push('exports');
+  supportsArray = options.supports;
+  exportsArray = options.exports;
+  targets = options.targets;
 
   var cleanedMain = options.main.replace(/^\.\//, '').replace(/\.js$/, '');
   if (options.src) {
@@ -5626,6 +5808,36 @@ var setOptions = function(options) {
     sourceDir = mainSplit.join('/') || '.';
   }
   main = cleanedMain.replace(new RegExp('^' + sourceDir + '/'), '');
+
+  if (format === 'umd') {
+
+    umdDepsAmd = '';
+    dependencies.forEach(function(dep) {
+      umdDepsAmd += ", '" + dep + "'";
+    });
+
+    umdDepsCommonjs = '';
+    dependencies.forEach(function(dep) {
+      umdDepsCommonjs += ", require('" + dep + "')";
+    });
+
+    umdDepsWindow = '';
+    dependencies.forEach(function(dep) {
+      umdDepsWindow += ', root.' + dep;
+    });
+
+    umdDepsFactory = '';
+    dependencies.forEach(function(dep) {
+      umdDepsFactory += ', ' + dep;
+    });
+
+    if (onlyHas(exportsArray, 'return')) {
+      umdDepsAmd = umdDepsAmd.slice(2);
+      umdDepsCommonjs = umdDepsCommonjs.slice(2);
+      umdDepsWindow = umdDepsWindow.slice(2);
+      umdDepsFactory = umdDepsFactory.slice(2);
+    }
+  }
 };
 
 
@@ -5694,7 +5906,7 @@ exports.loadFiles = function() {
 };
 });
 define('templates', function(require, exports, module) {
-module.exports = ({"vaccine.js":"????????????????????????????????????????????????????????????????? (performance)\n    var vaccineFirstDefineTime,\n        vaccineRequireStart,\n        vaccineRequireEnd;\n\n///////////////////////////////////////////////////////////////////////////////\n    function define(id, factory) {\n????????????????????????????????????????????????????????????????? (performance)\n      vaccineFirstDefineTime = vaccineFirstDefineTime || Date.now();\n///////////////////////////////////////////////////////////////////////////////\n??????????????????????????????????????????????????????????????????????? (debug)\n      if ((vaccineFactories || {})[$-- dirs > 1 ? 'id' : \"'./' + id\" --$]) {\n        throw 'Attempting to redefine: ' + id;\n      } else {\n        console.log('Defining: ' + id);\n      }\n///////////////////////////////////////////////////////////////////////////////\n      (vaccineFactories = vaccineFactories || {})[$-- dirs > 1 ? 'id' : \"'./' + id\" --$] = factory;\n    }\n\n\n    function require(id) {\n????????????????????????????????????????????????????????????????? (performance)\n      if (!vaccineRequireStart) {\n        vaccineRequireStart = Date.now();\n        var firstRequire = true;\n      }\n\n///////////////////////////////////////////////////////////////////////////////\n??????????????????????????????????????????????????????????????????????? (debug)\n      console.log('Resolving require as: ' + id);\n\n///////////////////////////////////////////////////////////////////////////////\n???????????????????????????????????????????????????????????????????? (dirs > 1)\n      var parts = id.split('/');\n///////////////////////////////////////////////////////////////////////////////\n?????????????????????????????????????????????????????????????? exprts('module')\n      var module = {exports: {}};\n:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n  ??????????????????????????????????????????????????????? exprts('exports')\n      var exports = {};\n  /////////////////////////////////////////////////////////////////////////\n///////////////////////////////////////////////////////////////////////////////\n\n      if (!vaccineModules[id] && !vaccineWindow[id]) {\n??????????????????????????????????????????????????????????????????????? (debug)\n        if (vaccineFactories[id]) {\n          console.log('Executing module factory: ' + id);\n        } else {\n          throw 'Missing module factory. Cannot execute: ' + id;\n        }\n///////////////////////////////////////////////////////////////////////////////\n        $-- exprts('return') ? 'vaccineModules[id] = ' : '' --$vaccineFactories[id](\n???????????????????????????????????????????????????????????????????? (dirs > 1)\n            function(reqId) {\n  ????????????????????????????????????????????????????????????????? (debug)\n              console.log('Attempting to require: ' + reqId);\n  ///////////////////////////////////////////////////////////////// (debug)\n              var matching = /(\\.?\\.\\/?)*/.exec(reqId)[0],\n                  // Some code golf to get the number of \"directories\" back.\n                  back = Math.floor(matching.replace(/\\//g, '').length/1.9 + 0.99),\n                  base;\n              if (back) {\n                base = parts.slice(0, parts.length - back).join('/');\n                if (base) base += '/';\n                reqId = base + reqId.slice(matching.length);\n              }\n              return require(reqId.replace(/\\/$/, ''));\n            }$-- exprts('exports') ? ',' : ');' --$\n:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n            $-- exprts('exports') ? 'require,' : 'require);' --$\n///////////////////////////////////////////////////////////////////////////////\n?????????????????????????????????????????????????????????????? exprts('return')\n  ???????????????????????????????????????????????????????? exprts('module')\n            module.exports, module) || module.exports;\n  :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n    ????????????????????????????????????????????????? exprts('exports')\n            exports) || exports;\n    ///////////////////////////////////////////////////////////////////\n  /////////////////////////////////////////////////////////////////////////\n:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n            $-- exprts('module') ? 'module.exports, module' : 'exports' --$);\n        vaccineModules[id] = $-- exprts('module') ? 'module.exports' : 'exports' --$;\n///////////////////////////////////////////////////////////////////////////////\n      }\n??????????????????????????????????????????????????????????????????????? (debug)\n      var moduleFoundWhere = vaccineModules[id] ? 'local' : 'window';\n      console.log('Returning required ' + moduleFoundWhere + ' module: ' + id);\n///////////////////////////////////////////////////////////////////////////////\n????????????????????????????????????????????????????????????????? (performance)\n      if (firstRequire) {\n        vaccineRequireEnd = Date.now();\n        console.log('Defined in: ' + (vaccineRequireStart - vaccineFirstDefineTime) + ' ms');\n        console.log('Executed in: ' + (vaccineRequireEnd - vaccineRequireStart) + ' ms');\n        console.log('Overall time: ' + (vaccineRequireEnd - vaccineFirstDefineTime) + ' ms');\n      }\n///////////////////////////////////////////////////////////////////////////////\n      return vaccineModules[id] || vaccineWindow[id];\n    }\n\n\n    var vaccineFactories,\n        vaccineModules = {},\n?????????????????????????????????????????????? (numDeps > 1 && supports('amd'))\n        vaccineDependencies = $-- depString --$,\n///////////////////////////////////////////////////////////////////////////////\n        vaccineWindow = window;\n\n??????????????????????????????????????????????????????????????? supports('amd')\n  ?????????????????????????????????????????????????????? supports('window')\n    if (typeof vaccineWindow.define == 'function' &&\n        vaccineWindow.define.amd) {\n  /////////////////////////////////////////////////////////////////////////\n      define('$-- name --$',\n  ????????????????????????????????????????????????????????? (numDeps === 0)\n             function() {\n  ========================================================= (numDeps === 1)\n             $-- depString --$,\n             function(vaccineSingleDep) {\n               vaccineModules.$-- dependencies[0] --$ = vaccineSingleDep;\n  :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n             vaccineDependencies,\n             function() {\n               for (var i = 0, args = arguments; i < args.length; ++i) {\n                 vaccineModules[vaccineDependencies[i]] = args[i];\n               }\n  /////////////////////////////////////////////////////////////////////////\n               return require('$-- dirs > 1 ? main : \"./\" + main --$');\n             });\n    $-- supports('window') ? '} else {' : '' --$\n///////////////////////////////////////////////////////////////////////////////\n???????????????????????????????????????????????????????????? supports('window')\n      vaccineWindow.$-- globalName --$ = require('$-- dirs > 1 ? main : \"./\" + main --$');\n    $-- supports('amd') ? '}' : '' --$\n///////////////////////////////////////////////////////////////////////////////\n????????????????????????????????????????????????????????????????????????? (dev)\n    function requireDev(main) {\n      main = main || '$-- main --$';\n      return require($-- dirs > 1 ? 'main' : \"'./' + main\" --$);\n    }\n///////////////////////////////////////////////////////////////////////////////\n","Makefile":".PHONY: build\nbuild:\n\t./build.sh > $-- name --$.js\n","build.sh":"    #!/bin/sh\n    # build with: ./build.sh > $-- name --$.js\n    echo '(function() {$-- useStrict ? '\"use strict\";' : '' --$'\n\n???????????????????????????????????????????????????????????????????? (commonJS)\n    # vaccine.js must NOT be in the source list.\n    source_dir='$-- sourceDir --$'\n\n\n    for file in $(find $source_dir -type f)\n    do\n      name=$(echo \"$file\" | sed -e \"s#^$source_dir/##\" -e 's/\\.js//')\n      echo \"define('$name', function(require, $-- exprts('module') ? 'exports, module' : 'exports' --$) {\"\n      cat $file\n      echo '});'\n    done\n:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n    cat $(find $-- sourceDir --$ -type f)   # vaccine.js must NOT be in the source list.\n///////////////////////////////////////////////////////////////////////////////\n\n    cat vaccine.js  # Must be after sources.\n    echo '}());'\n","dev_server.js":"    var sourceDir = '$-- sourceDir --$';   // Change this to... uh, your source directory.\n\n\n    var http = require('http'),\n        fs = require('fs'),\n        exec = require('child_process').exec,\n        port = 3000,\n        rootUrl = 'http://localhost:' + port,\n        server,\n        types;\n\n    types = {\n      js: 'application/javascript',\n      json: 'application/json',\n      html: 'text/html',\n      css: 'text/css',\n\n      png: 'image/png',\n      jpg: 'image/jpeg',\n      jpeg: 'image/jpeg',\n      gif: 'image/gif',\n      ico: 'image/x-icon',\n    };\n\n    server = http.createServer(function (req, res) {\n      findFile(req.url, function(err, fileBufferOrText, path) {\n        if (err) return notFound(err, req.url, res);\n        var ext = path.split('.').pop();\n        if (ext === path) ext = 'html';\n        var type = types[ext];\n        if (!type) type = 'text/plain';\n        if (path.match(new RegExp('^/' + sourceDir + '/'))) {\n          fileBufferOrText = nodeWrap(path, fileBufferOrText);\n        }\n        res.writeHead(200, {'Content-Type': type});\n        res.end(fileBufferOrText);\n      });\n    });\n\n    server.listen(port, 'localhost');\n    console.log('Serving ' + rootUrl);\n    server.on('error', console.log);\n\n    function notFound(err, path, res) {\n      console.log(err);\n      if (!path.match(/favicon\\.ico/)) console.log('404: ' + path);\n      res.writeHead(404, {'Content-Type': 'text/plain'});\n      res.end('404 Not Found\\n');\n    }\n\n    function findFile(path, callback) {\n      fs.stat('.' + path, function(err, stats) {\n        if (err) return callback(err);\n\n        if (stats.isDirectory()) {\n          findFile(path + '/index.html', callback);\n          return;\n        }\n\n        fs.readFile('.' + path, function(err, buffer) {\n          callback(err, buffer, path);\n        });\n      });\n    }\n\n    function nodeWrap(path, buffer) {\n      var prefix = new RegExp('^' + sourceDir + '/'),\n          module = path.slice(1).replace(prefix, '').replace(/\\.js$/, ''),\n          compiled;\n      compiled = 'define(\"' + module + '\", ';\n      compiled += 'function(require, $-- exprts('module') ? 'exports, module' : 'exports' --$) {\\n';\n      compiled += buffer.toString('utf8');\n      compiled += '\\n});';\n      return compiled;\n    }\n"});
+module.exports = ({"vaccine.js":"????????????????????????????????????????????????????????????????? (performance)\n    var vaccineFirstDefineTime,\n        vaccineRequireStart,\n        vaccineRequireEnd;\n\n///////////////////////////////////////////////////////////////////////////////\n    function define(id, factory) {\n????????????????????????????????????????????????????????????????? (performance)\n      vaccineFirstDefineTime = vaccineFirstDefineTime || Date.now();\n///////////////////////////////////////////////////////////////////////////////\n??????????????????????????????????????????????????????????????????????? (debug)\n      if ((vaccineFactories || {})[$-- dirs > 1 ? 'id' : \"'./' + id\" --$]) {\n        throw 'Attempting to redefine: ' + id;\n      } else {\n        console.log('Defining: ' + id);\n      }\n///////////////////////////////////////////////////////////////////////////////\n      (vaccineFactories = vaccineFactories || {})[$-- dirs > 1 ? 'id' : \"'./' + id\" --$] = factory;\n    }\n\n\n    function require(id) {\n????????????????????????????????????????????????????????????????? (performance)\n      if (!vaccineRequireStart) {\n        vaccineRequireStart = Date.now();\n        var firstRequire = true;\n      }\n\n///////////////////////////////////////////////////////////////////////////////\n??????????????????????????????????????????????????????????????????????? (debug)\n      console.log('Resolving require as: ' + id);\n\n///////////////////////////////////////////////////////////////////////////////\n???????????????????????????????????????????????????????????????????? (dirs > 1)\n      var parts = id.split('/');\n///////////////////////////////////////////////////////////////////////////////\n?????????????????????????????????????????????????????????????? exprts('module')\n      var module = {exports: {}};\n:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n  ??????????????????????????????????????????????????????? exprts('exports')\n      var exports = {};\n  /////////////////////////////////////////////////////////////////////////\n///////////////////////////////////////////////////////////////////////////////\n\n      if (!vaccineModules[id] && !vaccineWindow[id]) {\n??????????????????????????????????????????????????????????????????????? (debug)\n        if (vaccineFactories[id]) {\n          console.log('Executing module factory: ' + id);\n        } else {\n          throw 'Missing module factory. Cannot execute: ' + id;\n        }\n///////////////////////////////////////////////////////////////////////////////\n        $-- exprts('return') ? 'vaccineModules[id] = ' : '' --$vaccineFactories[id](\n???????????????????????????????????????????????????????????????????? (dirs > 1)\n            function(reqId) {\n  ????????????????????????????????????????????????????????????????? (debug)\n              console.log('Attempting to require: ' + reqId);\n  ///////////////////////////////////////////////////////////////// (debug)\n              var matching = /(\\.?\\.\\/?)*/.exec(reqId)[0],\n                  // Some code golf to get the number of \"directories\" back.\n                  back = Math.floor(matching.replace(/\\//g, '').length/1.9 + 0.99),\n                  base;\n              if (back) {\n                base = parts.slice(0, parts.length - back).join('/');\n                if (base) base += '/';\n                reqId = base + reqId.slice(matching.length);\n              }\n              return require(reqId.replace(/\\/$/, ''));\n            }$-- exprts('exports') ? ',' : ');' --$\n:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n            $-- exprts('exports') ? 'require,' : 'require);' --$\n///////////////////////////////////////////////////////////////////////////////\n?????????????????????????????????????????????????????????????? exprts('return')\n  ???????????????????????????????????????????????????????? exprts('module')\n            module.exports, module) || module.exports;\n  :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n    ????????????????????????????????????????????????? exprts('exports')\n            exports) || exports;\n    ///////////////////////////////////////////////////////////////////\n  /////////////////////////////////////////////////////////////////////////\n:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n            $-- exprts('module') ? 'module.exports, module' : 'exports' --$);\n        vaccineModules[id] = $-- exprts('module') ? 'module.exports' : 'exports' --$;\n///////////////////////////////////////////////////////////////////////////////\n      }\n??????????????????????????????????????????????????????????????????????? (debug)\n      var moduleFoundWhere = vaccineModules[id] ? 'local' : 'window';\n      console.log('Returning required ' + moduleFoundWhere + ' module: ' + id);\n///////////////////////////////////////////////////////////////////////////////\n????????????????????????????????????????????????????????????????? (performance)\n      if (firstRequire) {\n        vaccineRequireEnd = Date.now();\n        console.log('Defined in: ' + (vaccineRequireStart - vaccineFirstDefineTime) + ' ms');\n        console.log('Executed in: ' + (vaccineRequireEnd - vaccineRequireStart) + ' ms');\n        console.log('Overall time: ' + (vaccineRequireEnd - vaccineFirstDefineTime) + ' ms');\n      }\n///////////////////////////////////////////////////////////////////////////////\n      return vaccineModules[id] || vaccineWindow[id];\n    }\n\n\n    var vaccineFactories,\n        vaccineModules = {},\n?????????????????????????????????????????????? (numDeps > 1 && supports('amd'))\n        vaccineDependencies = $-- depString --$,\n///////////////////////////////////////////////////////////////////////////////\n        vaccineWindow = window;\n\n??????????????????????????????????????????????????????????????? supports('amd')\n  ?????????????????????????????????????????????????????? supports('window')\n    if (typeof vaccineWindow.define == 'function' &&\n        vaccineWindow.define.amd) {\n  /////////////////////////////////////////////////////////////////////////\n      define('$-- name --$',\n  ????????????????????????????????????????????????????????? (numDeps === 0)\n             function() {\n  ========================================================= (numDeps === 1)\n             $-- depString --$,\n             function(vaccineSingleDep) {\n               vaccineModules.$-- dependencies[0] --$ = vaccineSingleDep;\n  :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n             vaccineDependencies,\n             function() {\n               for (var i = 0, args = arguments; i < args.length; ++i) {\n                 vaccineModules[vaccineDependencies[i]] = args[i];\n               }\n  /////////////////////////////////////////////////////////////////////////\n               return require('$-- dirs > 1 ? main : \"./\" + main --$');\n             });\n    $-- supports('window') ? '} else {' : '' --$\n///////////////////////////////////////////////////////////////////////////////\n???????????????????????????????????????????????????????????? supports('window')\n      vaccineWindow.$-- globalName --$ = require('$-- dirs > 1 ? main : \"./\" + main --$');\n    $-- supports('amd') ? '}' : '' --$\n///////////////////////////////////////////////////////////////////////////////\n????????????????????????????????????????????????????????????????????????? (dev)\n    function requireDev(main) {\n      main = main || '$-- main --$';\n      return require($-- dirs > 1 ? 'main' : \"'./' + main\" --$);\n    }\n///////////////////////////////////////////////////////////////////////////////\n","Makefile":".PHONY: build\nbuild:\n\t./build.sh > $-- name --$.js\n","build.sh":"    #!/bin/sh\n    # build with: ./build.sh > $-- name --$.js\n    echo '(function() {$-- useStrict ? '\"use strict\";' : '' --$'\n\n??????????????????????????????????????????????????????? (format === 'commonjs')\n    # vaccine.js must NOT be in the source list.\n    source_dir='$-- sourceDir --$'\n\n\n    for file in $(find $source_dir -type f)\n    do\n      name=$(echo \"$file\" | sed -e \"s#^$source_dir/##\" -e 's/\\.js//')\n      echo \"define('$name', function(require, $-- exprts('module') ? 'exports, module' : 'exports' --$) {\"\n      cat $file\n      echo '});'\n    done\n:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n    cat $(find $-- sourceDir --$ -type f)   # vaccine.js must NOT be in the source list.\n///////////////////////////////////////////////////////////////////////////////\n\n    cat vaccine.js  # Must be after sources.\n    echo '}());'\n","dev_server.js":"    var sourceDir = '$-- sourceDir --$';   // Change this to... uh, your source directory.\n\n\n    var http = require('http'),\n        fs = require('fs'),\n        exec = require('child_process').exec,\n        port = 3000,\n        rootUrl = 'http://localhost:' + port,\n        server,\n        types;\n\n    types = {\n      js: 'application/javascript',\n      json: 'application/json',\n      html: 'text/html',\n      css: 'text/css',\n\n      png: 'image/png',\n      jpg: 'image/jpeg',\n      jpeg: 'image/jpeg',\n      gif: 'image/gif',\n      ico: 'image/x-icon',\n    };\n\n    server = http.createServer(function (req, res) {\n      findFile(req.url, function(err, fileBufferOrText, path) {\n        if (err) return notFound(err, req.url, res);\n        var ext = path.split('.').pop();\n        if (ext === path) ext = 'html';\n        var type = types[ext];\n        if (!type) type = 'text/plain';\n        if (path.match(new RegExp('^/' + sourceDir + '/'))) {\n          fileBufferOrText = nodeWrap(path, fileBufferOrText);\n        }\n        res.writeHead(200, {'Content-Type': type});\n        res.end(fileBufferOrText);\n      });\n    });\n\n    server.listen(port, 'localhost');\n    console.log('Serving ' + rootUrl);\n    server.on('error', console.log);\n\n    function notFound(err, path, res) {\n      console.log(err);\n      if (!path.match(/favicon\\.ico/)) console.log('404: ' + path);\n      res.writeHead(404, {'Content-Type': 'text/plain'});\n      res.end('404 Not Found\\n');\n    }\n\n    function findFile(path, callback) {\n      fs.stat('.' + path, function(err, stats) {\n        if (err) return callback(err);\n\n        if (stats.isDirectory()) {\n          findFile(path + '/index.html', callback);\n          return;\n        }\n\n        fs.readFile('.' + path, function(err, buffer) {\n          callback(err, buffer, path);\n        });\n      });\n    }\n\n    function nodeWrap(path, buffer) {\n      var prefix = new RegExp('^' + sourceDir + '/'),\n          module = path.slice(1).replace(prefix, '').replace(/\\.js$/, ''),\n          compiled;\n      compiled = 'define(\"' + module + '\", ';\n      compiled += 'function(require, $-- exprts('module') ? 'exports, module' : 'exports' --$) {\\n';\n      compiled += buffer.toString('utf8');\n      compiled += '\\n});';\n      return compiled;\n    }\n","umd.js":"    (function (root, factory) {\n?????????????????????????????????????????????????????????? supports('commonjs')\n        if (typeof exports === 'object') {\n            // CommonJS\n  ???????????????????????????????????????????????????????? exprts('module')\n            factory(exports, module$-- umdDepsCommonjs --$);\n  :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n            factory(exports$-- umdDepsCommonjs --$);\n  /////////////////////////////////////////////////////////////////////////\n///////////////////////////////////////////////////////////////////////////////\n??????????????????????????????????????????????????????????????? supports('amd')\n        $-- supports('commonjs') ? '} else ' : '' --$if (typeof define === 'function' && define.amd) {\n            // AMD. Register as an anonymous module.\n  ???????????????????????????????????????????????????????? exprts('module')\n            define(['exports', 'module'$-- umdDepsAmd --$], factory);\n  :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n    ????????????????????????????????????????????????? exprts('exports')\n            define(['exports'$-- umdDepsAmd --$], factory);\n    :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n            define([$-- umdDepsAmd --$], factory);\n    ///////////////////////////////////////////////////////////////////\n  /////////////////////////////////////////////////////////////////////////\n  ????????????????????????????????????????????????????? !supports('window')\n        }\n  /////////////////////////////////////////////////////////////////////////\n///////////////////////////////////////////////////////////////////////////////\n???????????????????????????????????????????????????????????? supports('window')\n        $-- (supports('amd') || supports('commonjs')) ? '} else {' : '' --$\n  ???????????????????????????????????????????????????????? exprts('module')\n            var _module = {exports: {}};\n  :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n    ????????????????????????????????????????????????? exprts('exports')\n            var _exports = {};\n    ///////////////////////////////////////////////////////////////////\n  /////////////////////////////////////////////////////////////////////////\n  ???????????????????????????????????????????????????????? exprts('return')\n    ????????????????????????????????????????????????? exprts('exports')\n      ???????????????????????????????????????????? exprts('module')\n            root.$-- globalName --$ = factory(_module.exports, _module$-- umdDepsWindow --$) || _module.exports;\n      :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n            root.$-- globalName --$ = factory(_exports$-- umdDepsWindow --$) || _exports;\n      /////////////////////////////////////////////////////////////\n    :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n            root.$-- globalName --$ = factory($-- umdDepsWindow --$);\n    ///////////////////////////////////////////////////////////////////\n  :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n    ?????????????????????????????????????????????????? exprts('module')\n            factory(_module.exports, _module$-- umdDepsWindow --$);\n            root.$-- globalName --$ = _module.exports;\n    :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n            factory(_exports$-- umdDepsWindow --$);\n            root.$-- globalName --$ = _exports;\n    ///////////////////////////////////////////////////////////////////\n  /////////////////////////////////////////////////////////////////////////\n        $-- (supports('amd') || supports('commonjs')) ? '}' : '' --$\n///////////////////////////////////////////////////////////////////////////////\n  ???????????????????????????????????????????????????????? exprts('module')\n    }(this, function (exports, module$-- umdDepsFactory --$) {\n  :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n    ????????????????????????????????????????????????? exprts('exports')\n    }(this, function (exports$-- umdDepsFactory --$) {\n    :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n    }(this, function ($-- umdDepsFactory --$) {\n    ///////////////////////////////////////////////////////////////////\n  /////////////////////////////////////////////////////////////////////////\n\n      // Code goes here\n\n    }));\n"});
 });
 function define(id, factory) {
   (vaccineFactories = vaccineFactories || {})['./' + id] = factory;
