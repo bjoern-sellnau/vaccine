@@ -116,16 +116,20 @@ var update = function() {
   updateSources();
 };
 
-var compile = function() {
-  var options = {},
-      current = currentOptions;
-  Object.keys(current).forEach(function(k) {
-    if (Array.isArray(current[k])) {
-      options[k] = current[k].slice();
+var copyCurrentOptions = function() {
+  var options = {};
+  Object.keys(currentOptions).forEach(function(k) {
+    if (Array.isArray(currentOptions[k])) {
+      options[k] = currentOptions[k].slice();
     } else {
-      options[k] = current[k];
+      options[k] = currentOptions[k];
     }
   });
+  return options;
+};
+
+var compile = function() {
+  var options = copyCurrentOptions();
   var deps = [];
   options.dependencies.split(/\W+/).forEach(function(dep) {
     if (dep) deps.push(dep);
@@ -140,11 +144,19 @@ var compile = function() {
 
   var problems = vaccine.validateOptions(options);
   d3.selectAll('.problem').classed('problem', false);
+  d3.selectAll('.fix').remove();
   problems.forEach(function(problem) {
     problem.options.forEach(function(opt) {
       var group = d3.select('#' + opt.group);
       if (!group) return;
-      group.select('.title').classed('problem', true);
+
+      group.select('.title')
+          .classed('problem', true)
+        .append('span')
+          .attr('class', 'fix')
+          .text('fix')
+          .on('click', problemFixer(problem.fix));
+
       var labels = group.selectAll('label');
       labels.each(function() {
         var label = d3.select(this),
@@ -154,10 +166,18 @@ var compile = function() {
         }
       });
     });
-    problem.fix();
+    problem.fix(options);
   });
 
   return vaccine(options);
+};
+
+var problemFixer = function(fix) {
+  return function() {
+    var options = copyCurrentOptions();
+    fix(options);
+    setOptions(options);
+  };
 };
 
 var updateSources = function() {
@@ -285,7 +305,8 @@ var swapSaved = function() {
 var changeFormat = function() {
   var format = this.value;
   if (currentOptions.format === format) return;
-  var options = getOptions();
+  var options = copyCurrentOptions();
+  options.format = format;
   if (format === 'amd') {
     options.exports = ['exports', 'module', 'return'];
     options.supports = ['window', 'amd'];

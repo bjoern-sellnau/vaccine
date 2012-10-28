@@ -143,6 +143,14 @@ code .special {
   margin-left: 15px;
 }
 
+.fix {
+  cursor: pointer;
+  text-decoration: underline;
+  color: green;
+  margin-left: 10px;
+  font-weight: normal;
+}
+
 #config label {
   margin-right: 6px;
   display: inline-block;
@@ -159,7 +167,7 @@ code .special {
 
 #config input[type=button],
 #config input[type=button][disabled=disabled]:hover {
-  font-size: 14px;
+  font-size: 15px;
   text-align: center;
   display: inline-block;
   background-color: #F0F0F0;
@@ -173,9 +181,8 @@ code .special {
   border-width: 1px;
   border-radius: 6px;
   border-color: #BABABA #888 #888 #BABABA;
-  padding: 2px 7px;
-  margin-left: 3px;
-  margin-right: 7px;
+  padding: 4px 8px;
+  margin-right: 12px;
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   -khtml-user-select: none;

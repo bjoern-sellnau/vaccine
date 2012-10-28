@@ -90,7 +90,7 @@ module.exports = exports = function(options) {
 exports.validateOptions = function(opts) {
   var problems = [];
   var setDefault = function(option, value) {
-    var fix = function() { opts[option] = value; };
+    var fix = function(options) { options[option] = value; };
     var options = [{group: option, parts: value}];
     problems.push({type: 'default', options: options, fix: fix});
   };
@@ -116,20 +116,23 @@ exports.validateOptions = function(opts) {
   }
 
   if (maybeHas(opts.exports, 'module') && !maybeHas(opts.exports, 'exports')) {
-    mismatch([{group: 'exports', parts: ['module', 'exports']}], function() {
-      opts.exports.push('exports');
+    mismatch([{group: 'exports', parts: ['module', 'exports']}],
+             function(options) {
+      options.exports.push('exports');
     });
   }
 
   if (maybeHas(opts.supports, 'commonjs') && format === 'amd') {
     mismatch([{group: 'format', parts: ['amd']},
-              {group: 'supports', parts: ['commonjs']}], function() {
-      remove(opts.supports, 'commonjs');
+              {group: 'supports', parts: ['commonjs']}], function(options) {
+      remove(options.supports, 'commonjs');
     });
   }
   if (!maybeHas(opts.supports, 'commonjs') && format === 'commonjs') {
     mismatch([{group: 'format', parts: ['commonjs']},
-              {group: 'supports', parts: ['commonjs']}], function() {});
+              {group: 'supports', parts: ['commonjs']}], function(options) {
+      options.supports.push('commonjs');
+    });
   }
   return problems;
 }

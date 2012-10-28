@@ -90,7 +90,7 @@ argv.exports = ensureArray('export');
 vaccine.loadFiles();
 var problems = vaccine.validateOptions(argv);
 problems.forEach(function(problem) {
-  problem.fix();
+  problem.fix(argv);
 });
 
 var targets = vaccine(argv);
