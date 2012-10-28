@@ -26,8 +26,9 @@ var optimist = require('optimist')
                         "'return', 'module' (for module.exports), and " +
                         "'exports'.")
     .describe('target', "[m] Which files to configure. Options are: " +
-                         "vaccine.js, build.sh, Makefile, vaccine_dev.js, " +
-                         "and dev_server.js. vaccine.js and build.sh are default.")
+                         "vaccine.js, umd.js, build.sh, Makefile, " +
+                         "vaccine_dev.js, and dev_server.js. vaccine.js and " +
+                         "build.sh are default.")
 
     .describe('stdout', 'Write to stdout instead of to files.')
     .describe('debug', 'Add debugging logs for development.')

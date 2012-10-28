@@ -221,7 +221,7 @@ var updateSources = function() {
 
   sources.exit().remove();
 
-  var order = ['vaccine.js', 'build.sh', 'Makefile',
+  var order = ['vaccine.js', 'umd.js', 'build.sh', 'Makefile',
                'vaccine_dev.js', 'dev_server.js'];
   sources.sort(function(a, b) {
     return order.indexOf(a.name) - order.indexOf(b.name);

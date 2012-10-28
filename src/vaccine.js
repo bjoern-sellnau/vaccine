@@ -1,6 +1,7 @@
 'use strict';
 
-var templateFiles = ['vaccine.js', 'Makefile', 'build.sh', 'dev_server.js'],
+var templateFiles = ['vaccine.js', 'Makefile', 'build.sh', 'dev_server.js',
+                     'umd.js'],
     templateText = {},
     conditionals = {};
 
@@ -10,6 +11,7 @@ var templateMap = {
   'build.sh': 'build.sh',
   'dev_server.js': 'dev_server.js',
   'vaccine_dev.js': 'vaccine.js',
+  'umd.js': 'umd.js',
 };
 
 var macroMap = {
@@ -32,6 +34,8 @@ var name,
     dependencies = [],
     depString,
     umdDepString,
+    umdFactoryCommonjs,
+    umdFactoryWindow,
     numDeps,
     dirs,
     supportsArray,
@@ -107,6 +111,8 @@ exports.validateOptions = function(opts) {
   };
 
   var format = opts.format;
+
+  // Defaults must come first.
   switch (format) {
     case 'amd':
       maybeDefault('supports', ['amd', 'window']);
@@ -118,25 +124,18 @@ exports.validateOptions = function(opts) {
       maybeDefault('exports', ['module', 'exports']);
       maybeDefault('targets', ['vaccine.js', 'build.sh']);
       break;
+    case 'umd':
+      maybeDefault('supports', ['amd', 'window', 'commonjs']);
+      maybeDefault('exports', ['exports']);
+      maybeDefault('targets', ['umd.js']);
+      break;
   }
 
+  // Extraneous problems
   if (maybeHas(opts.exports, 'module') && !maybeHas(opts.exports, 'exports')) {
     mismatch([{group: 'exports', parts: ['module', 'exports']}],
              function(options) {
       options.exports.push('exports');
-    });
-  }
-
-  if (maybeHas(opts.supports, 'commonjs') && format === 'amd') {
-    formatMismatch('amd', [{group: 'supports', parts: ['commonjs']}],
-          function(options) {
-      remove(options.supports, 'commonjs');
-    });
-  }
-  if (!maybeHas(opts.supports, 'commonjs') && format === 'commonjs') {
-    formatMismatch('commonjs', [{group: 'supports', parts: ['commonjs']}],
-          function(options) {
-      options.supports.push('commonjs');
     });
   }
   if (opts.supports && opts.supports.length === 1 &&
@@ -145,12 +144,55 @@ exports.validateOptions = function(opts) {
       options.supports.push('window');
     });
   }
-  if (format === 'commonjs' && maybeHas(opts.exports, 'return')) {
-    formatMismatch('commonjs', [{group: 'exports', parts: ['return']}],
-          function(options) {
-      remove(options.exports, 'return');
-    });
+
+  // AMD problems
+  if (format === 'amd') {
+    if (maybeHas(opts.supports, 'commonjs')) {
+      formatMismatch('amd', [{group: 'supports', parts: ['commonjs']}],
+            function(options) {
+        remove(options.supports, 'commonjs');
+      });
+    }
   }
+
+  // CommonJS problems
+  if (format === 'commonjs') {
+    if (!maybeHas(opts.supports, 'commonjs')) {
+      formatMismatch('commonjs', [{group: 'supports', parts: ['commonjs']}],
+            function(options) {
+        options.supports.push('commonjs');
+      });
+    }
+    if (maybeHas(opts.exports, 'return')) {
+      formatMismatch('commonjs', [{group: 'exports', parts: ['return']}],
+            function(options) {
+        remove(options.exports, 'return');
+      });
+    }
+  }
+
+  // UMD problems
+  if (format === 'umd') {
+    if (!opts.targets || opts.targets.length !== 1 ||
+                         opts.targets[0] !== 'umd.js') {
+      var parts = opts.targets.concat('umd.js');
+      formatMismatch('umd', [{group: 'targets', parts: parts}],
+          function(options) {
+        options.targets = ['umd.js'];
+      });
+    }
+  } else {
+    if (maybeHas(opts.targets, 'umd.js')) {
+      formatMismatch(format, [{group: 'targets', parts: ['umd.js']}],
+          function(options) {
+        remove(options.targets, 'umd.js');
+        if (!options.targets.length) {
+          options.targets = ['vaccine.js', 'build.sh'];
+        }
+      });
+    }
+  }
+
   return problems;
 }
 
@@ -183,6 +225,7 @@ var setOptions = function(options) {
   main = cleanedMain.replace(new RegExp('^' + sourceDir + '/'), '');
 
   if (format === 'umd') {
+
     umdDepString = '[';
     if (exprts('exports')) {
       umdDepString += "'exports'";
@@ -193,6 +236,12 @@ var setOptions = function(options) {
       umdDepString += "'" + dependencies.join("', '") + "'";
     }
     umdDepString += ']';
+
+    umdFactoryCommonjs = 'exports';
+    if (exprts('module')) umdFactoryCommonjs += ', module';
+    dependencies.forEach(function(dep) {
+      umdFactoryCommonjs += ", require('" + dep + "')";
+    });
   }
 };
 
