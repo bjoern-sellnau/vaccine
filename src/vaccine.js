@@ -33,9 +33,10 @@ var name,
     useStrict,
     dependencies = [],
     depString,
-    umdDepString,
-    umdFactoryCommonjs,
-    umdFactoryWindow,
+    umdDepsAmd,
+    umdDepsCommonjs,
+    umdDepsWindow,
+    umdDepsFactory,
     numDeps,
     dirs,
     supportsArray,
@@ -51,6 +52,15 @@ var has = function(array, item) {
 var maybeHas = function(array, item) {
   if (!array) return false;
   return has(array, item);
+};
+
+var onlyHas = function(array, item) {
+  return array.length === 1 && array[0] === item;
+};
+
+var maybeOnlyHas = function(array, item) {
+  if (!array) return false;
+  return onlyHas(array, item);
 };
 
 var exprts = function(exprtsType) {
@@ -138,8 +148,7 @@ exports.validateOptions = function(opts) {
       options.exports.push('exports');
     });
   }
-  if (opts.supports && opts.supports.length === 1 &&
-                       opts.supports[0] === 'commonjs') {
+  if (maybeOnlyHas(opts.supports, 'commonjs')) {
     mismatch([{group: 'supports', parts: ['commonjs']}], function(options) {
       options.supports.push('window');
     });
@@ -173,12 +182,19 @@ exports.validateOptions = function(opts) {
 
   // UMD problems
   if (format === 'umd') {
-    if (!opts.targets || opts.targets.length !== 1 ||
-                         opts.targets[0] !== 'umd.js') {
+    if (!maybeOnlyHas(opts.targets, 'umd.js')) {
       var parts = opts.targets.concat('umd.js');
       formatMismatch('umd', [{group: 'targets', parts: parts}],
           function(options) {
         options.targets = ['umd.js'];
+      });
+    }
+    if (maybeHas(opts.supports, 'commonjs') &&
+        maybeHas(opts.exports, 'return')) {
+      formatMismatch('umd', [{group: 'supports', parts: ['commonjs']},
+                             {group: 'exports', parts: ['return']}],
+                            function(options) {
+        remove(options.exports, 'return');
       });
     }
   } else {
@@ -226,22 +242,32 @@ var setOptions = function(options) {
 
   if (format === 'umd') {
 
-    umdDepString = '[';
-    if (exprts('exports')) {
-      umdDepString += "'exports'";
-      if (exprts('module')) umdDepString += ", 'module'";
-      if (numDeps > 0) umdDepString += ', ';
-    }
-    if (numDeps > 0) {
-      umdDepString += "'" + dependencies.join("', '") + "'";
-    }
-    umdDepString += ']';
-
-    umdFactoryCommonjs = 'exports';
-    if (exprts('module')) umdFactoryCommonjs += ', module';
+    umdDepsAmd = '';
     dependencies.forEach(function(dep) {
-      umdFactoryCommonjs += ", require('" + dep + "')";
+      umdDepsAmd += ", '" + dep + "'";
     });
+
+    umdDepsCommonjs = '';
+    dependencies.forEach(function(dep) {
+      umdDepsCommonjs += ", require('" + dep + "')";
+    });
+
+    umdDepsWindow = '';
+    dependencies.forEach(function(dep) {
+      umdDepsWindow += ', root.' + dep;
+    });
+
+    umdDepsFactory = '';
+    dependencies.forEach(function(dep) {
+      umdDepsFactory += ', ' + dep;
+    });
+
+    if (onlyHas(exportsArray, 'return')) {
+      umdDepsAmd = umdDepsAmd.slice(2);
+      umdDepsCommonjs = umdDepsCommonjs.slice(2);
+      umdDepsWindow = umdDepsWindow.slice(2);
+      umdDepsFactory = umdDepsFactory.slice(2);
+    }
   }
 };
 
