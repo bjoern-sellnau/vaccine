@@ -283,12 +283,15 @@ var swapSaved = function() {
 };
 
 var changeFormat = function() {
-  var amd = (this.value === 'amd' && this.checked) || !this.checked;
+  var format = this.value;
+  if (currentOptions.format === format) return;
   var options = getOptions();
-  if (amd) {
+  if (format === 'amd') {
     options.exports = ['exports', 'module', 'return'];
+    options.supports = ['window', 'amd'];
   } else {
     options.exports = ['exports', 'module'];
+    options.supports = ['window', 'amd', 'commonjs'];
   }
   setOptions(options);
 };

@@ -43,12 +43,21 @@ var has = function(array, item) {
   return array.indexOf(item) >= 0;
 };
 
+var maybeHas = function(array, item) {
+  if (!array) return false;
+  return has(array, item);
+};
+
 var exprts = function(exprtsType) {
   return has(exportsArray, exprtsType);
 };
 
 var supports = function(supportsType) {
   return has(supportsArray, supportsType);
+};
+
+var remove = function(array, item) {
+  array.splice(array.indexOf(item), 1);
 };
 
 module.exports = exports = function(options) {
@@ -106,11 +115,21 @@ exports.validateOptions = function(opts) {
       break;
   }
 
-  if (opts.exports && has(opts.exports, 'module') &&
-                      !has(opts.exports, 'exports')) {
+  if (maybeHas(opts.exports, 'module') && !maybeHas(opts.exports, 'exports')) {
     mismatch([{group: 'exports', parts: ['module', 'exports']}], function() {
       opts.exports.push('exports');
     });
+  }
+
+  if (maybeHas(opts.supports, 'commonjs') && format === 'amd') {
+    mismatch([{group: 'format', parts: ['amd']},
+              {group: 'supports', parts: ['commonjs']}], function() {
+      remove(opts.supports, 'commonjs');
+    });
+  }
+  if (!maybeHas(opts.supports, 'commonjs') && format === 'commonjs') {
+    mismatch([{group: 'format', parts: ['commonjs']},
+              {group: 'supports', parts: ['commonjs']}], function() {});
   }
   return problems;
 }
