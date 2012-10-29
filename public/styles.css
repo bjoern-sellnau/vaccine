@@ -21,16 +21,29 @@ h1 {
   padding-top: 4px;
 }
 
-#main {
+#base {
   max-width: 1200px;
   margin: 50px auto 70px auto;
   position: relative;
   z-index: 1;
 }
 
-#sources {
+#main {
   min-height: 1200px;
   margin-left: 25px;
+}
+
+#introduction {
+  margin-left: 34px;
+  font-size: 18px;
+  margin-bottom: 30px;
+  width: 704px;
+}
+
+#introduction code {
+  background-color: #eee;
+  display: inline-block;
+  padding: 2px;
 }
 
 .source {
@@ -70,7 +83,7 @@ h1 {
   width: 700px;
 }
 
-code {
+.source code {
   white-space: pre;
   font-size: 14px;
   display: block;

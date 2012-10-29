@@ -7,7 +7,7 @@
   <body>
     <a style="position: absolute; left: -12px; top: -12px; border: 0;" href="https://github.com/jakesandlund/vaccine"><img src="https://s3.amazonaws.com/github/ribbons/forkme_left_red_aa0000.png" alt="Fork me on GitHub"></a>
     <header><h1>Vaccine.js</h1></header>
-    <div id="main">
+    <div id="base">
       <div id="config">
         <div id="format" class="group">
           <div class="title">Format</div>
@@ -98,7 +98,21 @@
             vaccine.js versions with a 4.8k sized library.</div>
         </div>
       </div>
-      <div id="sources">
+      <div id="main">
+        <div id="introduction">
+<p>Vaccine generates shims to make libraries written in CommonJS or AMD
+work in the browser. The <em>vaccine.js</em> shim is configured to a
+library's specific needs, allowing it to be as small as possible by only
+including the required functionality.</p>
+<p>To use Vaccine, first set the options in the right panel as desired.
+Next, copy <em>vaccine.js</em> and <em>build.sh</em> to your library's root
+directory. When your library is ready to be built, run
+<code>sh build.sh &gt; your_built_library.js</code>.
+
+<p>For single file libraries, Vaccine has the option to configure a UMD
+template.</p>
+        </div>
+        <div id="sources"></div>
       </div>
     </div>
     <footer>Copyright 2012 Jake Sandlund</footer>
