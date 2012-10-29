@@ -36,8 +36,31 @@ h1 {
 #introduction {
   margin-left: 34px;
   font-size: 18px;
-  margin-bottom: 30px;
+  padding-bottom: 30px;
   width: 704px;
+  position: relative;
+}
+
+#introduction.hidden {
+  padding-bottom: 0;
+}
+
+#introduction.hidden .description {
+  display: none;
+}
+
+#introduction .toggle-intro {
+  position: absolute;
+  bottom: 25px;
+  right: 3px;
+  color: grey;
+  cursor: pointer;
+  text-decoration: underline;
+  font-size: 12px;
+}
+
+#introduction.hidden .toggle-intro {
+  top: -35px;
 }
 
 #introduction code {
@@ -48,7 +71,8 @@ h1 {
 
 .source {
   padding: 10px;
-  margin-bottom: 10px;
+  padding-top: 0;
+  margin-bottom: 20px;
 }
 
 .source .title {

@@ -5,7 +5,8 @@ var d3 = require('d3'),
     jsdiff = require('./jsdiff'),
     uglifyjs = require('./uglify-js'),
     vaccine = require('./vaccine'),
-    templateText = require('./templates');
+    templateText = require('./templates'),
+    firstUpdate;
 
 var prepend = function(text, pre) {
   var split = text.split('\n');
@@ -97,6 +98,7 @@ var setOptions = function(options) {
 };
 
 var update = function() {
+  if (firstUpdate) toggleIntro();
   configHolder.select('#save').attr('disabled', null);
   currentCompiled = compile();
   var vaccineCompiled = currentCompiled.filter(function(d) {
@@ -318,6 +320,20 @@ var swapSaved = function() {
   updateSources();
 };
 
+var toggleIntro = function() {
+  var intro = d3.select('#introduction'),
+      toggle = d3.select('#introduction .toggle-intro'),
+      hidden = !intro.classed('hidden');
+  intro.classed('hidden', hidden);
+  toggle.text(hidden ? 'Show Intro' : 'Hide Intro');
+  firstUpdate = false;
+};
+
+d3.select('#introduction .toggle-intro').on('click', toggleIntro);
+
+toggleIntro();
+toggleIntro();
+
 configHolder.on('click', maybeUpdate);
 configHolder.on('keyup', maybeUpdate);
 configHolder.select('#diff').on('click', toggleDiff);
@@ -327,3 +343,5 @@ configHolder.select('#swap').on('click', swapSaved);
 setOptions(defaultOptions);
 maybeUpdate();
 saveCurrent();
+
+firstUpdate = true;

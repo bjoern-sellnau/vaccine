@@ -100,6 +100,7 @@
       </div>
       <div id="main">
         <div id="introduction">
+          <div class="description">
 <p>Vaccine generates shims to make libraries written in CommonJS or AMD
 work in the browser. The <em>vaccine.js</em> shim is configured to a
 library's specific needs, allowing it to be as small as possible by only
@@ -107,10 +108,12 @@ including the required functionality.</p>
 <p>To use Vaccine, first set the options in the right panel as desired.
 Next, copy <em>vaccine.js</em> and <em>build.sh</em> to your library's root
 directory. When your library is ready to be built, run
-<code>sh build.sh &gt; your_built_library.js</code>.
+<code>sh build.sh &gt; built_lib.js</code>.
 
 <p>For single file libraries, Vaccine has the option to configure a UMD
-template.</p>
+template, which doesn't need a build.</p>
+          </div>
+          <div class="toggle-intro"></div>
         </div>
         <div id="sources"></div>
       </div>
