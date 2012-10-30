@@ -102,6 +102,28 @@ module.exports = exports = function(options) {
   });
 };
 
+var defaultForFormat = function(format) {
+  var defaults = {
+    amd: {
+      supports: ['amd', 'window'],
+      exports: ['return'],
+      targets: ['vaccine.js', 'build.sh'],
+    },
+    commonjs: {
+      supports: ['amd', 'window', 'commonjs'],
+      exports: ['module', 'exports'],
+      targets: ['vaccine.js', 'build.sh'],
+    },
+    umd: {
+      supports: ['amd', 'window', 'commonjs'],
+      exports: ['exports'],
+      targets: ['umd.js'],
+    }
+  };
+  return defaults[format];
+};
+exports.defaultForFormat = defaultForFormat;
+
 exports.validateOptions = function(opts) {
   var problems = [];
   var setDefault = function(option, value) {
@@ -123,23 +145,10 @@ exports.validateOptions = function(opts) {
   var format = opts.format;
 
   // Defaults must come first.
-  switch (format) {
-    case 'amd':
-      maybeDefault('supports', ['amd', 'window']);
-      maybeDefault('exports', ['module', 'exports', 'return']);
-      maybeDefault('targets', ['vaccine.js', 'build.sh']);
-      break;
-    case 'commonjs':
-      maybeDefault('supports', ['amd', 'window', 'commonjs']);
-      maybeDefault('exports', ['module', 'exports']);
-      maybeDefault('targets', ['vaccine.js', 'build.sh']);
-      break;
-    case 'umd':
-      maybeDefault('supports', ['amd', 'window', 'commonjs']);
-      maybeDefault('exports', ['exports']);
-      maybeDefault('targets', ['umd.js']);
-      break;
-  }
+  var fmtDefault = defaultForFormat(format);
+  maybeDefault('supports', fmtDefault.supports);
+  maybeDefault('exports', fmtDefault.exports);
+  maybeDefault('targets', fmtDefault.targets);
 
   // Extraneous problems
   if (maybeHas(opts.exports, 'module') && !maybeHas(opts.exports, 'exports')) {
@@ -176,6 +185,9 @@ exports.validateOptions = function(opts) {
       formatMismatch('commonjs', [{group: 'exports', parts: ['return']}],
             function(options) {
         remove(options.exports, 'return');
+        if (!options.exports.length) {
+          options.exports = ['module', 'exports'];
+        }
       });
     }
   }

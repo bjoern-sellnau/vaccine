@@ -40,15 +40,17 @@ var configHolder = d3.select('#config'),
     savedSize,
     diffEnabled = false;
 
+var amdFmtDefault = vaccine.defaultForFormat('amd');
+
 var defaultOptions = {
   format: 'amd',
   name: 'my_lib_name',
   main: 'src/index.js',
   dependencies: ['dep_one', 'dep_two'],
   dirs: '1',
-  targets: ['vaccine.js', 'build.sh'],
-  exports: ['exports', 'module', 'return'],
-  supports: ['amd', 'window'],
+  targets: amdFmtDefault.targets,
+  exports: amdFmtDefault.exports,
+  supports: amdFmtDefault.supports,
   debugging: [],
   src: '',
   global: '',
@@ -95,6 +97,7 @@ var setOptions = function(options) {
       this.value = current;
     }
   });
+  pickFormat(options.format);
 };
 
 var update = function() {
@@ -333,6 +336,25 @@ d3.select('#introduction .toggle-intro').on('click', toggleIntro);
 
 toggleIntro();
 toggleIntro();
+
+var changeFormat = function() {
+  var format = this.parentNode.id;
+  pickFormat(format);
+  var options = copyCurrentOptions();
+  var fmtDefault = vaccine.defaultForFormat(format);
+  options.supports = fmtDefault.supports;
+  options.exports = fmtDefault.exports;
+  options.targets = fmtDefault.targets;
+  options.format = format;
+  setOptions(options);
+};
+
+var pickFormat = function(format) {
+  d3.selectAll('.format-picker').classed('picked', false);
+  d3.select('#' + format).classed('picked', true);
+};
+
+d3.selectAll('.format-picker input').on('click', changeFormat);
 
 configHolder.on('click', maybeUpdate);
 configHolder.on('keyup', maybeUpdate);
