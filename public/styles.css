@@ -211,6 +211,7 @@ code .special {
 #config label {
   margin-right: 6px;
   display: inline-block;
+  font-style: italic;
 }
 
 #config input[type=radio], #config input[type=checkbox] {
@@ -218,8 +219,10 @@ code .special {
 }
 
 #config input[type=text] {
-  width: 230px;
+  width: 212px;
   font-size: 14px;
+  margin-bottom: 12px;
+  color: #666;
 }
 
 #config input[type=button],

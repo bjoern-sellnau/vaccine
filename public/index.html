@@ -20,29 +20,12 @@
             </div>
           </div>
         </div>
-        <div class="group">
-          <div class="title">Name</div>
+        <div id="exports" class="group">
+          <div class="title">Exports</div>
           <div class="inputs">
-            <input type="text" name="name">
-          </div>
-        </div>
-        <div class="group">
-          <div class="title">Main (entry file)</div>
-          <div class="inputs">
-            <input type="text" name="main">
-          </div>
-        </div>
-        <div class="group">
-          <div class="title">Dependencies</div>
-          <div class="inputs">
-            <input type="text" name="dependencies">
-          </div>
-        </div>
-        <div class="group">
-          <div class="title">Directory Levels</div>
-          <div class="inputs">
-            <label><input type="radio" name="dirs" value="1">one</label>
-            <label><input type="radio" name="dirs" value="10">more than one</label>
+            <label><input type="checkbox" name="exports" value="exports">exports</label>
+            <label><input type="checkbox" name="exports" value="module">module.exports</label>
+            <label><input type="checkbox" name="exports" value="return">return</label>
           </div>
         </div>
         <div id="supports" class="group">
@@ -53,12 +36,27 @@
             <label><input type="checkbox" name="supports" value="commonjs">CommonJS</label>
           </div>
         </div>
+        <div class="group">
+          <div class="title">Directory Levels</div>
+          <div class="inputs">
+            <label><input type="radio" name="dirs" value="1">one</label>
+            <label><input type="radio" name="dirs" value="10">more than one</label>
+          </div>
+        </div>
         <div class="group controls">
           <div class="title">Controls</div>
           <div class="controls">
             <input id="diff" type="button" value="Diff">
             <input id="save" type="button" value="Save">
             <input id="swap" type="button" value="Swap">
+          </div>
+        </div>
+        <div class="group">
+          <div class="title">Variables</div>
+          <div class="inputs">
+            <label>Name<input type="text" name="name"></label>
+            <label>Main (entry file)<input type="text" name="main"></label>
+            <label>Dependencies<input type="text" name="dependencies"></label>
           </div>
         </div>
         <div id="targets" class="group">
@@ -72,14 +70,6 @@
             <label><input type="checkbox" name="targets" value="dev_server.js">dev_server.js</label>
           </div>
         </div>
-        <div id="exports" class="group">
-          <div class="title">Exports</div>
-          <div class="inputs">
-            <label><input type="checkbox" name="exports" value="exports">exports</label>
-            <label><input type="checkbox" name="exports" value="module">module.exports</label>
-            <label><input type="checkbox" name="exports" value="return">return</label>
-          </div>
-        </div>
         <div class="group">
           <div class="title">Debugging</div>
           <div class="inputs">
@@ -91,8 +81,8 @@
         <div class="group">
           <div class="title">Variable Overrides</div>
           <div class="inputs">
-            <label>source directory<input type="text" name="src"></label>
-            <label>global variable name<input type="text" name="global"></label>
+            <label>Source directory<input type="text" name="src"></label>
+            <label>Global variable name<input type="text" name="global"></label>
           </div>
         </div>
         <div class="group">
