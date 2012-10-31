@@ -63,6 +63,11 @@ h1 {
   top: -35px;
 }
 
+h2 {
+  font-size: 22px;
+  font-weight: bold;
+}
+
 #introduction code {
   background-color: #eee;
   display: inline-block;
