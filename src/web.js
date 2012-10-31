@@ -75,7 +75,8 @@ var maybeUpdate = function() {
 
 var getOptions = function() {
   var options = {};
-  configHolder.selectAll('.inputs input').each(function() {
+  configHolder.selectAll('input').each(function() {
+    if (this.type === 'button') return;
     if (this.type === 'checkbox') {
       options[this.name] = options[this.name] || [];
       if (this.checked) options[this.name].push(this.value);
@@ -87,7 +88,8 @@ var getOptions = function() {
 };
 
 var setOptions = function(options) {
-  configHolder.selectAll('.inputs input').each(function() {
+  configHolder.selectAll('input').each(function() {
+    if (this.type === 'button') return;
     var current = options[this.name];
     if (this.type === 'checkbox') {
       this.checked = current.indexOf(this.value) >= 0;
@@ -97,7 +99,6 @@ var setOptions = function(options) {
       this.value = current;
     }
   });
-  pickFormat(options.format);
 };
 
 var update = function() {
@@ -183,7 +184,7 @@ var compile = function() {
 var problemFixer = function(group, fix) {
   var title = group.select('.title')
       .classed('problem', true);
-  var span = title.select('span');
+  var span = title.select('span.fix');
   var fixes = [fix];
   if (span.empty()) {
     span = title.append('span')
@@ -339,7 +340,6 @@ toggleIntro();
 
 var changeFormat = function() {
   var format = this.parentNode.id;
-  pickFormat(format);
   var options = copyCurrentOptions();
   var fmtDefault = vaccine.defaultForFormat(format);
   options.supports = fmtDefault.supports;
@@ -349,12 +349,7 @@ var changeFormat = function() {
   setOptions(options);
 };
 
-var pickFormat = function(format) {
-  d3.selectAll('.format-picker').classed('picked', false);
-  d3.select('#' + format).classed('picked', true);
-};
-
-d3.selectAll('.format-picker input').on('click', changeFormat);
+d3.selectAll('.format-picker input[type=button]').on('click', changeFormat);
 
 configHolder.on('click', maybeUpdate);
 configHolder.on('keyup', maybeUpdate);

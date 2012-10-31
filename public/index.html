@@ -10,13 +10,19 @@
     <div id="base">
       <div id="config">
         <div id="format" class="group">
-          <div class="title">Format</div>
+          <div class="title">Format <span class="hint">(buttons set default)</span></div>
           <div class="controls">
-            <div id="amd" class="format-picker"><input type="button" value="AMD"></div>
-            <div id="commonjs" class="format-picker"><input type="button" value="CommonJS"></div>
-            <div id="umd" class="format-picker"><input type="button" value="UMD"></div>
-            <div class="inputs">
-              <input type="hidden" name="format">
+            <div id="amd" class="format-picker">
+              <input type="button" value="AMD">
+              <input type="radio" name="format" value="amd">
+            </div>
+            <div id="commonjs" class="format-picker">
+              <input type="button" value="CommonJS">
+              <input type="radio" name="format" value="commonjs">
+            </div>
+            <div id="umd" class="format-picker">
+              <input type="button" value="UMD">
+              <input type="radio" name="format" value="umd">
             </div>
           </div>
         </div>

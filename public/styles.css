@@ -171,6 +171,12 @@ code .special {
   margin-bottom: 6px;
 }
 
+#config .group .hint {
+  font-weight: normal;
+  font-size: 13px;
+  margin-left: 5px;
+}
+
 #config .group.controls {
   margin-top: 50px;
   margin-bottom: 50px;
@@ -182,21 +188,16 @@ code .special {
 
 .format-picker {
   display: inline-block;
-  border-style: solid;
-  border-width: 4px;
-  border-radius: 12px;
-  border-color: white;
-  background-color: white;
-  padding-right: 1px;
 }
 
-.format-picker.picked {
-  border-color: yellow;
-  background-color: yellow;
+#config .group .format-picker input[type=radio] {
+  margin: 0 auto;
+  margin-top: 4px;
+  display: block;
 }
 
 #format .controls input[type=button] {
-  margin-right: 0;
+  margin-right: 6px;
   padding: 4px 6px;
 }
 
