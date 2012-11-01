@@ -44,6 +44,7 @@ var name,
     supportsArray,
     exportsArray,
     requireArray,
+    defineArray,
     targets,
     sourceDir,
     main;
@@ -82,6 +83,10 @@ var req = function(requireType) {
   return has(requireArray, requireType);
 };
 
+var define = function(defineType) {
+  return has(defineArray, defineType);
+};
+
 module.exports = exports = function(options) {
 
   setOptions(options);
@@ -116,18 +121,21 @@ var defaultForFormat = function(format) {
       exports: ['return'],
       targets: ['vaccine.js', 'build.sh'],
       require: ['absolute', 'single'],
+      define: [],
     },
     commonjs: {
       supports: ['amd', 'window', 'commonjs'],
       exports: ['module', 'exports'],
       targets: ['vaccine.js', 'build.sh'],
       require: ['single'],
+      define: [],
     },
     umd: {
       supports: ['amd', 'window', 'commonjs'],
       exports: ['exports'],
       targets: ['umd.js'],
       require: [],
+      define: [],
     }
   };
   return defaults[format];
@@ -166,7 +174,8 @@ exports.validateOptions = function(opts) {
   maybeDefault('supports', fmtDefault.supports);
   maybeDefault('exports', fmtDefault.exports);
   maybeDefault('targets', fmtDefault.targets);
-  maybeDefault('require', fmtDefault.require);
+  if (!opts.require) setDefault('require', fmtDefault.require);
+  if (!opts.define) setDefault('define', fmtDefault.define);
 
   // Miscellaneous problems
   if (maybeHas(opts.exports, 'module') && !maybeHas(opts.exports, 'exports')) {
@@ -180,15 +189,14 @@ exports.validateOptions = function(opts) {
       options.supports.push('window');
     });
   }
-  if (maybeOnlyHas(opts.require, 'index')) {
-    var defaultRequire = defaultForFormat(format).require;
-    mismatch([{group: 'require', parts: defaultRequire}], function(options) {
-      options.require = ['index'].concat(defaultRequire);
-    });
-  }
   if (maybeHas(opts.require, 'index') && maybeHas(opts.require, 'single')) {
     mismatch([{group: 'require', parts: ['index', 'single']}], function(options) {
       removeWithDefault(options, 'require', 'index');
+    });
+  }
+  if (maybeOnlyHas(opts.require, 'index')) {
+    mismatch([{group: 'require', parts: ['index']}], function(options) {
+      options.require.push('full');
     });
   }
 
@@ -209,6 +217,13 @@ exports.validateOptions = function(opts) {
     if (maybeHas(opts.require, 'index')) {
       mismatch([{group: 'require', parts: ['index']}], function(options) {
         removeWithDefault(options, 'require', 'index');
+      });
+    }
+  } else {
+    if (maybeHas(opts.define, 'optional_id')) {
+      formatMismatch([{group: 'define', parts: ['optional_id']}],
+          function(options) {
+        removeWithDefault(options, 'define', 'optional_id');
       });
     }
   }
@@ -259,6 +274,12 @@ exports.validateOptions = function(opts) {
         removeWithDefault(options, 'targets', 'umd.js');
       });
     }
+    if (!opts.require || !opts.require.length) {
+      var defaultRequire = defaultForFormat(format).require;
+      mismatch([{group: 'require', parts: defaultRequire}], function(options) {
+        options.require = defaultRequire;
+      });
+    }
   }
 
   return problems;
@@ -283,6 +304,7 @@ var setOptions = function(options) {
   requireArray = options.require;
   supportsArray = options.supports;
   exportsArray = options.exports;
+  defineArray = options.define;
   targets = options.targets;
 
   if (req('full') && req('single')) {

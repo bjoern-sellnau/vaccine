@@ -44,13 +44,14 @@ var amdFmtDefault = vaccine.defaultForFormat('amd');
 
 var defaultOptions = {
   format: 'amd',
-  name: 'my_lib_name',
+  name: 'my_project_name',
   main: 'src/index.js',
   dependencies: ['dep_one', 'dep_two'],
   dirs: '1',
   targets: amdFmtDefault.targets,
   exports: amdFmtDefault.exports,
   supports: amdFmtDefault.supports,
+  define: amdFmtDefault.define,
   require: amdFmtDefault.require,
   debugging: [],
   src: '',
@@ -154,8 +155,7 @@ var compile = function() {
   var debugging = options.debugging;
   options.debug = debugging.indexOf('debug') >= 0;
   options.performance = debugging.indexOf('performance') >= 0;
-  options.use_strict = debugging.indexOf('use-strict') >= 0;
-  options.commonjs = options.format === 'commonjs';
+  options.use_strict = debugging.indexOf('use_strict') >= 0;
 
   var problems = vaccine.validateOptions(options);
   d3.selectAll('.problem').classed('problem', false);
@@ -348,6 +348,7 @@ var changeFormat = function() {
   options.exports = fmtDefault.exports;
   options.targets = fmtDefault.targets;
   options.require = fmtDefault.require;
+  options.define = fmtDefault.define;
   options.format = format;
   setOptions(options);
 };

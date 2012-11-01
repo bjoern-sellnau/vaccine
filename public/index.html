@@ -10,7 +10,7 @@
     <div id="base">
       <div id="config">
         <div id="format" class="group">
-          <div class="title">Format <span class="hint">(buttons set default)</span></div>
+          <div class="title">Format <span class="hint">(buttons set to default)</span></div>
           <div class="controls">
             <div id="amd" class="format-picker">
               <input type="button" value="AMD">
@@ -32,7 +32,6 @@
             <label><input type="checkbox" name="require" value="absolute">absolute id ("my_lib/module")</label>
             <label><input type="checkbox" name="require" value="single">single relative ("./module")</label>
             <label><input type="checkbox" name="require" value="full">full relative</label>
-            <label><input type="checkbox" name="require" value="array" disabled="disabled">array ("define([requires], ...)")</label>
             <label><input type="checkbox" name="require" value="index">w/o index ("pkg/index" -&gt; "pkg")</label>
           </div>
         </div>
@@ -50,6 +49,13 @@
             <label><input type="checkbox" name="supports" value="window">window</label>
             <label><input type="checkbox" name="supports" value="amd">AMD</label>
             <label><input type="checkbox" name="supports" value="commonjs">CommonJS</label>
+          </div>
+        </div>
+        <div id="define" class="group">
+          <div class="title">Define</div>
+          <div class="inputs">
+            <label><input type="checkbox" name="define" value="optional_id">optional id</label>
+            <label><input type="checkbox" name="define" value="array" disabled="disabled">array ("define([requires], ...)")</label>
           </div>
         </div>
         <div class="group controls">
@@ -84,7 +90,7 @@
           <div class="inputs">
             <label><input type="checkbox" name="debugging" value="debug">debug</label>
             <label><input type="checkbox" name="debugging" value="performance">performance</label>
-            <label><input type="checkbox" name="debugging" value="use-strict">"use strict";</label>
+            <label><input type="checkbox" name="debugging" value="use_strict">"use strict";</label>
           </div>
         </div>
         <div class="group">

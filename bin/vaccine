@@ -29,6 +29,8 @@ var optimist = require('optimist')
                          "vaccine.js, umd.js, build.sh, Makefile, " +
                          "vaccine_dev.js, and dev_server.js. vaccine.js and " +
                          "build.sh are default.")
+    .describe('define', 'Choose how the define wrap works in AMD. Only choice ' +
+                        "is 'optional_id' or not")
 
     .describe('stdout', 'Write to stdout instead of to files.')
     .describe('debug', 'Add debugging logs for development.')
@@ -44,6 +46,7 @@ var optimist = require('optimist')
     .alias('main', 'm')
     .alias('format', 'f')
     .alias('dep', 'd')
+    .alias('define', 'def')
     .alias('support', 's')
     .alias('export', 'e')
     .alias('require', 'r')
@@ -89,6 +92,7 @@ argv.targets = ensureArray('target');
 argv.supports = ensureArray('support');
 argv.exports = ensureArray('export');
 argv.require = ensureArray('require');
+argv.define = ensureArray('define');
 
 vaccine.loadFiles();
 var problems = vaccine.validateOptions(argv);
