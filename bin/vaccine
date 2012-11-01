@@ -16,9 +16,9 @@ var optimist = require('optimist')
     .describe('format', 'The format your library is writen in: "commonjs", ' +
                         '"amd", or "umd"')
 
-    .describe('dirs', 'The number of directory *levels* under your source ' +
-                      'dir. (e.g. src/foo/*.js + src/bar/*.js + src/baz/*.js ' +
-                      'would be 2 directory levels.)')
+    .describe('require', 'The way to require external modules. Choices are: ' +
+                         "'absolute', 'single' (e. g. `./module`), " +
+                         "'full'")
     .describe('dep', "[m] Your library's dependencies.")
     .describe('support', "[m] Choose between supporting AMD, attaching to " +
                          "'window', or both (default both).")
@@ -46,6 +46,7 @@ var optimist = require('optimist')
     .alias('dep', 'd')
     .alias('support', 's')
     .alias('export', 'e')
+    .alias('require', 'r')
     .alias('target', 't')
     .alias('stdout', 'c')
     .alias('help', 'h')
@@ -87,6 +88,7 @@ argv.dependencies = ensureArray('dep');
 argv.targets = ensureArray('target');
 argv.supports = ensureArray('support');
 argv.exports = ensureArray('export');
+argv.require = ensureArray('require');
 
 vaccine.loadFiles();
 var problems = vaccine.validateOptions(argv);
