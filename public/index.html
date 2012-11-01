@@ -26,6 +26,15 @@
             </div>
           </div>
         </div>
+        <div id="require" class="group">
+          <div class="title">Require</div>
+          <div class="inputs">
+            <label><input type="checkbox" name="require" value="absolute">absolute id ("my_lib/module")</label>
+            <label><input type="checkbox" name="require" value="single">single relative ("./module")</label>
+            <label><input type="checkbox" name="require" value="full">full relative</label>
+            <label><input type="checkbox" name="require" value="array" disabled="disabled">array ("define([requires], ...)")</label>
+          </div>
+        </div>
         <div id="exports" class="group">
           <div class="title">Exports</div>
           <div class="inputs">
@@ -40,13 +49,6 @@
             <label><input type="checkbox" name="supports" value="window">window</label>
             <label><input type="checkbox" name="supports" value="amd">AMD</label>
             <label><input type="checkbox" name="supports" value="commonjs">CommonJS</label>
-          </div>
-        </div>
-        <div class="group">
-          <div class="title">Directory Levels</div>
-          <div class="inputs">
-            <label><input type="radio" name="dirs" value="1">one</label>
-            <label><input type="radio" name="dirs" value="10">more than one</label>
           </div>
         </div>
         <div class="group controls">
@@ -101,7 +103,7 @@
         <div id="introduction">
           <div class="description">
             <h2>Configurable shims for modular JavaScript</h2>
-<p>Vaccine generates shims to make CommonJS or AMD modules
+<p>Vaccine generates shims to make CommonJS (Node.js) or AMD modules
 work in the browser. Configurability makes the shims small
 by only including the required functionality. A small size is important
 for libraries (and some applications).</p>

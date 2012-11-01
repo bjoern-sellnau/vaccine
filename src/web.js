@@ -51,6 +51,7 @@ var defaultOptions = {
   targets: amdFmtDefault.targets,
   exports: amdFmtDefault.exports,
   supports: amdFmtDefault.supports,
+  require: amdFmtDefault.require,
   debugging: [],
   src: '',
   global: '',
@@ -345,6 +346,7 @@ var changeFormat = function() {
   options.supports = fmtDefault.supports;
   options.exports = fmtDefault.exports;
   options.targets = fmtDefault.targets;
+  options.require = fmtDefault.require;
   options.format = format;
   setOptions(options);
 };

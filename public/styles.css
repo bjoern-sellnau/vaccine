@@ -198,6 +198,8 @@ code .special {
 #config .group .format-picker input[type=radio] {
   margin: 0 auto;
   margin-top: 4px;
+  position: relative;
+  left: -2px;
   display: block;
 }
 

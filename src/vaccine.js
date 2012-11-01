@@ -115,7 +115,7 @@ var defaultForFormat = function(format) {
       supports: ['amd', 'window'],
       exports: ['return'],
       targets: ['vaccine.js', 'build.sh'],
-      require: ['absolute'],
+      require: ['absolute', 'single'],
     },
     commonjs: {
       supports: ['amd', 'window', 'commonjs'],
@@ -180,13 +180,6 @@ exports.validateOptions = function(opts) {
       options.supports.push('window');
     });
   }
-  ['single', 'absolute'].forEach(function(other) {
-    if (maybeHas(opts.require, 'full') && maybeHas(opts.require, other)) {
-      mismatch([{group: 'require', parts: ['full', other]}], function(options) {
-        remove(options.require, other);
-      });
-    }
-  });
 
   // AMD problems
   if (format === 'amd') {
@@ -275,6 +268,14 @@ var setOptions = function(options) {
   supportsArray = options.supports;
   exportsArray = options.exports;
   targets = options.targets;
+
+  if (req('full') && req('single')) {
+    remove(requireArray, 'single');
+  }
+  if (req('full') && req('absolute')) {
+    remove(requireArray, 'absolute');
+  }
+
 
   var cleanedMain = options.main.replace(/^\.\//, '').replace(/\.js$/, '');
   if (options.src) {
