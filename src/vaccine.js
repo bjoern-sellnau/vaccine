@@ -180,6 +180,17 @@ exports.validateOptions = function(opts) {
       options.supports.push('window');
     });
   }
+  if (maybeOnlyHas(opts.require, 'index')) {
+    var defaultRequire = defaultForFormat(format).require;
+    mismatch([{group: 'require', parts: defaultRequire}], function(options) {
+      options.require = ['index'].concat(defaultRequire);
+    });
+  }
+  if (maybeHas(opts.require, 'index') && maybeHas(opts.require, 'single')) {
+    mismatch([{group: 'require', parts: ['index', 'single']}], function(options) {
+      removeWithDefault(options, 'require', 'index');
+    });
+  }
 
   // AMD problems
   if (format === 'amd') {
@@ -193,6 +204,11 @@ exports.validateOptions = function(opts) {
       formatMismatch([{group: 'require', parts: ['single']}],
           function(options) {
         options.require.push('absolute');
+      });
+    }
+    if (maybeHas(opts.require, 'index')) {
+      mismatch([{group: 'require', parts: ['index']}], function(options) {
+        removeWithDefault(options, 'require', 'index');
       });
     }
   }

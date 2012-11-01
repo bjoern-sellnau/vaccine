@@ -167,11 +167,12 @@ var compile = function() {
 
       problemFixer(group, problem.fix);
 
-      var labels = group.selectAll('label');
+      var labels = group.selectAll('label, .format-picker');
       labels.each(function() {
         var label = d3.select(this),
             input = label.select('input');
-        if (opt.parts.indexOf(input.attr('value')) >= 0) {
+        // toLowerCase allows for the use of the values format buttons.
+        if (opt.parts.indexOf(input.attr('value').toLowerCase()) >= 0) {
           label.classed('problem', true);
         }
       });

@@ -15,7 +15,8 @@
         console.log('Defining: ' + id);
       }
 ///////////////////////////////////////////////////////////////////////////////
-      (vaccineFactories = vaccineFactories || {})[$-- commonjs && req('single') ? "'./' + id" : 'id' --$] = factory;
+      (vaccineFactories = vaccineFactories || {}
+      )[$-- commonjs && req('single') ? "'./' + id" : (req('index') ? "id.replace(/\\/index$/, '')" : 'id') --$] = factory;
     }
 
 

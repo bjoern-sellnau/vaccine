@@ -126,9 +126,12 @@ h2 {
 .added {
   color: green;
 }
-.removed, .problem {
+.removed,
+.problem,
+.format-picker.problem input[type=button] {
   color: red;
 }
+
 code .comment {
   color: green;
 }
