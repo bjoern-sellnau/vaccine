@@ -190,6 +190,18 @@ code .special {
   margin-bottom: 50px;
 }
 
+#diff {
+  padding: 9px 13px;
+  margin-left: 2px;
+  margin-top: 10px;
+  font-size: 18px;
+}
+
+#diff em {
+  font-size: 24px;
+  margin-right: 4px;
+}
+
 #config .group .inputs, #config .group .controls {
   margin-left: 15px;
 }
@@ -236,6 +248,7 @@ code .special {
   color: #666;
 }
 
+.button,
 #config input[type=button],
 #config input[type=button][disabled=disabled]:hover {
   font-size: 15px;
@@ -266,10 +279,12 @@ code .special {
   cursor: default;
 }
 
+.button:hover,
 #config input[type=button]:hover {
   background: #CFCFCF;
 }
 
+.button.active,
 #config input[type=button].active {
   background-color: #2C9CAF;
   background-image: -ms-linear-gradient(top, #2C9CAF, #237B8B);
