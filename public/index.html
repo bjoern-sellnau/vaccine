@@ -27,7 +27,7 @@
           </div>
         </div>
         <div id="require" class="group">
-          <div class="title">Require</div>
+          <div class="title">Require <span class="hint">other modules</span></div>
           <div class="inputs">
             <label><input type="checkbox" name="require" value="absolute">absolute id ("my_lib/module")</label>
             <label><input type="checkbox" name="require" value="single">single relative ("./module")</label>
@@ -36,7 +36,7 @@
           </div>
         </div>
         <div id="exports" class="group">
-          <div class="title">Exports</div>
+          <div class="title">Export <span class="hint">a module's API</span></div>
           <div class="inputs">
             <label><input type="checkbox" name="exports" value="exports">exports</label>
             <label><input type="checkbox" name="exports" value="module">module.exports</label>
@@ -44,7 +44,7 @@
           </div>
         </div>
         <div id="supports" class="group">
-          <div class="title">Supports</div>
+          <div class="title">Supports <span class="hint">these environments</span></div>
           <div class="inputs">
             <label><input type="checkbox" name="supports" value="window">window</label>
             <label><input type="checkbox" name="supports" value="amd">AMD</label>
@@ -52,7 +52,7 @@
           </div>
         </div>
         <div id="define" class="group">
-          <div class="title">Define</div>
+          <div class="title">Define <span class="hint">(AMD)</span></div>
           <div class="inputs">
             <label><input type="checkbox" name="define" value="optional_id">optional id ("define(id?, ...)")</label>
             <label><input type="checkbox" name="define" value="array" disabled="disabled">array ("define([requires], ...)")</label>
@@ -67,7 +67,7 @@
           </div>
         </div>
         <div class="group">
-          <div class="title">Variables</div>
+          <div class="title">Project Variables</div>
           <div class="inputs">
             <label>Name<input type="text" name="name"></label>
             <label>Main (entry file)<input type="text" name="main"></label>
