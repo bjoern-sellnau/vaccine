@@ -1,7 +1,36 @@
 Vaccine
 =======
 
-I'll fix up the README soon. For now, check out [www.vaccinejs.com](http://www.vaccinejs.com)!
+For an introduction to Vaccine, check out [www.vaccinejs.com](http://www.vaccinejs.com)!
+
+Some things that the intro doesn't cover:
+
+You can also install vaccine with npm with `npm install -g vaccine`. That way
+you don't need to copy from the website. Run `vaccine --help` for info on
+the options.
+
+In case it wasn't clear in the intro, you can develop with separate script
+tags, like so:
+
+```html
+<!-- Must be before sources -->
+<script src="/vaccine_dev.js"></script>
+
+<!-- Sources can be in any order -->
+<script src="/src/underscore.js"></script>
+<script src="/src/underscore/arrays.js"></script>
+<script src="/src/underscore/collections.js"></script>
+<script src="/src/underscore/each.js"></script>
+<script src="/src/underscore/functions.js"></script>
+<script src="/src/underscore/objects.js"></script>
+<script src="/src/underscore/utils.js"></script>
+
+<!-- Get the main exports with "requireDev()" -->
+<script>_ = requireDev();</script>
+```
+
+You can also use the `dev_server.js` to wrap CommonJS modules for the
+browser.
 
 LICENSE
 -------
