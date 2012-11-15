@@ -33,6 +33,14 @@ h1 {
   margin-left: 25px;
 }
 
+#easydemo {
+  z-index: 3;
+}
+
+#demo-text {
+  display: none;
+}
+
 #introduction {
   margin-left: 34px;
   font-size: 18px;

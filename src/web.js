@@ -6,6 +6,7 @@ var d3 = require('d3'),
     uglifyjs = require('./uglify-js'),
     vaccine = require('./vaccine'),
     templateText = require('./templates'),
+    demo = require('./demo'),
     firstUpdate;
 
 var prepend = function(text, pre) {
@@ -56,6 +57,11 @@ var defaultOptions = {
   debugging: [],
   src: '',
   global: '',
+};
+
+var updateWithOptions = function(options) {
+  setOptions(options);
+  maybeUpdate();
 };
 
 var maybeUpdate = function() {
@@ -361,8 +367,9 @@ configHolder.select('#diff').on('click', toggleDiff);
 configHolder.select('#save').on('click', saveCurrent);
 configHolder.select('#swap').on('click', swapSaved);
 
-setOptions(defaultOptions);
-maybeUpdate();
+updateWithOptions(defaultOptions);
 saveCurrent();
 
 firstUpdate = true;
+
+demo(updateWithOptions, defaultOptions);
