@@ -12,6 +12,10 @@
   box-shadow: 2px 2px 8px 3px #888;
 }
 
+#easydemo.unfocused {
+  opacity: 0.6;
+}
+
 #easydemo .header {
   height: 30px;
   cursor: move;

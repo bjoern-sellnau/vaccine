@@ -4,7 +4,7 @@ var d3 = require('d3'),
 
 module.exports = function(w) {
   web = w;
-  easydemo.start();
+  easydemo.start('Vaccine.js', states);
 };
 
 var updateWith = function(options) {
@@ -110,6 +110,3 @@ var states = [
 d3.selectAll('#demo-text > p').each(function(d, i) {
   states[i].text = this.innerHTML;
 });
-
-easydemo.title('Vaccine.js');
-easydemo.states(states);

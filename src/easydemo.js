@@ -54,6 +54,7 @@
       activeState = {p: {}},
       currentState = {p: {}},
       infoEnds = [createDiv(), createDiv()],
+      justFocused,
       changingStates,
       states,
       sameStateTimer,
@@ -88,10 +89,9 @@
   demoBox.appendChild(header);
   demoBox.appendChild(infoBoxContainer);
 
-  easydemo.states = function(s) { states = s; };
-  easydemo.title = function(t) { title.innerHTML = t; };
-
-  easydemo.start = function() {
+  easydemo.start = function(t, s) {
+    title.innerHTML = t;
+    states = s;
     infoBox.innerHTML = '';
     infoBox.appendChild(infoEnds[0]);
 
@@ -102,6 +102,7 @@
       s.p = p;
       s.index = i;
       p.innerHTML = s.text;
+      s.signals = (s.signals || []).map(function(s) { return {info: s}; });
       var signalButtons = p.getElementsByTagName('signal');
       signalButtons = Array.prototype.slice.call(signalButtons);
       signalButtons.forEach(function(button, i) {
@@ -113,6 +114,7 @@
 
     infoBox.appendChild(infoEnds[1]);
     currentState = states[0];
+    changeState();
     show();
   };
 
@@ -147,12 +149,8 @@
   var setState = function(state) {
     var delay = get(state, 'delay');
     if (scrollEndTimer) window.clearTimeout(scrollEndTimer);
-    if (!changingStates) {
-      if (!delay) {
-        changeState();
-      } else {
-        scrollEndTimer = window.setTimeout(changeState, delay);
-      }
+    if (!changingStates && delay) {
+      scrollEndTimer = window.setTimeout(changeState, delay);
     }
 
     if (state === currentState) return;
@@ -163,7 +161,11 @@
     if (sameStateTimer) window.clearTimeout(sameStateTimer);
     currentState = state;
     if (!changingStates) {
-      sameStateTimer = window.setTimeout(changeState, get(state, 'sameDelay'));
+      if (delay) {
+        sameStateTimer = window.setTimeout(changeState, get(state, 'sameDelay'));
+      } else {
+        changeState();
+      }
     }
   };
 
@@ -186,7 +188,7 @@
 
   var exitFinished = function() {
     var nowSignals = (currentState.signals || []).filter(function(s) {
-      return !get(s, 'finished');
+      return !get(s.info, 'finished');
     });
     nowSignals.forEach(setSignal);
 
@@ -199,7 +201,7 @@
 
   var enterFinished = function() {
     var finishedSignals = (currentState.signals || []).filter(function(s) {
-      return get(s, 'finished');
+      return get(s.info, 'finished');
     });
     finishedSignals.forEach(setSignal);
     changingStates = false;
@@ -215,13 +217,13 @@
     });
   };
 
-  var setSignal = function(signalInfo) {
-    var under = get(signalInfo, 'under'),
-        x = isNaN(signalInfo.left) ? 'right' : 'left',
-        y = isNaN(signalInfo.top) ? 'bottom' : 'top',
+  var setSignal = function(signal) {
+    var under = get(signal.info, 'under'),
+        x = isNaN(signal.info.left) ? 'right' : 'left',
+        y = isNaN(signal.info.top) ? 'bottom' : 'top',
         underNodes = document.querySelectorAll(under);
 
-    signalInfo.signalNodes = [];
+    signal.signalNodes = [];
 
     underNodes = Array.prototype.slice.call(underNodes);
     underNodes.forEach(function(underNode) {
@@ -230,11 +232,11 @@
           underPosition = window.getComputedStyle(underNode).position;
       if (underPosition === 'static') underNode.style.position = 'relative';
       sigNode.className = 'easydemo-signal';
-      sigNode.style[x] = signalInfo[x] + 'px';
-      sigNode.style[y] = signalInfo[y] + 'px';
+      sigNode.style[x] = signal.info[x] + 'px';
+      sigNode.style[y] = signal.info[y] + 'px';
       sigNode.appendChild(div);
       underNode.appendChild(sigNode);
-      signalInfo.signalNodes.push(sigNode);
+      signal.signalNodes.push(sigNode);
     });
   };
 
@@ -402,6 +404,14 @@
     return [posx, posy];
   };
 
+  var unfocus = function() {
+    if (justFocused) {
+      justFocused = false;
+    } else {
+      demoBox.classList.add('unfocused');
+    }
+  };
+
   header.onmousedown = updateBoxBy({x: 1, y: 1});
   leftResize.onmousedown = updateBoxBy({x: 1, width: -1});
   rightResize.onmousedown = updateBoxBy({width: 1});
@@ -414,6 +424,19 @@
   openCloseArrow.onclick = toggleInfoBox;
   previousArrow.onclick = function() { moveStateDelta(-1); };
   nextArrow.onclick = function() { moveStateDelta(+1); };
+  demoBox.onmousedown = function() {
+    demoBox.classList.remove('unfocused');
+    justFocused = true;
+  };
+  document.addEventListener('mousedown', unfocus);
+
+  document.addEventListener('keydown', function(e) {
+    if (e.keyCode === 9) unfocus();     // Tab
+    if (!demoBox.classList.contains('unfocused')) {
+      if (e.keyCode === 39) moveStateDelta(+1);   // Right arrow
+      if (e.keyCode === 37) moveStateDelta(-1);   // Left arrow
+    }
+  });
   closeCross.onclick = close;
 
   window.easydemo = easydemo;
