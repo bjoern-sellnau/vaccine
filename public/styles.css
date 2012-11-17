@@ -37,6 +37,10 @@ h1 {
   z-index: 3;
 }
 
+.easydemo-signal {
+  z-index: 3;
+}
+
 #demo-text {
   display: none;
 }

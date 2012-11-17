@@ -7,7 +7,7 @@ var d3 = require('d3'),
     vaccine = require('./vaccine'),
     templateText = require('./templates'),
     demo = require('./demo'),
-    firstUpdate;
+    web = {};
 
 var prepend = function(text, pre) {
   var split = text.split('\n');
@@ -58,11 +58,13 @@ var defaultOptions = {
   src: '',
   global: '',
 };
+web.defaultOptions = defaultOptions;
 
 var updateWithOptions = function(options) {
   setOptions(options);
   maybeUpdate();
 };
+web.updateWithOptions = updateWithOptions;
 
 var maybeUpdate = function() {
   var options = getOptions();
@@ -110,7 +112,6 @@ var setOptions = function(options) {
 };
 
 var update = function() {
-  if (firstUpdate) toggleIntro();
   configHolder.select('#save').attr('disabled', null);
   currentCompiled = compile();
   var vaccineCompiled = currentCompiled.filter(function(d) {
@@ -295,11 +296,14 @@ var numberSpan = function(number, approximate) {
   return '<span class="' + numClass + '">' + abs + '</span>';
 };
 
-var toggleDiff = function() {
-  diffEnabled = !diffEnabled;
+var toggleDiff = function() { setDiff(!diffEnabled); };
+
+var setDiff = function(enabled) {
+  diffEnabled = enabled;
   configHolder.select('#diff').classed('active', diffEnabled);
   updateSources();
 };
+web.setDiff = setDiff;
 
 var makeCompiledMap = function(compiled) {
   var map = {};
@@ -315,6 +319,7 @@ var saveCurrent = function() {
   configHolder.select('#save').attr('disabled', 'disabled');
   if (diffEnabled) updateSources();
 };
+web.saveCurrent = saveCurrent;
 
 var swapSaved = function() {
   if (!savedOptions) return;
@@ -331,20 +336,6 @@ var swapSaved = function() {
   setOptions(currentOptions);
   updateSources();
 };
-
-var toggleIntro = function() {
-  var intro = d3.select('#introduction'),
-      toggle = d3.select('#introduction .toggle-intro'),
-      hidden = !intro.classed('hidden');
-  intro.classed('hidden', hidden);
-  toggle.text(hidden ? 'Show Intro' : 'Hide Intro');
-  firstUpdate = false;
-};
-
-d3.select('#introduction .toggle-intro').on('click', toggleIntro);
-
-toggleIntro();
-toggleIntro();
 
 var changeFormat = function() {
   var format = this.parentNode.id;
@@ -372,4 +363,4 @@ saveCurrent();
 
 firstUpdate = true;
 
-demo(updateWithOptions, defaultOptions);
+demo(web);

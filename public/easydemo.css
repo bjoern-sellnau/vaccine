@@ -166,10 +166,14 @@
 signal {
   display: inline;
   border-style: solid;
-  border-color: transparent;
   border-width: 1px;
+  border-color: #555;
   border-radius: 8px;
   padding: 0 4px;
+}
+
+p.state:hover signal {
+  border-color: #666;
 }
 
 p.state.active signal {
@@ -194,17 +198,17 @@ p.state.active signal:active {
   opacity: 0.8;
   position: absolute;
   animation-name: easydemo-pulse, easydemo-enter;
-  animation-duration: 0.8s, 0.3s;
+  animation-duration: 0.8s, 0.2s;
   animation-iteration-count: infinite, 1;
   animation-direction: alternate, normal;
   animation-timing-function: linear, ease-in;
   -webkit-animation-name: easydemo-pulse, easydemo-enter;
-  -webkit-animation-duration: 0.8s, 0.3s;
+  -webkit-animation-duration: 0.8s, 0.2s;
   -webkit-animation-iteration-count: infinite, 1;
   -webkit-animation-direction: alternate, normal;
   -webkit-animation-timing-function: linear, ease-in;
   -moz-animation-name: easydemo-pulse, easydemo-enter;
-  -moz-animation-duration: 0.8s, 0.3s;
+  -moz-animation-duration: 0.8s, 0.2s;
   -moz-animation-iteration-count: infinite, 1;
   -moz-animation-direction: alternate, normal;
   -moz-animation-timing-function: linear, ease-in;
@@ -265,10 +269,10 @@ p.state.active signal:active {
 
 @keyframes easydemo-enter {
   0% {
-    width: 24px;
-    height: 24px;
-    border-radius: 24px;
-    margin: -12px;
+    width: 16px;
+    height: 16px;
+    border-radius: 16px;
+    margin: -8px;
   }
 
   100% {
@@ -308,10 +312,10 @@ p.state.active signal:active {
 
 @-moz-keyframes easydemo-enter {
   0% {
-    width: 24px;
-    height: 24px;
-    border-radius: 24px;
-    margin: -12px;
+    width: 16px;
+    height: 16px;
+    border-radius: 16px;
+    margin: -8px;
   }
 
   100% {
@@ -351,10 +355,10 @@ p.state.active signal:active {
 
 @-webkit-keyframes easydemo-enter {
   0% {
-    width: 24px;
-    height: 24px;
-    border-radius: 24px;
-    margin: -12px;
+    width: 16px;
+    height: 16px;
+    border-radius: 16px;
+    margin: -8px;
   }
 
   100% {

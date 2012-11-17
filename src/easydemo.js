@@ -62,6 +62,7 @@
   easydemo.delay = 0;
   easydemo.sameDelay = 3000;
   easydemo.under = document.body;
+  easydemo.finished = true;
   easydemo.activeSignalDelay = 800;
 
   header.className = 'header';
@@ -185,7 +186,7 @@
 
   var exitFinished = function() {
     var nowSignals = (currentState.signals || []).filter(function(s) {
-      return !s.finished;
+      return !get(s, 'finished');
     });
     nowSignals.forEach(setSignal);
 
@@ -198,7 +199,7 @@
 
   var enterFinished = function() {
     var finishedSignals = (currentState.signals || []).filter(function(s) {
-      return s.finished;
+      return get(s, 'finished');
     });
     finishedSignals.forEach(setSignal);
     changingStates = false;
@@ -216,8 +217,8 @@
 
   var setSignal = function(signalInfo) {
     var under = get(signalInfo, 'under'),
-        x = signalInfo.left ? 'left' : 'right',
-        y = signalInfo.top ? 'top' : 'bottom',
+        x = isNaN(signalInfo.left) ? 'right' : 'left',
+        y = isNaN(signalInfo.top) ? 'bottom' : 'top',
         underNodes = document.querySelectorAll(under);
 
     signalInfo.signalNodes = [];
@@ -238,6 +239,7 @@
   };
 
   var setScroll = function(state) {
+    setState(state);
     var pos = height / 2,
         pHeight = state.p.offsetHeight,
         infoHeight = infoBox.clientHeight,
@@ -311,7 +313,6 @@
     if (i >= states.length) i = states.length - 1;
     if (infoBox.style.display === 'none') toggleInfoBox();
     setScroll(states[i]);
-    setState(states[i]);
   };
 
   var updatePositions = function() {

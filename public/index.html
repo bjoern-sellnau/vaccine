@@ -59,7 +59,7 @@
             <label><input type="checkbox" name="define" value="array" disabled="disabled">array ("define([requires], ...)")</label>
           </div>
         </div>
-        <div class="group controls">
+        <div id="controls" class="group controls">
           <div class="title">Controls</div>
           <div class="controls">
             <input id="save" type="button" value="Save">
@@ -108,56 +108,31 @@
         </div>
       </div>
       <div id="main">
-        <div id="introduction">
-          <div class="description">
-            <h2>Configurable shims for modular JavaScript</h2>
-<p>Vaccine generates shims to make
-<a href="http://wiki.commonjs.org/wiki/Modules/1.1">CommonJS</a>
-(<a href="http://nodejs.org/api/modules.html">Node.js</a>) or
-<a href="https://github.com/amdjs/amdjs-api/wiki/AMD">AMD</a> modules
-work in the browser. Configurability makes the shims small
-by including only the required functionality. A small size is especially
-important for libraries.</p>
-
-<p>To use Vaccine, first set the options in the right panel. The shim will
-<strong>instantly adjust</strong> to changes. Use the <em>diff</em> button to
-compare between two configurations.</p>
-
-<p>
-Next, copy <em>vaccine.js</em> and <em>build.sh</em> to your project's root
-directory. When you are ready to build, run
-<code>sh build.sh &gt; my_built_file.js</code>. Note that all source code,
-and only source code, must be in a separate directory for the tiny build
-script to work.
-
-<p>Use the <a href="https://github.com/umdjs/umd">UMD</a> template for
-single file projects&mdash;no build required.</p>
-
-<p>For development, the <em>vaccine_dev.js</em> version can be placed
-before script tags for all the modules (in any order). Call
-<code>requireDev()</code> to get the project's global.</p>
-
-<p>The name "vaccine" comes from the analogy that the shims are injected into
-the code like the virus used in a vaccine, and that they are
-a temporary treatment until the
-<a href="http://wiki.ecmascript.org/doku.php?id=harmony:modules">Harmony modules</a>
-"cure" arrives.
-</p>
-          </div>
-          <div class="toggle-intro"></div>
-        </div>
         <div id="demo-text">
 <p>Vaccine generates shims to make
 <a href="http://wiki.commonjs.org/wiki/Modules/1.1">CommonJS</a>
 (<a href="http://nodejs.org/api/modules.html">Node.js</a>) or
 <a href="https://github.com/amdjs/amdjs-api/wiki/AMD">AMD</a> modules
-work in the browser. Configurability makes the shims small
-by including only the required functionality. A small size is especially
-important for libraries.</p>
+work in the browser. The shims are configured to meet a project's specific
+needs.</p>
 
-<p>To use Vaccine, first set the options in the right panel. The shim will
-<strong>instantly adjust</strong> to changes. Use the <em>diff</em> button to
-compare between two configurations.</p>
+<p>Configurability allows the shims to be <signal>small</signal> by including
+only the required functionality. A small size is especially important for
+libraries.</p>
+
+<p>Larger projects may not be as concerned <signal>about size</signal>, but
+instead need <signal>more</signal> <signal>functionality</signal>.</p>
+
+<p>To use Vaccine, first set the options in the <signal>right panel</signal>.
+The <signal>shim</signal> will <strong>instantly adjust</strong> to
+changes.</p>
+
+<p>Certain combinations of options are not allowed, and are marked in red.
+A <signal>fix it</signal> link can be used to correct the problem.</p>
+
+<p>Use the <signal>diff button</signal> to compare between the current
+and <signal>saved</signal> configuration. The <signal>size</signal> shows
+the amount added or removed.</p>
 
 <p>
 Next, copy <em>vaccine.js</em> and <em>build.sh</em> to your project's root
