@@ -26,15 +26,14 @@ var update = function(options) {
   web.updateWithOptions(options);
 };
 
-var enterDiff = function(finished) {
-  update({});
-  web.saveCurrent();
-  web.setDiff(true);
-  update({
-    require: ['absolute'],
-    dependencies: 'dep_one',
-  });
-  finished();
+var enterDiffWith = function(options) {
+  return function(finished) {
+    update({});
+    web.saveCurrent();
+    web.setDiff(true);
+    update(options);
+    finished();
+  };
 };
 
 var exitDiff = function(finished) {
@@ -81,6 +80,12 @@ var states = [
     ],
   },
   {
+    enter: updateWith({}),
+    signals: [
+      {under: '#format', top: 0, left: 0}
+    ],
+  },
+  {
     enter: updateWith({
       format: 'commonjs',
       require: ['absolute', 'single'],
@@ -93,7 +98,10 @@ var states = [
     ],
   },
   {
-    enter: enterDiff,
+    enter: enterDiffWith({
+      require: ['absolute'],
+      dependencies: 'dep_one',
+    }),
     exit: exitDiff,
     signals: [
       {under: '#diff', top: -5, left: -5},
@@ -101,10 +109,49 @@ var states = [
       sizeSignal,
     ],
   },
-  {},
-  {},
-  {},
-  {},
+  {
+    enter: enterDiffWith({
+      name: 'datazooka',
+      main: 'src/datazooka.js',
+      dependencies: 'd3, crossfilter',
+    }),
+    exit: exitDiff,
+    signals: [
+      {under: '#variables label:first-child', top: -5, left: -5},
+      {under: '#variables label:nth-child(2)', top: -5, left: -5},
+      {under: '#variables label:nth-child(3)', top: -5, left: -5},
+    ],
+  },
+  {
+    enter: updateWith({}),
+    signals: [
+      {under: '#sources .source:first-child', top: 1, left: 1},
+      {under: '#sources .source:nth-child(2)', top: 1, left: 1},
+    ],
+  },
+  {
+    enter: updateWith({
+      format: 'umd',
+      require: [],
+      exports: ['exports'],
+      supports: ['window', 'commonjs', 'amd'],
+      targets: ['umd.js'],
+    }),
+    signals: [
+      {under: '#umd', top: 0, left: 0},
+    ],
+  },
+  {
+    enter: updateWith({
+      targets: ['vaccine_dev.js'],
+    }),
+    signals: [
+      {under: '#sources .source', top: 1, left: 1},
+    ],
+  },
+  {
+    enter: updateWith({}),
+  },
 ];
 
 d3.selectAll('#demo-text > p').each(function(d, i) {

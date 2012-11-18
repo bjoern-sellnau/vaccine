@@ -67,7 +67,7 @@
             <div class="button" id="diff"><em>Diff</em> with saved</div>
           </div>
         </div>
-        <div class="group">
+        <div class="group" id="variables">
           <div class="title">Project Variables</div>
           <div class="inputs">
             <label>Name<input type="text" name="name"></label>
@@ -127,24 +127,31 @@ instead need <signal>more</signal> <signal>functionality</signal>.</p>
 The <signal>shim</signal> will <strong>instantly adjust</strong> to
 changes.</p>
 
-<p>Certain combinations of options are not allowed, and are marked in red.
+<p>The <signal>format</signal> buttons set sensible defaults for each
+format. Aside from those buttons, all options can be selected in any
+combination.</p>
+
+<p>However, certain combinations of options do not work, and are marked in red.
 A <signal>fix it</signal> link can be used to correct the problem.</p>
 
 <p>Use the <signal>diff button</signal> to compare between the current
 and <signal>saved</signal> configuration. The <signal>size</signal> shows
 the amount added or removed.</p>
 
+<p>Enter your project's <signal>name</signal>, <signal>main file</signal>,
+and <signal>dependencies</signal> to make the shim work for your project.</p>
+
 <p>
-Next, copy <em>vaccine.js</em> and <em>build.sh</em> to your project's root
-directory. When you are ready to build, run
-<code>sh build.sh &gt; my_built_file.js</code>. Note that all source code,
-and only source code, must be in a separate directory for the tiny build
-script to work.
+After setting the options as desired, copy <signal>vaccine.js</signal> and
+<signal>build.sh</signal> to your project's root directory. When you are ready to
+build, run <code>sh build.sh &gt; my_built_file.js</code>. Note that all
+source code, and only source code, must be in a separate directory for the
+tiny build script to work.</p>
 
-<p>Use the <a href="https://github.com/umdjs/umd">UMD</a> template for
-single file projects&mdash;no build required.</p>
+<p>Use the <a href="https://github.com/umdjs/umd">UMD</a>
+<signal>format</signal> for single file projects&mdash;no build required.</p>
 
-<p>For development, the <em>vaccine_dev.js</em> version can be placed
+<p>For development, the <signal>vaccine_dev.js</signal> version can be placed
 before script tags for all the modules (in any order). Call
 <code>requireDev()</code> to get the project's global.</p>
 

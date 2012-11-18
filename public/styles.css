@@ -45,45 +45,19 @@ h1 {
   display: none;
 }
 
-#introduction {
-  margin-left: 34px;
-  font-size: 18px;
-  padding-bottom: 30px;
-  width: 704px;
-  position: relative;
-}
-
-#introduction.hidden {
-  padding-bottom: 0;
-}
-
-#introduction.hidden .description {
-  display: none;
-}
-
-#introduction .toggle-intro {
-  position: absolute;
-  bottom: 25px;
-  right: 3px;
-  color: grey;
-  cursor: pointer;
-  text-decoration: underline;
-  font-size: 12px;
-}
-
-#introduction.hidden .toggle-intro {
-  top: -35px;
-}
 
 h2 {
   font-size: 22px;
   font-weight: bold;
 }
 
-#introduction code {
-  background-color: #eee;
+#easydemo code {
   display: inline-block;
   padding: 2px;
+}
+
+#easydemo .active code {
+  background-color: #ddd;
 }
 
 .source {
