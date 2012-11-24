@@ -125,16 +125,20 @@ libraries.</p>
 <p>Larger projects may not be as concerned about size, but
 instead need more functionality.</p>
 
+<p>The canonical example of reducing size via configurability is for projects
+that have only one directory of source files (no subdirectories). Having one
+level of sources simplifies the require implementation considerably.</p>
+
 <p>To use Vaccine, first set the options in the <signal>right panel</signal>.
 The <signal>shim</signal> will <strong>instantly adjust</strong> to
 changes.</p>
 
-<p>The <signal>format</signal> buttons set sensible defaults for each
-format. Aside from those buttons, all options can be selected in any
-combination.</p>
+<p>All options can be selected in any combination. However, certain
+combinations of options do not work, and are marked in red. A <signal>fix
+it</signal> link can be used to correct the problem.</p>
 
-<p>However, certain combinations of options do not work, and are marked in red.
-A <signal>fix it</signal> link can be used to correct the problem.</p>
+<p>The <signal>defaults</signal> buttons set sensible defaults for each
+format, which helps to avoid incorrect combinations.</p>
 
 <p>Use the <signal>diff button</signal> to compare between the current
 and <signal>saved</signal> configuration. The <signal>size</signal> shows
@@ -150,8 +154,8 @@ build, run <code>sh build.sh &gt; my_built_file.js</code>. Note that all
 source code, and only source code, must be in a separate directory for the
 tiny build script to work.</p>
 
-<p>Use the <a href="https://github.com/umdjs/umd">UMD</a>
-<signal>format</signal> for single file projects&mdash;no build required.</p>
+<p>Use the <a href="https://github.com/umdjs/umd">UMD</a> format for single
+file projects&mdash;no build required.</p>
 
 <p>For development, the <signal>vaccine_dev.js</signal> version can be placed
 before script tags for all the modules (in any order). Call

@@ -26,9 +26,10 @@ var update = function(options) {
   web.updateWithOptions(options);
 };
 
-var enterDiffWith = function(options) {
+var enterDiffWith = function(options, savedOpts) {
+  savedOpts = savedOpts || {};
   return function(finished) {
-    update({});
+    update(savedOpts);
     web.saveCurrent();
     web.setDiff(true);
     update(options);
@@ -68,16 +69,24 @@ var states = [
     }),
   },
   {
-    enter: updateWith({}),
-    signals: [
-      {under: '#config', top: -4, left: -4},
-      {under: '#sources .source', top: 1, left: 1},
-    ],
+    enter: enterDiffWith({
+      format: 'commonjs',
+      require: ['single'],
+      exports: ['exports', 'module'],
+      supports: ['commonjs', 'window', 'amd'],
+    }, {
+      format: 'commonjs',
+      require: ['full'],
+      exports: ['exports', 'module'],
+      supports: ['commonjs', 'window', 'amd'],
+    }),
+    exit: exitDiff,
   },
   {
     enter: updateWith({}),
     signals: [
-      {under: '#format', top: 0, left: 0}
+      {under: '#config', top: -4, left: -4},
+      {under: '#sources .source', top: 1, left: 1},
     ],
   },
   {
@@ -90,6 +99,12 @@ var states = [
     exit: updateWith({}),
     signals: [
       {under: '.fix', top: 0, right: -7},
+    ],
+  },
+  {
+    enter: updateWith({}),
+    signals: [
+      {under: '#defaults', top: 0, left: 0}
     ],
   },
   {
@@ -132,9 +147,6 @@ var states = [
       supports: ['window', 'commonjs', 'amd'],
       targets: ['umd.js'],
     }),
-    signals: [
-      {under: '#umd', top: 0, left: 0},
-    ],
   },
   {
     enter: updateWith({
