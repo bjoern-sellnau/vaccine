@@ -66,11 +66,6 @@ var states = [
       exports: ['exports', 'module', 'return'],
       supports: ['amd', 'window'],
     }),
-    signals: [
-      sizeSignal,
-      {under: '#require', top: 0, left: -7},
-      {under: '#exports', top: 0, left: -7},
-    ],
   },
   {
     enter: updateWith({}),

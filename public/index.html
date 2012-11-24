@@ -113,15 +113,18 @@
 <a href="http://wiki.commonjs.org/wiki/Modules/1.1">CommonJS</a>
 (<a href="http://nodejs.org/api/modules.html">Node.js</a>) or
 <a href="https://github.com/amdjs/amdjs-api/wiki/AMD">AMD</a> modules
-work in the browser. The shims are configured to meet a project's specific
-needs.</p>
+work in the browser. It is similar to
+<a href="https://github.com/sstephenson/stitch">Stitch</a>, or a subset of
+<a href="https://github.com/substack/node-browserify">Browserify</a> and
+<a href="https://github.com/jrburke/almond">Almond</a>, except that Vaccine
+is configurable.</p>
 
 <p>Configurability allows the shims to be <signal>small</signal> by including
 only the required functionality. A small size is especially important for
 libraries.</p>
 
-<p>Larger projects may not be as concerned <signal>about size</signal>, but
-instead need <signal>more</signal> <signal>functionality</signal>.</p>
+<p>Larger projects may not be as concerned about size, but
+instead need more functionality.</p>
 
 <p>To use Vaccine, first set the options in the <signal>right panel</signal>.
 The <signal>shim</signal> will <strong>instantly adjust</strong> to
