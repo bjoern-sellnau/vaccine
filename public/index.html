@@ -10,21 +10,20 @@
     <header><h1>Vaccine.js</h1></header>
     <div id="base">
       <div id="config">
-        <div id="format" class="group">
-          <div class="title">Format <span class="hint">(buttons set to default)</span></div>
+        <div id="defaults" class="group">
+          <div class="title">Defaults <span class="hint">for format</span></div>
           <div class="controls">
-            <div id="amd" class="format-picker">
-              <input type="button" value="AMD">
-              <input type="radio" name="format" value="amd">
-            </div>
-            <div id="commonjs" class="format-picker">
-              <input type="button" value="CommonJS">
-              <input type="radio" name="format" value="commonjs">
-            </div>
-            <div id="umd" class="format-picker">
-              <input type="button" value="UMD">
-              <input type="radio" name="format" value="umd">
-            </div>
+            <input id="amd" type="button" value="AMD">
+            <input id="commonjs" type="button" value="CommonJS">
+            <input id="umd" type="button" value="UMD">
+          </div>
+        </div>
+        <div id="format" class="group">
+          <div class="title">Format</div>
+          <div class="controls">
+            <label><input type="radio" name="format" value="amd">AMD</label>
+            <label><input type="radio" name="format" value="commonjs">CommonJS</label>
+            <label><input type="radio" name="format" value="umd">UMD</label>
           </div>
         </div>
         <div id="require" class="group">

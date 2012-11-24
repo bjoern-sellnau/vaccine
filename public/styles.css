@@ -113,8 +113,7 @@ h2 {
   color: green;
 }
 .removed,
-.problem,
-.format-picker.problem input[type=button] {
+.problem {
   color: red;
 }
 
@@ -193,19 +192,7 @@ code .special {
   margin-left: 15px;
 }
 
-.format-picker {
-  display: inline-block;
-}
-
-#config .group .format-picker input[type=radio] {
-  margin: 0 auto;
-  margin-top: 4px;
-  position: relative;
-  left: -2px;
-  display: block;
-}
-
-#format .controls input[type=button] {
+#defaults .controls input[type=button] {
   margin-right: 6px;
   padding: 4px 6px;
 }

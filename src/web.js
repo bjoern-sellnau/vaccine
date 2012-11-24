@@ -338,7 +338,7 @@ var swapSaved = function() {
 };
 
 var changeFormat = function() {
-  var format = this.parentNode.id;
+  var format = this.id;
   var options = copyCurrentOptions();
   var fmtDefault = vaccine.defaultForFormat(format);
   options.supports = fmtDefault.supports;
@@ -350,7 +350,7 @@ var changeFormat = function() {
   setOptions(options);
 };
 
-d3.selectAll('.format-picker input[type=button]').on('click', changeFormat);
+d3.selectAll('#defaults input').on('click', changeFormat);
 
 configHolder.on('click', maybeUpdate);
 configHolder.on('keyup', maybeUpdate);
