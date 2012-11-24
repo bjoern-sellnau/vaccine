@@ -76,7 +76,8 @@ var supports = function(supportsType) {
 };
 
 var remove = function(array, item) {
-  array.splice(array.indexOf(item), 1);
+  var index = array.indexOf(item);
+  if (index >= 0) array.splice(index, 1);
 };
 
 var req = function(requireType) {
