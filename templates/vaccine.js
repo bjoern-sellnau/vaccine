@@ -9,14 +9,14 @@
       vaccineFirstDefineTime = vaccineFirstDefineTime || Date.now();
 ///////////////////////////////////////////////////////////////////////////////
 ??????????????????????????????????????????????????????????????????????? (debug)
-      if ((vaccineFactories || {})[$-- commonjs && req('single') ? "'./' + id" : 'id' --$]) {
+      if ((vaccineFactories || {})[$-- onlyReq('single') ? "'./' + id" : 'id' --$]) {
         throw 'Attempting to redefine: ' + id;
       } else {
         console.log('Defining: ' + id);
       }
 ///////////////////////////////////////////////////////////////////////////////
       (vaccineFactories = vaccineFactories || {}
-      )[$-- commonjs && req('single') ? "'./' + id" : (req('index') ? "id.replace(/\\/index$/, '')" : 'id') --$] = factory;
+      )[$-- onlyReq('single') ? "'./' + id" : (req('index') ? "id.replace(/\\/index$/, '')" : 'id') --$] = factory;
     }
 
 

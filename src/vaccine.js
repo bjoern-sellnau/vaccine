@@ -84,6 +84,10 @@ var req = function(requireType) {
   return has(requireArray, requireType);
 };
 
+var onlyReq = function(requireType) {
+  return onlyHas(requireArray, requireType);
+};
+
 var define = function(defineType) {
   return has(defineArray, defineType);
 };
@@ -209,12 +213,6 @@ exports.validateOptions = function(opts) {
         remove(options.supports, 'commonjs');
       });
     }
-    if (maybeOnlyHas(opts.require, 'single')) {
-      formatMismatch([{group: 'require', parts: ['single']}],
-          function(options) {
-        options.require.push('absolute');
-      });
-    }
     if (maybeHas(opts.require, 'index')) {
       mismatch([{group: 'require', parts: ['index']}], function(options) {
         removeWithDefault(options, 'require', 'index');
@@ -326,7 +324,7 @@ var setOptions = function(options) {
   }
   main = cleanedMain.replace(new RegExp('^' + sourceDir + '/'), '');
 
-  if (format === 'commonjs' && req('single')) {
+  if (onlyHas(requireArray, 'single')) {
     main = './' + main;
   }
 
