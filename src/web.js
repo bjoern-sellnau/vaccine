@@ -226,15 +226,7 @@ var updateSources = function() {
       .attr('class', 'source')
       .each(function(d) {
         source = d3.select(this);
-        if (d.name === 'vaccine.js' || d.name === 'umd.js') {
-          var titleContainer = source.append('div')
-              .attr('class', 'title-and-size');
-          titleContainer.append('div')
-              .attr('id', 'sizes');
-        } else {
-          var titleContainer = source;
-        }
-        titleContainer.append('div')
+        source.append('div')
             .attr('class', 'title')
             .text(d.name);
         source.append('div')
@@ -269,7 +261,7 @@ var updateSources = function() {
     var sizeHtml = numberSpan(min) + ' bytes minified';
     sizeHtml += numberSpan(gzip, true) + ' bytes gzipped';
     sizeHtml += '<span class="asterisk">*</span>';
-    sources.select('#sizes').html(sizeHtml);
+    d3.select('#sizes .info').html(sizeHtml);
   }
 };
 

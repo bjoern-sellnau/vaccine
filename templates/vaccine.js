@@ -57,14 +57,14 @@
   ????????????????????????????????????????????????????????????????? (debug)
               console.log('Attempting to require: ' + reqId);
   ///////////////////////////////////////////////////////////////// (debug)
-              var matching = /(\.?\.\/?)*/.exec(reqId)[0],
+              var dots = /(\.?\.\/?)*/.exec(reqId)[0],
                   // Some code golf to get the number of "directories" back.
-                  back = Math.floor(matching.replace(/\//g, '').length/1.9 + 0.99),
+                  back = Math.floor(dots.replace(/\//g, '').length/1.9 + 0.99),
                   base;
               if (back) {
                 base = parts.slice(0, parts.length - back).join('/');
                 if (base) base += '/';
-                reqId = base + reqId.slice(matching.length);
+                reqId = base + reqId.slice(dots.length);
               }
               return require(reqId.replace(/\/$/, ''));
             }$-- exprts('exports') ? ',' : ');' --$
