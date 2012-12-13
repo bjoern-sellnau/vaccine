@@ -64,10 +64,6 @@ h1 {
   background-color: blue;
 }
 
-#sizes .shot.only {
-  height: 30px;
-}
-
 #sizes .shot.current {
   height: 15px;
 }
@@ -75,11 +71,6 @@ h1 {
 #sizes .shot.saved {
   height: 15px;
   top: 15px;
-  background-color: #66a;
-}
-
-#sizes .shot.hidden {
-  display: none;
 }
 
 #base {

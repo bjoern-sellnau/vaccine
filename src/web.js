@@ -249,20 +249,21 @@ var updateSources = function() {
       var min = 'Oops!';
       var gzip = min;
     } else {
+      var currentShot = 250 * currentSize / 650;
       if (diffEnabled) {
         var min = currentSize - savedSize;
         var gzip = gzipFromMin(currentSize) - gzipFromMin(savedSize);
-        var currentShot = 250 * currentSize / 650;
         var savedShot = 250 * savedSize / 650;
-        d3.select('#sizes .shot.current').style('width', currentShot + 'px');
-        d3.select('#sizes .shot.saved').style('width', savedShot + 'px');
       } else {
         var min = currentSize;
         var gzip = gzipFromMin(currentSize);
-        var shotSize = 250 * currentSize / 650;
-        d3.select('#sizes .shot.only').style('width', shotSize + 'px');
+        var savedShot = currentShot;
       }
       gzip = 5 * Math.round(gzip / 5);
+      d3.select('#sizes .shot.current').transition().duration(600)
+          .style('width', currentShot + 'px');
+      d3.select('#sizes .shot.saved').transition().duration(600)
+          .style('width', savedShot + 'px');
     }
     var sizeHtml = numberSpan(min) + ' bytes minified';
     sizeHtml += numberSpan(gzip, true) + ' bytes gzipped';
@@ -300,11 +301,9 @@ var setDiff = function(enabled) {
   diffEnabled = enabled;
   configHolder.select('#diff').classed('active', diffEnabled);
   if (enabled) {
-    d3.select('#sizes .shot.only').attr('class', 'shot current');
-    d3.select('#sizes .shot.hidden').attr('class', 'shot saved');
+    d3.select('#sizes .shot.saved').style('background-color', '#66a');
   } else {
-    d3.select('#sizes .shot.current').attr('class', 'shot only');
-    d3.select('#sizes .shot.saved').attr('class', 'shot hidden');
+    d3.select('#sizes .shot.saved').style('background-color', null);
   }
   updateSources();
 };
