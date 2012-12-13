@@ -249,11 +249,11 @@ var updateSources = function() {
       var min = 'Oops!';
       var gzip = min;
     } else {
-      var currentShot = 250 * currentSize / 650;
+      var currentShot = 197 * currentSize / 650;
       if (diffEnabled) {
         var min = currentSize - savedSize;
         var gzip = gzipFromMin(currentSize) - gzipFromMin(savedSize);
-        var savedShot = 250 * savedSize / 650;
+        var savedShot = 197 * savedSize / 650;
       } else {
         var min = currentSize;
         var gzip = gzipFromMin(currentSize);
@@ -301,7 +301,7 @@ var setDiff = function(enabled) {
   diffEnabled = enabled;
   configHolder.select('#diff').classed('active', diffEnabled);
   if (enabled) {
-    d3.select('#sizes .shot.saved').style('background-color', '#66a');
+    d3.select('#sizes .shot.saved').style('background-color', '#99c');
   } else {
     d3.select('#sizes .shot.saved').style('background-color', null);
   }

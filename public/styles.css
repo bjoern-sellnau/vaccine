@@ -22,13 +22,13 @@ h1 {
 }
 
 #sizes-container {
-  height: 50px;
+  height: 75px;
   background-color: #eee;
-  padding-top: 10px;
 }
 
 #sizes {
-  height: 50px;
+  height: 58px;
+  padding-top: 19px;
   width: 990px;
   margin: 0 auto;
 }
@@ -50,27 +50,34 @@ h1 {
 
 #sizes .shot-container {
   float: left;
-  width: 250px;
-  height: 30px;
+  width: 197px;
+  height: 28px;
   background-color: white;
-  margin: 5px 15px 0 35px;
+  margin: 3px 37px 0 55px;
   position: relative;
 }
 
-#sizes .shot {
+#sizes div.shot {
   position: absolute;
   right: 0px;
   top: 0px;
-  background-color: blue;
+  background-color: #88f;
 }
 
 #sizes .shot.current {
-  height: 15px;
+  height: 14px;
 }
 
 #sizes .shot.saved {
-  height: 15px;
-  top: 15px;
+  height: 14px;
+  top: 14px;
+}
+
+#sizes img.shot {
+  position: absolute;
+  z-index: 1;
+  top: -14px;
+  left: -41px;
 }
 
 #base {
