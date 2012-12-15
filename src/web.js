@@ -301,7 +301,7 @@ var setDiff = function(enabled) {
   diffEnabled = enabled;
   configHolder.select('#diff').classed('active', diffEnabled);
   if (enabled) {
-    d3.select('#sizes .shot.saved').style('background-color', '#99c');
+    d3.select('#sizes .shot.saved').style('background-color', '#9E8E66');
   } else {
     d3.select('#sizes .shot.saved').style('background-color', null);
   }

@@ -10,20 +10,24 @@ body {
 
 header {
   height: 100px;
-  background-color: #ddd;
+  background-color: #D9D9D9;
 }
 
 h1 {
   text-align: center;
   margin: 0;
-  font-family: Tahoma, sans-serif;
-  font-size: 40px;
-  padding-top: 24px;
+  font-family: "Open Sans", serif;
+  font-size: 46px;
+  font-weight: bold;
+  padding-top: 12px;
 }
 
 #sizes-container {
   height: 75px;
-  background-color: #eee;
+  background-color: #6CD6EC;
+  border-style: solid;
+  border-color: #999;
+  border-width: 1px 0;
 }
 
 #sizes {
@@ -52,7 +56,7 @@ h1 {
   float: left;
   width: 197px;
   height: 28px;
-  background-color: white;
+  background-color: #eee;
   margin: 3px 37px 0 55px;
   position: relative;
 }
@@ -61,7 +65,7 @@ h1 {
   position: absolute;
   right: 0px;
   top: 0px;
-  background-color: #88f;
+  background-color: #DBA311;
 }
 
 #sizes .shot.current {
@@ -86,7 +90,6 @@ h1 {
 }
 
 #main {
-  min-height: 1200px;
   margin-left: 5px;
 }
 
@@ -143,8 +146,9 @@ h2 {
   padding: 2px;
   overflow-x: auto;
   border-style: solid;
-  border-color: #eee;
+  border-color: #D9D9D9;
   border-width: 0 0 0 20px;
+  background-color: white;
 }
 
 .added {
@@ -308,8 +312,23 @@ code .special {
   color: white;
 }
 
+.clear {
+  clear: both;
+}
+
 footer {
   text-align: center;
-  margin-top: 20px;
-  margin-bottom: 40px;
+  height: 80px;
+  margin-top: 40px;
+  padding-top: 60px;
+  background-color: #D9D9D9;
+  border-top: solid 1px #999;
+}
+
+footer a {
+  margin-left: 4px;
+  text-decoration: none;
+}
+footer a:hover {
+  text-decoration: underline;
 }
