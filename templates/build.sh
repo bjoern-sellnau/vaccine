@@ -7,7 +7,7 @@
     source_dir='$-- sourceDir --$'
 
 
-    for file in $(find $source_dir -type f)
+    for file in $(find $source_dir -type f | sort)
     do
       name=$(echo "$file" | sed -e "s#^$source_dir/##" -e 's/\.js//')
   ???????????????????????????????????????????????????????????????? commonjs
@@ -20,7 +20,8 @@
   /////////////////////////////////////////////////////////////////////////
     done
 :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-    cat $(find $-- sourceDir --$ -type f)   # vaccine.js must NOT be in the source list.
+    # vaccine.js must NOT be in the source list.
+    cat $(find $-- sourceDir --$ -type f | sort)
 ///////////////////////////////////////////////////////////////////////////////
 
     cat vaccine.js  # Must be after sources.

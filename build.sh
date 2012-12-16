@@ -5,7 +5,7 @@ echo '(function() {'
 source_dir='src'
 
 # Put web.js first, for better debugging
-sources="src/web.js $(find $source_dir -type f | grep -v 'src/web\.js')"
+sources="src/web.js $(find $source_dir -type f | sort | grep -v 'src/web\.js')"
 
 
 for file in $sources
