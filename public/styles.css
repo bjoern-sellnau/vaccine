@@ -32,17 +32,17 @@ h1 {
 
 #sizes {
   height: 58px;
-  padding-top: 19px;
   width: 990px;
   margin: 0 auto;
 }
 
 #sizes .info {
   float: left;
+  margin-top: 18px;
 }
 
 #sizes .number {
-  font-size: 30px;
+  font-size: 32px;
   width: 90px;
   display: inline-block;
   text-align: right;
@@ -54,10 +54,10 @@ h1 {
 
 #sizes .shot-container {
   float: left;
-  width: 197px;
-  height: 28px;
-  background-color: #eee;
-  margin: 3px 37px 0 55px;
+  width: 161px;
+  height: 24px;
+  background-color: #DDD6B0;
+  margin: 25px 66px 0 55px;
   position: relative;
 }
 
@@ -69,19 +69,19 @@ h1 {
 }
 
 #sizes .shot.current {
-  height: 14px;
+  height: 12px;
 }
 
 #sizes .shot.saved {
-  height: 14px;
-  top: 14px;
+  height: 12px;
+  top: 12px;
 }
 
 #sizes img.shot {
   position: absolute;
   z-index: 1;
-  top: -14px;
-  left: -41px;
+  top: -11px;
+  left: -34px;
 }
 
 #base {

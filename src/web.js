@@ -7,7 +7,9 @@ var d3 = require('d3'),
     vaccine = require('./vaccine'),
     templateText = require('./templates'),
     demo = require('./demo'),
-    web = {};
+    web = {},
+    diffColor = '#664985',
+    shotWidth = 161;
 
 var prepend = function(text, pre) {
   var split = text.split('\n');
@@ -249,11 +251,11 @@ var updateSources = function() {
       var min = 'Oops!';
       var gzip = min;
     } else {
-      var currentShot = 197 * currentSize / 650;
+      var currentShot = shotWidth * currentSize / 650;
       if (diffEnabled) {
         var min = currentSize - savedSize;
         var gzip = gzipFromMin(currentSize) - gzipFromMin(savedSize);
-        var savedShot = 197 * savedSize / 650;
+        var savedShot = shotWidth * savedSize / 650;
       } else {
         var min = currentSize;
         var gzip = gzipFromMin(currentSize);
@@ -301,7 +303,7 @@ var setDiff = function(enabled) {
   diffEnabled = enabled;
   configHolder.select('#diff').classed('active', diffEnabled);
   if (enabled) {
-    d3.select('#sizes .shot.saved').style('background-color', '#B09BC7');
+    d3.select('#sizes .shot.saved').style('background-color', diffColor);
   } else {
     d3.select('#sizes .shot.saved').style('background-color', null);
   }

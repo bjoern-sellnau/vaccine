@@ -16,8 +16,8 @@
    inkscape:version="0.48.1 r9760"
    sodipodi:docname="shot.svg"
    inkscape:export-filename="/Users/jtsandlund/dev/vaccine/public/shot.png"
-   inkscape:export-xdpi="73.8806"
-   inkscape:export-ydpi="73.8806">
+   inkscape:export-xdpi="60.5"
+   inkscape:export-ydpi="60.5">
   <defs
      id="defs4" />
   <sodipodi:namedview
@@ -28,17 +28,17 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="2.9957447"
-     inkscape:cx="169.1656"
+     inkscape:cx="162.46939"
      inkscape:cy="-5.6234193"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
      showguides="true"
      inkscape:guide-bbox="true"
-     inkscape:window-width="1893"
-     inkscape:window-height="1028"
-     inkscape:window-x="1440"
-     inkscape:window-y="22"
+     inkscape:window-width="1440"
+     inkscape:window-height="856"
+     inkscape:window-x="-10"
+     inkscape:window-y="0"
      inkscape:window-maximized="0" />
   <metadata
      id="metadata7">
@@ -48,7 +48,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -128,7 +128,7 @@
        y="1001.6718"
        rx="0.30000001" />
     <rect
-       style="fill:#eeeeee;fill-opacity:1;stroke:#222222;stroke-width:5.44513368999999958;stroke-linecap:square;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       style="fill:#ddd6b0;fill-opacity:1;stroke:#222222;stroke-width:5.44513368999999958;stroke-linecap:square;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
        id="rect3903"
        width="38.942871"
        height="13.443058"
