@@ -1,7 +1,11 @@
 .PHONY: build vaccine.js
 
+test:
+	@echo Open localhost:5000/test.html in a browser
+	foreman start
+
 build:
-	./build.sh > public/vaccine.js
+	foreman run ./build
 
 release:
 	./release.sh

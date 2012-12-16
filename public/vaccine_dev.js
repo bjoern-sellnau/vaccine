@@ -21,4 +21,7 @@ var vaccineFactories,
     vaccineModules = {},
     vaccineWindow = window;
 
-  vaccineWindow.vaccine = require('./web');
+function requireDev(main) {
+  main = main || './web';
+  return require(main);
+}

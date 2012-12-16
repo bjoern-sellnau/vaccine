@@ -1,0 +1,10 @@
+[
+  ["public/styles.css", "s/public\\//"],
+  ["public/d3.js", "s/public\\//"],
+  ["public/*.png", "s/public\\//"],
+  {
+    "local": "public/easydemo.css",
+    "name": "s/public\\//",
+    "dependencyTransform": ["easydemo.png", "url\\(\"(easydemo.png)\"\\);"]
+  }
+]
