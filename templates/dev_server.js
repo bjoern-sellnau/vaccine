@@ -1,75 +1,43 @@
-    var sourceDir = '$-- sourceDir --$';   // Change this to... uh, your source directory.
-
-
-    var http = require('http'),
+    var express = require('express'),
         fs = require('fs'),
         exec = require('child_process').exec,
-        port = 3000,
-        rootUrl = 'http://localhost:' + port,
-        server,
-        types;
+        port = process.env.PORT || 5000,
+        app = express();
 
-    types = {
-      js: 'application/javascript',
-      json: 'application/json',
-      html: 'text/html',
-      css: 'text/css',
-
-      png: 'image/png',
-      jpg: 'image/jpeg',
-      jpeg: 'image/jpeg',
-      gif: 'image/gif',
-      ico: 'image/x-icon',
-    };
-
-    server = http.createServer(function (req, res) {
-      findFile(req.url, function(err, fileBufferOrText, path) {
-        if (err) return notFound(err, req.url, res);
-        var ext = path.split('.').pop();
-        if (ext === path) ext = 'html';
-        var type = types[ext];
-        if (!type) type = 'text/plain';
-        if (path.match(new RegExp('^/' + sourceDir + '/'))) {
-          fileBufferOrText = nodeWrap(path, fileBufferOrText);
-        }
-        res.writeHead(200, {'Content-Type': type});
-        res.end(fileBufferOrText);
+    app.get(/^\/build[\/\w]*\.?\w*$/, function(req, res) {
+      exec('.' + req.path, {maxBuffer: 1024*1024}, function(err, stdout) {
+        if (err) return notFound(err, req.path, res);
+        res.type('application/javascript');
+        res.send(stdout);
       });
     });
 
-    server.listen(port, 'localhost');
-    console.log('Serving ' + rootUrl);
-    server.on('error', console.log);
+???????????????????????????????????????????????????????????????????? (commonjs)
+    var sourceDirRe = new RegExp('^/$-- sourceDir --$/');
+    app.get(sourceDirRe, function(req, res) {
+      fs.readFile('.' + req.path, 'utf8', function(err, srcText) {
+        if (err) return notFound(err, req.path, res);
 
-    function notFound(err, path, res) {
-      console.log(err);
-      if (!path.match(/favicon\.ico/)) console.log('404: ' + path);
-      res.writeHead(404, {'Content-Type': 'text/plain'});
-      res.end('404 Not Found\n');
-    }
-
-    function findFile(path, callback) {
-      fs.stat('.' + path, function(err, stats) {
-        if (err) return callback(err);
-
-        if (stats.isDirectory()) {
-          findFile(path + '/index.html', callback);
-          return;
-        }
-
-        fs.readFile('.' + path, function(err, buffer) {
-          callback(err, buffer, path);
-        });
+        var module = req.path.replace(sourceDirRe, '').replace(/\.js$/, ''),
+            compiled = "define('" + module + "', ";
+        compiled += 'function(require, $-- exprts('module') ? 'exports, module' : 'exports' --$) {\n';
+  ????????????????????????????????????????????????????????????? (useStrict)
+        compiled += "'use strict';\n"
+  /////////////////////////////////////////////////////////////////////////
+        compiled += srcText;
+        compiled += '\n});';
+        res.type('application/javascript');
+        res.send(compiled);
       });
-    }
+    });
 
-    function nodeWrap(path, buffer) {
-      var prefix = new RegExp('^' + sourceDir + '/'),
-          module = path.slice(1).replace(prefix, '').replace(/\.js$/, ''),
-          compiled;
-      compiled = 'define("' + module + '", ';
-      compiled += 'function(require, $-- exprts('module') ? 'exports, module' : 'exports' --$) {\n';
-      compiled += buffer.toString('utf8');
-      compiled += '\n});';
-      return compiled;
-    }
+///////////////////////////////////////////////////////////////////////////////
+    var notFound = function(err, path, res) {
+      console.log(err);
+      res.send('404 Not Found\n', 404);
+    };
+
+    app.use(express.static(__dirname));
+
+    app.listen(port);
+    console.log('Serving localhost:' + port);
