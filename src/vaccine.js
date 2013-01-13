@@ -31,8 +31,6 @@ var name,
     performance,
     debug,
     dev,
-    devPerformance,
-    devDebug,
     useStrict,
     dependencies = [],
     depString,
@@ -98,22 +96,14 @@ module.exports = exports = function(options) {
 
   return targets.map(function(target) {
     if (target === 'vaccine_dev.js') {
-      var old = {
-        debug: debug,
-        performance: performance,
-        supportsArray: supportsArray
-      };
       dev = true;
-      debug = devDebug;
-      performance = devPerformance;
+      var oldSupportsArray = supportsArray;
       supportsArray = [];
     }
     var compiled = compileTemplate(templateMap[target]);
     if (target === 'vaccine_dev.js') {
       dev = false;
-      debug = old.debug;
-      performance = old.performance;
-      supportsArray = old.supportsArray;
+      supportsArray = oldSupportsArray;
     }
     return {name: target, compiled: compiled};
   });
@@ -294,8 +284,6 @@ var setOptions = function(options) {
   umd = format === 'umd';
   performance = options.performance;
   debug = options.debug;
-  devDebug = !options.dev_no_debug;
-  devPerformance = !options.dev_no_performance;
   useStrict = options.use_strict;
   dependencies = options.dependencies || [];
   numDeps = dependencies.length;

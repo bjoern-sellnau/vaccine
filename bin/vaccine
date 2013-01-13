@@ -35,8 +35,6 @@ var optimist = require('optimist')
     .describe('stdout', 'Write to stdout instead of to files.')
     .describe('debug', 'Add debugging logs for development.')
     .describe('performance', 'Measure the load-time performance of your library.')
-    .describe('dev-no-debug', "Don't add debugging for vaccine_dev.js.")
-    .describe('dev-no-performance', "Don't measure performance for vaccine_dev.js")
     .describe('src', 'The directory your sources are under. Derived from --main.')
     .describe('global', 'The global variable name (defaults to --name).')
     .describe('use-strict', 'Enable strict mode in built file.')
@@ -61,8 +59,6 @@ var optimist = require('optimist')
     .boolean('stdout')
     .boolean('debug')
     .boolean('performance')
-    .boolean('dev-no-debug')
-    .boolean('dev-no-performance')
     .boolean('use-strict')
 
     .default('lib', 'lib')
@@ -77,8 +73,6 @@ if (argv.h) {
 }
 
 argv.use_strict = argv['use-strict'];
-argv.dev_no_debug = argv['dev-no-debug'];
-argv.dev_no_performance = argv['dev-no-performance'];
 
 var ensureArray = function(key) {
   if (typeof argv[key] !== 'undefined' && !Array.isArray(argv[key])) {
