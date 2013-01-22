@@ -115,7 +115,7 @@ var states = [
     exit: exitDiff,
     signals: [
       {under: '#diff', top: -5, left: -5},
-      {under: '#controls', top: 28, left: 18},
+      {under: '#controls', top: 8, left: 9},
       sizeSignal,
     ],
   },

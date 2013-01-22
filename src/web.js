@@ -33,8 +33,7 @@ var diff = function(old, next) {
 
 vaccine.templateText(templateText);
 
-var configHolder = d3.select('#config'),
-    currentOptions = {},
+var currentOptions = {},
     currentCompiled,
     currentSize,
     savedOptions,
@@ -87,7 +86,7 @@ var maybeUpdate = function() {
 
 var getOptions = function() {
   var options = {};
-  configHolder.selectAll('input').each(function() {
+  d3.selectAll('input').each(function() {
     if (this.type === 'button') return;
     if (this.type === 'checkbox') {
       options[this.name] = options[this.name] || [];
@@ -100,7 +99,7 @@ var getOptions = function() {
 };
 
 var setOptions = function(options) {
-  configHolder.selectAll('input').each(function() {
+  d3.selectAll('input').each(function() {
     if (this.type === 'button') return;
     var current = options[this.name];
     if (this.type === 'checkbox') {
@@ -114,7 +113,7 @@ var setOptions = function(options) {
 };
 
 var update = function() {
-  configHolder.select('#save').attr('disabled', null);
+  d3.select('#save').attr('disabled', null);
   currentCompiled = compile();
   var vaccineCompiled = currentCompiled.filter(function(d) {
     return d.name === 'vaccine.js' || d.name === 'umd.js';
@@ -301,7 +300,7 @@ var toggleDiff = function() { setDiff(!diffEnabled); };
 
 var setDiff = function(enabled) {
   diffEnabled = enabled;
-  configHolder.select('#diff').classed('active', diffEnabled);
+  d3.select('#diff').classed('active', diffEnabled);
   if (enabled) {
     d3.select('#sizes .shot.saved').style('background-color', diffColor);
   } else {
@@ -322,7 +321,7 @@ var saveCurrent = function() {
   savedCompiledMap = makeCompiledMap(currentCompiled);
   savedOptions = currentOptions;
   savedSize = currentSize;
-  configHolder.select('#save').attr('disabled', 'disabled');
+  d3.select('#save').attr('disabled', 'disabled');
   if (diffEnabled) updateSources();
 };
 web.saveCurrent = saveCurrent;
@@ -358,11 +357,12 @@ var changeFormat = function() {
 
 d3.selectAll('#defaults input').on('click', changeFormat);
 
-configHolder.on('click', maybeUpdate);
-configHolder.on('keyup', maybeUpdate);
-configHolder.select('#diff').on('click', toggleDiff);
-configHolder.select('#save').on('click', saveCurrent);
-configHolder.select('#swap').on('click', swapSaved);
+d3.selectAll('.configuration')
+    .on('click', maybeUpdate)
+    .on('keyup', maybeUpdate);
+d3.select('#diff').on('click', toggleDiff);
+d3.select('#save').on('click', saveCurrent);
+d3.select('#swap').on('click', swapSaved);
 
 updateWithOptions(defaultOptions);
 saveCurrent();

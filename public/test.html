@@ -21,7 +21,7 @@
       </div>
     </div>
     <div id="base" class="structure">
-      <div id="config">
+      <div id="config" class="configuration">
         <div id="defaults" class="group">
           <div class="title">Defaults <span class="hint">for format</span></div>
           <div class="controls">
@@ -70,31 +70,12 @@
             <label><input type="checkbox" name="define" value="array" disabled="disabled">array ("define([requires], ...)")</label>
           </div>
         </div>
-        <div id="controls" class="group controls">
-          <div class="title">Controls</div>
-          <div class="controls">
-            <input id="save" type="button" value="Save">
-            <input id="swap" type="button" value="Swap">
-            <div class="button" id="diff"><em>Diff</em> with saved</div>
-          </div>
-        </div>
         <div class="group" id="variables">
           <div class="title">Project Variables</div>
           <div class="inputs">
             <label>Name<input type="text" name="name"></label>
             <label>Main (entry file)<input type="text" name="main"></label>
             <label>Dependencies<input type="text" name="dependencies"></label>
-          </div>
-        </div>
-        <div id="targets" class="group">
-          <div class="title">Targets</div>
-          <div class="inputs">
-            <label><input type="checkbox" name="targets" value="vaccine.js">vaccine.js</label>
-            <label><input type="checkbox" name="targets" value="umd.js">umd.js</label>
-            <label><input type="checkbox" name="targets" value="build.sh">build.sh</label>
-            <label><input type="checkbox" name="targets" value="Makefile">Makefile</label>
-            <label><input type="checkbox" name="targets" value="vaccine_dev.js">vaccine_dev.js</label>
-            <label><input type="checkbox" name="targets" value="dev_server.js">dev_server.js</label>
           </div>
         </div>
         <div class="group">
@@ -118,8 +99,7 @@
             vaccine.js versions with a 4.8k sized library.</div>
         </div>
       </div>
-      <div id="main">
-        <div id="demo-text">
+      <div id="demo-text">
 <p>Vaccine generates shims to make
 <a href="http://wiki.commonjs.org/wiki/Modules/1.1">CommonJS</a>
 (<a href="http://nodejs.org/api/modules.html">Node.js</a>) or
@@ -141,7 +121,7 @@ instead need more functionality.</p>
 that have only one directory of source files (no subdirectories). Having one
 level of sources simplifies the require implementation considerably.</p>
 
-<p>To use Vaccine, first set the options in the <signal>right panel</signal>.
+<p>To use Vaccine, first set the options in the <signal>left panel</signal>.
 The <signal>shim</signal> will <strong>instantly adjust</strong> to
 changes.</p>
 
@@ -179,11 +159,30 @@ a temporary treatment until the
 <a href="http://wiki.ecmascript.org/doku.php?id=harmony:modules">Harmony modules</a>
 "cure" arrives.
 </p>
+      </div>
+      <div id="main">
+        <div class="configuration">
+          <div id="controls">
+            <input id="save" type="button" value="Save">
+            <input id="swap" type="button" value="Swap">
+            <div class="button" id="diff"><em>Diff</em> with saved</div>
+          </div>
+          <div id="targets" class="group">
+            <div class="title"></div>
+            <div class="inputs">
+              <label><input type="checkbox" name="targets" value="vaccine.js">vaccine.js</label>
+              <label><input type="checkbox" name="targets" value="umd.js">umd.js</label>
+              <label><input type="checkbox" name="targets" value="build.sh">build.sh</label>
+              <label><input type="checkbox" name="targets" value="Makefile">Makefile</label>
+              <label><input type="checkbox" name="targets" value="vaccine_dev.js">vaccine_dev.js</label>
+              <label><input type="checkbox" name="targets" value="dev_server.js">dev_server.js</label>
+            </div>
+          </div>
         </div>
         <div id="sources"></div>
       </div>
-      <div class="clear"></div>
     </div>
+    <div class="clear"></div>
     <footer>Copyright 2012 <a href="http://jakesandlund.com">Jake Sandlund</a></footer>
 
     <script src="/d3.js"></script>

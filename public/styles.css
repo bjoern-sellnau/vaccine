@@ -14,6 +14,61 @@ header {
   background-color: #D9D9D9;
 }
 
+#base {
+  margin-top: 15px;
+}
+
+.structure {
+  margin-right: auto;
+  margin-left: auto;
+  min-width: 960px;
+  max-width: 1122px;
+  padding-left: 15px;
+  padding-right: 15px;
+}
+
+#config {
+  float: left;
+  width: 270px;
+  position: relative;
+  z-index: 2;
+}
+
+#main {
+  margin-left: 280px;
+}
+
+#controls {
+  float: right;
+  padding: 10px;
+  margin-right: 10px;
+}
+
+#diff {
+  margin-right: 0px;
+}
+
+#config,
+#controls {
+  border-style: solid;
+  border-width: 1px;
+  border-color: #aaa;
+  border-radius: 15px;
+}
+
+#targets {
+  width: auto;
+}
+
+#targets .title {
+  display: none;
+}
+
+#sources {
+  margin-top: 10px;
+}
+
+
 h1 {
   text-align: center;
   margin-top: 0;
@@ -82,24 +137,6 @@ h1 {
   z-index: 1;
   top: -11px;
   left: -34px;
-}
-
-#base {
-  margin-top: 15px;
-  margin-bottom: 70px;
-}
-
-.structure {
-  margin-right: auto;
-  margin-left: auto;
-  min-width: 960px;
-  max-width: 1150px;
-  padding-left: 15px;
-  padding-right: 15px;
-}
-
-#main {
-  margin-left: 5px;
 }
 
 #easydemo {
@@ -191,59 +228,27 @@ code .special {
 
 
 
-#config {
-  float: left;
-  width: 270px;
-  border-style: solid;
-  border-width: 1px;
-  border-color: #aaa;
-  background-color: white;
-  position: relative;
-  z-index: 2;
-}
-
-#sources {
-  margin-left: 280px;
-}
-
-#config .group {
+.group {
   margin: 5px;
   padding: 5px;
   padding-bottom: 10px;
   width: 250px;
 }
 
-#config .group .title {
+.group .title {
   font-weight: bold;
   font-size: 16px;
   margin-bottom: 6px;
 }
 
-#config .group .hint {
+.group .hint {
   font-weight: normal;
   font-size: 13px;
   margin-left: 5px;
   color: #555;
 }
 
-#config .group.controls {
-  margin-top: 50px;
-  margin-bottom: 50px;
-}
-
-#diff {
-  padding: 6px 13px;
-  margin-left: 2px;
-  margin-top: 10px;
-  font-size: 18px;
-}
-
-#diff em {
-  font-size: 22px;
-  margin-right: 4px;
-}
-
-#config .group .inputs, #config .group .controls {
+.group .inputs, .group .controls {
   margin-left: 15px;
 }
 
@@ -260,17 +265,21 @@ code .special {
   font-weight: normal;
 }
 
-#config label {
+label {
   margin-right: 6px;
-  display: inline-block;
+  display: block;
   font-style: italic;
 }
 
-#config input[type=radio], #config input[type=checkbox] {
+#targets label {
+  display: inline-block;
+}
+
+input[type=radio], input[type=checkbox] {
   margin-right: 5px;
 }
 
-#config input[type=text] {
+input[type=text] {
   width: 212px;
   font-size: 14px;
   margin-bottom: 12px;
@@ -278,8 +287,8 @@ code .special {
 }
 
 .button,
-#config input[type=button],
-#config input[type=button][disabled=disabled]:hover {
+input[type=button],
+input[type=button][disabled=disabled]:hover {
   font-size: 15px;
   text-align: center;
   display: inline-block;
@@ -304,17 +313,21 @@ code .special {
   user-select: none;
 }
 
-#config input[type=button][disabled=disabled]:hover {
+.button {
+  padding-top: 5px;
+}
+
+input[type=button][disabled=disabled]:hover {
   cursor: default;
 }
 
 .button:hover,
-#config input[type=button]:hover {
+input[type=button]:hover {
   background: #CFCFCF;
 }
 
 .button.active,
-#config input[type=button].active {
+input[type=button].active {
   background-color: #2C9CAF;
   background-image: -ms-linear-gradient(top, #2C9CAF, #237B8B);
   background-image: -webkit-linear-gradient(top, #2C9CAF, #237B8B);
