@@ -99,6 +99,9 @@ var getOptions = function() {
 };
 
 var setOptions = function(options) {
+  var format = options.format;
+  d3.selectAll('.format-picker.chosen').classed('chosen', false);
+  d3.select('#' + format).classed('chosen', true);
   d3.selectAll('input').each(function() {
     if (this.type === 'button') return;
     var current = options[this.name];
@@ -343,7 +346,7 @@ var swapSaved = function() {
 };
 
 var changeFormat = function() {
-  var format = this.id;
+  var format = this.parentNode.id;
   var options = copyCurrentOptions();
   var fmtDefault = vaccine.defaultForFormat(format);
   options.supports = fmtDefault.supports;
@@ -355,7 +358,7 @@ var changeFormat = function() {
   setOptions(options);
 };
 
-d3.selectAll('#defaults input').on('click', changeFormat);
+d3.selectAll('#format input[type=button]').on('click', changeFormat);
 
 d3.selectAll('.configuration')
     .on('click', maybeUpdate)

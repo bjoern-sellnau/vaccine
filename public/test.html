@@ -22,20 +22,13 @@
     </div>
     <div id="base" class="structure">
       <div id="config" class="configuration">
-        <div id="defaults" class="group">
-          <div class="title">Defaults <span class="hint">for format</span></div>
-          <div class="controls">
-            <input id="amd" type="button" value="AMD">
-            <input id="commonjs" type="button" value="CommonJS">
-            <input id="umd" type="button" value="UMD">
-          </div>
-        </div>
         <div id="format" class="group">
-          <div class="title">Format <span class="hint">authored in</span></div>
-          <div class="controls">
-            <label><input type="radio" name="format" value="amd">AMD</label>
-            <label><input type="radio" name="format" value="commonjs">CommonJS</label>
-            <label><input type="radio" name="format" value="umd">UMD</label>
+          <div class="title">Module Format</div>
+          <div class="inputs">
+            <div id="amd" class="format-picker"><input type="button" value="AMD"></div>
+            <div id="commonjs" class="format-picker"><input type="button" value="CommonJS"></div>
+            <div id="umd" class="format-picker"><input type="button" value="UMD"></div>
+            <input type="hidden" name="format">
           </div>
         </div>
         <div id="require" class="group">
