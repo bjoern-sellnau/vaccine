@@ -22,6 +22,9 @@
     </div>
     <div id="base" class="structure">
       <div id="config" class="configuration">
+        <div class="divider">
+          <h3>Project Settings</h3>
+        </div>
         <div id="format" class="group">
           <div class="title">Module Format</div>
           <div class="inputs">
@@ -30,6 +33,25 @@
             <div id="umd" class="format-picker"><input type="button" value="UMD"></div>
             <input type="hidden" name="format">
           </div>
+        </div>
+        <div id="supports" class="group">
+          <div class="title">Support <span class="hint">these environments</span></div>
+          <div class="inputs">
+            <label><input type="checkbox" name="supports" value="window">window</label>
+            <label><input type="checkbox" name="supports" value="amd">AMD</label>
+            <label><input type="checkbox" name="supports" value="commonjs">CommonJS</label>
+          </div>
+        </div>
+        <div class="group" id="variables">
+          <div class="title">Project Variables</div>
+          <div class="inputs">
+            <label>Name<input type="text" name="name"></label>
+            <label>Main (entry file)<input type="text" name="main"></label>
+            <label>Dependencies<input type="text" name="dependencies"></label>
+          </div>
+        </div>
+        <div class="divider">
+          <h3>Optimizations</h3>
         </div>
         <div id="require" class="group">
           <div class="title">Require <span class="hint">other modules</span></div>
@@ -48,14 +70,6 @@
             <label><input type="checkbox" name="exports" value="return">return</label>
           </div>
         </div>
-        <div id="supports" class="group">
-          <div class="title">Supports <span class="hint">these environments</span></div>
-          <div class="inputs">
-            <label><input type="checkbox" name="supports" value="window">window</label>
-            <label><input type="checkbox" name="supports" value="amd">AMD</label>
-            <label><input type="checkbox" name="supports" value="commonjs">CommonJS</label>
-          </div>
-        </div>
         <div id="define" class="group">
           <div class="title">Define <span class="hint">(AMD)</span></div>
           <div class="inputs">
@@ -63,13 +77,8 @@
             <label><input type="checkbox" name="define" value="array" disabled="disabled">array ("define([requires], ...)")</label>
           </div>
         </div>
-        <div class="group" id="variables">
-          <div class="title">Project Variables</div>
-          <div class="inputs">
-            <label>Name<input type="text" name="name"></label>
-            <label>Main (entry file)<input type="text" name="main"></label>
-            <label>Dependencies<input type="text" name="dependencies"></label>
-          </div>
+        <div class="divider">
+          <h3>Miscellaneous</h3>
         </div>
         <div class="group">
           <div class="title">Debugging</div>
