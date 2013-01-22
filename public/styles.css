@@ -6,6 +6,7 @@ html, body {
 body {
   font-family: Arial, sans-serif;
   font-size: 15px;
+  min-width: 990px;
 }
 
 header {
@@ -15,7 +16,8 @@ header {
 
 h1 {
   text-align: center;
-  margin: 0;
+  margin-top: 0;
+  margin-bottom: 0;
   font-family: "Open Sans", serif;
   font-size: 46px;
   font-weight: bold;
@@ -32,13 +34,11 @@ h1 {
 
 #sizes {
   height: 58px;
-  width: 990px;
-  margin: 0 auto;
 }
 
 #sizes .info {
-  float: left;
-  margin-top: 18px;
+  margin: 18px auto 0 auto;
+  width: 410px;
 }
 
 #sizes .number {
@@ -57,7 +57,7 @@ h1 {
   width: 161px;
   height: 24px;
   background-color: #DDD6B0;
-  margin: 25px 66px 0 55px;
+  margin: 6px 0 0 52px;
   position: relative;
 }
 
@@ -85,8 +85,17 @@ h1 {
 }
 
 #base {
-  margin: 15px auto 70px auto;
-  width: 990px;
+  margin-top: 15px;
+  margin-bottom: 70px;
+}
+
+.structure {
+  margin-right: auto;
+  margin-left: auto;
+  min-width: 960px;
+  max-width: 1150px;
+  padding-left: 15px;
+  padding-right: 15px;
 }
 
 #main {
@@ -120,6 +129,7 @@ h2 {
   background-color: #ddd;
 }
 
+
 .source {
   padding: 10px;
   padding-top: 0;
@@ -136,7 +146,7 @@ h2 {
 .source .code-container {
   border: solid 1px #aaa;
   margin-left: 20px;
-  width: 625px;
+  max-width: 800px;
 }
 
 .source code {
@@ -182,7 +192,7 @@ code .special {
 
 
 #config {
-  float: right;
+  float: left;
   width: 270px;
   border-style: solid;
   border-width: 1px;
@@ -190,7 +200,10 @@ code .special {
   background-color: white;
   position: relative;
   z-index: 2;
-  margin-right: 10px;
+}
+
+#sources {
+  margin-left: 280px;
 }
 
 #config .group {
