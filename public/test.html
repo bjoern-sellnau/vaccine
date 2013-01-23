@@ -46,7 +46,7 @@
           <div class="title">Project Variables</div>
           <div class="inputs">
             <label>Name<input type="text" name="name"></label>
-            <label>Main (entry file)<input type="text" name="main"></label>
+            <label id="entry-file">Main (entry file)<input type="text" name="main"></label>
             <label>Dependencies<input type="text" name="dependencies"></label>
           </div>
         </div>
@@ -56,10 +56,10 @@
         <div id="require" class="group">
           <div class="title">Require <span class="hint">other modules</span></div>
           <div class="inputs">
-            <label><input type="checkbox" name="require" value="absolute">absolute id ("my_lib/module")</label>
-            <label><input type="checkbox" name="require" value="single">single relative ("./module")</label>
             <label><input type="checkbox" name="require" value="full">full relative</label>
-            <label><input type="checkbox" name="require" value="index">w/o index ("pkg/index" -&gt; "pkg")</label>
+            <label><input type="checkbox" name="require" value="single">single relative ("./module")</label>
+            <label id="absolute-id"><input type="checkbox" name="require" value="absolute">absolute id ("my_lib/module")</label>
+            <label id="w-o-index"><input type="checkbox" name="require" value="index">w/o index ("pkg/index" -&gt; "pkg")</label>
           </div>
         </div>
         <div id="exports" class="group">
@@ -67,11 +67,11 @@
           <div class="inputs">
             <label><input type="checkbox" name="exports" value="exports">exports</label>
             <label><input type="checkbox" name="exports" value="module">module.exports</label>
-            <label><input type="checkbox" name="exports" value="return">return</label>
+            <label id="export-return"><input type="checkbox" name="exports" value="return">return</label>
           </div>
         </div>
         <div id="define" class="group">
-          <div class="title">Define <span class="hint">(AMD)</span></div>
+          <div class="title">Define <span class="hint">an AMD module</span></div>
           <div class="inputs">
             <label><input type="checkbox" name="define" value="optional_id">optional id ("define(id?, ...)")</label>
             <label><input type="checkbox" name="define" value="array" disabled="disabled">array ("define([requires], ...)")</label>
@@ -80,7 +80,7 @@
         <div class="divider">
           <h3>Miscellaneous</h3>
         </div>
-        <div class="group">
+        <div id="debugging" class="group">
           <div class="title">Debugging</div>
           <div class="inputs">
             <label><input type="checkbox" name="debugging" value="debug">debug</label>
@@ -91,7 +91,7 @@
         <div class="group">
           <div class="title">Variable Overrides</div>
           <div class="inputs">
-            <label>Source directory<input type="text" name="src"></label>
+            <label id="source-directory">Source directory<input type="text" name="src"></label>
             <label>Global variable name<input type="text" name="global"></label>
           </div>
         </div>
@@ -172,12 +172,12 @@ a temporary treatment until the
           <div id="targets" class="group">
             <div class="title"></div>
             <div class="inputs">
-              <label><input type="checkbox" name="targets" value="vaccine.js">vaccine.js</label>
-              <label><input type="checkbox" name="targets" value="umd.js">umd.js</label>
-              <label><input type="checkbox" name="targets" value="build.sh">build.sh</label>
-              <label><input type="checkbox" name="targets" value="Makefile">Makefile</label>
-              <label><input type="checkbox" name="targets" value="vaccine_dev.js">vaccine_dev.js</label>
-              <label><input type="checkbox" name="targets" value="dev_server.js">dev_server.js</label>
+              <label class="target-non-umd"><input type="checkbox" name="targets" value="vaccine.js">vaccine.js</label>
+              <label id="target-umd"><input type="checkbox" name="targets" value="umd.js">umd.js</label>
+              <label class="target-non-umd"><input type="checkbox" name="targets" value="build.sh">build.sh</label>
+              <label class="target-non-umd"><input type="checkbox" name="targets" value="Makefile">Makefile</label>
+              <label class="target-non-umd"><input type="checkbox" name="targets" value="vaccine_dev.js">vaccine_dev.js</label>
+              <label class="target-non-umd"><input type="checkbox" name="targets" value="dev_server.js">dev_server.js</label>
             </div>
           </div>
         </div>

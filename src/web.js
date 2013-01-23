@@ -42,6 +42,13 @@ var currentOptions = {},
     savedSize,
     diffEnabled = false;
 
+var formatHides = {
+  amd: ['#w-o-index', '#target-umd'],
+  commonjs: ['#absolute-id', '#define', '#export-return', '#target-umd'],
+  umd: ['#require', '#entry-file', '#define', '.target-non-umd',
+        '#source-directory', '#debugging'],
+};
+
 var amdFmtDefault = vaccine.defaultForFormat('amd');
 
 var defaultOptions = {
@@ -100,8 +107,13 @@ var getOptions = function() {
 
 var setOptions = function(options) {
   var format = options.format;
+  d3.selectAll('.format-hide').classed('format-hide', false);
+  formatHides[format].forEach(function(hide) {
+    d3.selectAll(hide).classed('format-hide', true);
+  });
   d3.selectAll('.format-picker.chosen').classed('chosen', false);
   d3.select('#' + format).classed('chosen', true);
+
   d3.selectAll('input').each(function() {
     if (this.type === 'button') return;
     var current = options[this.name];

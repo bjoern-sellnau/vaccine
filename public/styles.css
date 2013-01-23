@@ -302,6 +302,11 @@ h3 {
   margin-left: 7px;
 }
 
+#targets label.format-hide,
+.format-hide {
+  display: none;
+}
+
 .fix {
   cursor: pointer;
   text-decoration: underline;
