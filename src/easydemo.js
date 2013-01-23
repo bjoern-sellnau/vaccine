@@ -1,16 +1,4 @@
-(function (root, factory) {
-    if (typeof exports === 'object') {
-        // CommonJS
-        factory(exports);
-    } else if (typeof define === 'function' && define.amd) {
-        // AMD. Register as an anonymous module.
-        define(['exports'], factory);
-    } else {
-        var _exports = {};
-        factory(_exports);
-        root.easydemo = _exports;
-    }
-}(this, function (easydemo) {
+var easydemo = exports;
 
   var createDiv = function() { return document.createElement('div'); };
 
@@ -146,31 +134,27 @@
     };
   };
 
-  var setState = function(state) {
-    var delay = get(state, 'delay');
-    if (scrollEndTimer) window.clearTimeout(scrollEndTimer);
-    if (!changingStates && delay) {
-      scrollEndTimer = window.setTimeout(changeState, delay);
-    }
-
-    if (state === currentState) return;
-
+  var setState = function(state, delayed) {
+    var delay = delayed ? get(state, 'delay') : 0,
+        previous = currentState;
     currentState.p.className = 'state';
-    if (delay) state.p.className = 'state activating';
+    state.p.className = 'state activating';
     activeState.p.className = 'state active';
-    if (sameStateTimer) window.clearTimeout(sameStateTimer);
     currentState = state;
-    if (!changingStates) {
-      if (delay) {
-        sameStateTimer = window.setTimeout(changeState, get(state, 'sameDelay'));
-      } else {
-        changeState();
-      }
+    if (scrollEndTimer) window.clearTimeout(scrollEndTimer);
+    if (delay) {
+      scrollEndTimer = window.setTimeout(changeState, delay);
+    } else {
+      changeState();
+    }
+    if (currentState !== previous) {
+      if (sameStateTimer) window.clearTimeout(sameStateTimer);
+      sameStateTimer = window.setTimeout(changeState, get(state, 'sameDelay'));
     }
   };
 
   var changeState = function() {
-    if (currentState === activeState) return;
+    if (changingStates || currentState === activeState) return;
 
     var active = activeState;
     activeState = currentState;
@@ -187,31 +171,31 @@
   };
 
   var exitFinished = function() {
-    var nowSignals = (currentState.signals || []).filter(function(s) {
+    var nowSignals = (activeState.signals || []).filter(function(s) {
       return !get(s.info, 'finished');
     });
     nowSignals.forEach(setSignal);
 
-    if (currentState.enter) {
-      currentState.enter(enterFinished);
+    if (activeState.enter) {
+      activeState.enter(enterFinished);
     } else {
       enterFinished();
     }
   };
 
   var enterFinished = function() {
-    var finishedSignals = (currentState.signals || []).filter(function(s) {
+    var finishedSignals = (activeState.signals || []).filter(function(s) {
       return get(s.info, 'finished');
     });
     finishedSignals.forEach(setSignal);
     changingStates = false;
-    setState(currentState);
+    setState(currentState, true);
   };
 
   var removeSignals = function(state) {
     (state.signals || []).forEach(function(s) {
       s.signalNodes.forEach(function(node) {
-        node.parentNode.removeChild(node);
+        if (node.parentNode) node.parentNode.removeChild(node);
       });
       s.signalNodes = null;
     });
@@ -219,8 +203,8 @@
 
   var setSignal = function(signal) {
     var under = get(signal.info, 'under'),
-        x = isNaN(signal.info.left) ? 'right' : 'left',
-        y = isNaN(signal.info.top) ? 'bottom' : 'top',
+        xDim = typeof signal.info.left === 'undefined' ? 'right' : 'left',
+        yDim = typeof signal.info.top === 'undefined' ? 'bottom' : 'top',
         underNodes = document.querySelectorAll(under);
 
     signal.signalNodes = [];
@@ -229,11 +213,15 @@
     underNodes.forEach(function(underNode) {
       var sigNode = createDiv(),
           div = createDiv(),
+          x = signal.info[xDim],
+          y = signal.info[yDim],
           underPosition = window.getComputedStyle(underNode).position;
       if (underPosition === 'static') underNode.style.position = 'relative';
       sigNode.className = 'easydemo-signal';
-      sigNode.style[x] = signal.info[x] + 'px';
-      sigNode.style[y] = signal.info[y] + 'px';
+      if (+x === x) x = x + 'px';
+      if (+y === y) y = y + 'px';
+      sigNode.style[xDim] = x;
+      sigNode.style[yDim] = y;
       sigNode.appendChild(div);
       underNode.appendChild(sigNode);
       signal.signalNodes.push(sigNode);
@@ -267,14 +255,15 @@
     for (i = 0; i < states.length; ++i) {
       pos -= states[i].p.offsetHeight + pMargin;
       if (pos < 0) {
-        setState(states[i]);
+        setState(states[i], true);
         return;
       }
     }
-    setState(states[states.length - 1]);
+    setState(states[states.length - 1], true);
   };
 
   var show = function() {
+    focus();
     if (demoBox.parentNode) return;
     document.body.appendChild(demoBox);
     if (x === null) x = window.innerWidth / 2 - demoBox.offsetWidth / 2;
@@ -296,6 +285,7 @@
 
   var close = function() {
     if (!demoBox.parentNode) return;
+    setState(states[0]);
     document.body.removeChild(demoBox);
   };
   easydemo.close = close;
@@ -411,6 +401,9 @@
       demoBox.classList.add('unfocused');
     }
   };
+  var focus = function() {
+    demoBox.classList.remove('unfocused');
+  };
 
   header.onmousedown = updateBoxBy({x: 1, y: 1});
   leftResize.onmousedown = updateBoxBy({x: 1, width: -1});
@@ -424,11 +417,11 @@
   openCloseArrow.onclick = toggleInfoBox;
   previousArrow.onclick = function() { moveStateDelta(-1); };
   nextArrow.onclick = function() { moveStateDelta(+1); };
-  demoBox.onmousedown = function() {
-    demoBox.classList.remove('unfocused');
-    justFocused = true;
-  };
   document.addEventListener('mousedown', unfocus);
+  demoBox.addEventListener('mousedown', function() {
+    focus();
+    justFocused = true;
+  });
 
   document.addEventListener('keydown', function(e) {
     if (e.keyCode === 9) unfocus();     // Tab
@@ -438,7 +431,3 @@
     }
   });
   closeCross.onclick = close;
-
-  window.easydemo = easydemo;
-
-}));
