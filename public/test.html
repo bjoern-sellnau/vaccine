@@ -26,6 +26,7 @@
           <h3>Project Settings</h3>
         </div>
         <div id="format" class="group">
+          <div class="open-help"><div>?</div></div>
           <div class="title">Module Format <span class="hint">(set first)</span></div>
           <div class="inputs">
             <div id="amd" class="format-picker"><input type="button" value="AMD"></div>
@@ -35,6 +36,7 @@
           </div>
         </div>
         <div id="supports" class="group">
+          <div class="open-help"><div>?</div></div>
           <div class="title">Support <span class="hint">these environments</span></div>
           <div class="inputs">
             <label><input type="checkbox" name="supports" value="window">Global (window)</label>
@@ -43,6 +45,7 @@
           </div>
         </div>
         <div class="group" id="variables">
+          <div class="open-help"><div>?</div></div>
           <div class="title">Project Variables</div>
           <div class="inputs">
             <label>Name<input type="text" name="name"></label>
@@ -54,6 +57,7 @@
           <h3>Optimizations</h3>
         </div>
         <div id="require" class="group">
+          <div class="open-help"><div>?</div></div>
           <div class="title">Require <span class="hint">other modules</span></div>
           <div class="inputs">
             <label><input type="checkbox" name="require" value="full">full relative</label>
@@ -63,6 +67,7 @@
           </div>
         </div>
         <div id="exports" class="group">
+          <div class="open-help"><div>?</div></div>
           <div class="title">Export <span class="hint">a module's API</span></div>
           <div class="inputs">
             <label><input type="checkbox" name="exports" value="exports">exports</label>
@@ -71,6 +76,7 @@
           </div>
         </div>
         <div id="define" class="group">
+          <div class="open-help"><div>?</div></div>
           <div class="title">Define <span class="hint">an AMD module</span></div>
           <div class="inputs">
             <label><input type="checkbox" name="define" value="optional_id">optional id ("define(id?, ...)")</label>
@@ -81,6 +87,7 @@
           <h3>Miscellaneous</h3>
         </div>
         <div id="debugging" class="group">
+          <div class="open-help"><div>?</div></div>
           <div class="title">Debugging</div>
           <div class="inputs">
             <label><input type="checkbox" name="debugging" value="debug">debug</label>
@@ -88,7 +95,8 @@
             <label><input type="checkbox" name="debugging" value="use_strict">"use strict";</label>
           </div>
         </div>
-        <div class="group">
+        <div id="variable-overrides" class="group">
+          <div class="open-help"><div>?</div></div>
           <div class="title">Variable Overrides</div>
           <div class="inputs">
             <label id="source-directory">Source directory<input type="text" name="src"></label>
@@ -101,7 +109,32 @@
             vaccine.js versions with a 4.8k sized library.</div>
         </div>
       </div>
+
+
+      <div id="help-text">
+        Help here
+        <div id="help-format">
+        </div>
+        <div id="help-supports">
+        </div>
+        <div id="help-variables">
+        </div>
+        <div id="help-require">
+        </div>
+        <div id="help-exports">
+        </div>
+        <div id="help-define">
+        </div>
+        <div id="help-debugging">
+        </div>
+        <div id="help-variable-overrides">
+        </div>
+      </div>
+
+
       <div id="demo-text">
+
+
 <p>Vaccine generates shims to make
 <a href="http://wiki.commonjs.org/wiki/Modules/1.1">CommonJS</a>
 (<a href="http://nodejs.org/api/modules.html">Node.js</a>) or
@@ -170,15 +203,15 @@ a temporary treatment until the
             <div class="button" id="diff"><em>Diff</em> with saved</div>
           </div>
           <div id="targets" class="group">
-            <div class="title"></div>
             <div class="inputs">
               <label class="target-non-umd"><input type="checkbox" name="targets" value="vaccine.js">vaccine.js</label>
               <label id="target-umd"><input type="checkbox" name="targets" value="umd.js">umd.js</label>
               <label class="target-non-umd"><input type="checkbox" name="targets" value="build.sh">build.sh</label>
-              <label class="target-non-umd"><input type="checkbox" name="targets" value="Makefile">Makefile</label>
               <label class="target-non-umd"><input type="checkbox" name="targets" value="vaccine_dev.js">vaccine_dev.js</label>
               <label class="target-non-umd"><input type="checkbox" name="targets" value="dev_server.js">dev_server.js</label>
+              <label class="target-non-umd"><input type="checkbox" name="targets" value="Makefile">Makefile</label>
             </div>
+            <div class="title"></div>
           </div>
         </div>
         <div id="sources"></div>

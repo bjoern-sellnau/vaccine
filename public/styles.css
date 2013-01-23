@@ -35,7 +35,7 @@ header {
 }
 
 #main {
-  margin-left: 280px;
+  margin-left: 300px;
 }
 
 #controls {
@@ -58,16 +58,46 @@ header {
 
 #targets {
   width: auto;
+  padding-top: 17px;
 }
 
-#targets .title {
-  display: none;
+#targets .inputs {
+  margin-left: 0;
 }
 
 #sources {
   margin-top: 10px;
 }
 
+.open-help {
+  position: absolute;
+  right: 4px;
+  border-style: solid;
+  border-width: 1px;
+  border-radius: 11px;
+  border-color: #ccc;
+  cursor: pointer;
+  color: #aaa;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.open-help div {
+  width: 8px;
+  height: 15px;
+  font-weight: bold;
+  font-size: 14px;
+  padding: 2px 5px;
+}
+
+.open-help:hover {
+  border-color: #888;
+  color: #666;
+}
 
 h1 {
   text-align: center;
@@ -151,6 +181,10 @@ h1 {
   display: none;
 }
 
+#help-text {
+  display: none;
+}
+
 
 h2 {
   font-size: 22px;
@@ -231,9 +265,12 @@ code .special {
   border: dotted 1px #999;
   border-width: 0 0 1px 0;
   height: 9px;
-  margin: 10px;
-  margin-bottom: 20px;
+  margin: 25px 10px 35px 10px;
   text-align: center;
+}
+
+.divider:first-child {
+  margin-top: 10px;
 }
 
 h3 {
@@ -246,16 +283,17 @@ h3 {
 }
 
 .group {
-  margin: 5px;
+  margin: 15px 5px;
   padding: 5px;
   padding-bottom: 10px;
   width: 250px;
+  position: relative;
 }
 
 .group .title {
   font-weight: bold;
   font-size: 16px;
-  margin-bottom: 6px;
+  margin-bottom: 10px;
 }
 
 .group .hint {
