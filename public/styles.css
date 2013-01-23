@@ -120,7 +120,7 @@ h1 {
   position: absolute;
   right: 0px;
   top: 0px;
-  background-color: #AD6CF3;
+  background-color: #A542F0;
 }
 
 #sizes .shot.current {
@@ -240,7 +240,7 @@ h3 {
   font-size: 12px;
   display: inline-block;
   background-color: white;
-  color: #AD6CF3;
+  color: #A542F0;
   margin: 0;
   padding: 0 6px;
 }
@@ -273,19 +273,25 @@ h3 {
   border-style: solid;
   border-width: 6px;
   border-radius: 12px;
-  border-color: white;
-  display: inline-block;
+  border-color: transparent;
   margin-right: -2px;
+  margin-bottom: -4px;
+  display: inline-block;
 }
 
 .format-picker.chosen {
-  border-color: #6CD6EC;
-  background-color: #6CD6EC;
+  border-color: #A542F0;
+  background-color: #A542F0;
+}
+
+.format-picker.chosen input[type=button] {
+  color: #A542F0;
 }
 
 .format-picker input[type=button] {
   margin: 0;
-  font-size: 14px;
+  font-size: 18px;
+  width: 230px;
 }
 
 .format-picker.problem input[type=button] {
