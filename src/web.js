@@ -9,6 +9,7 @@ var d3 = require('d3'),
     demo = require('./demo'),
     web = {},
     diffColor = '#664985',
+    scrollHelpOffset = 60,
     shotWidth = 161;
 
 var prepend = function(text, pre) {
@@ -388,12 +389,13 @@ var openHelp = function(helpId) {
   help.selectAll('.focused').classed('focused', false);
 
   var helpHeight = Math.floor(0.6 * window.innerHeight);
-  help.select('.content')
+  var content = help.select('.content')
       .style('height', helpHeight + 'px');
 
   var section = help.select('#help-' + helpId);
-  section.node().scrollIntoView();
   section.select('.title').classed('focused', true);
+  var scrollTo = section.property('offsetTop') - scrollHelpOffset;
+  content.node().scrollTop = scrollTo;
 };
 
 var closeHelp = function() {
