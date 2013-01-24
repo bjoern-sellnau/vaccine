@@ -151,6 +151,7 @@
     - UMD is a pattern for a single file to support multiple environments, such
     as CommonJS, AMD, or a regular browser global. It does not need a build.
     </li>
+  </ul>
 </div>
 <div id="h-supports" class="help-section">
   <div class="title">Environments Supported</div>
@@ -185,12 +186,47 @@
     sources. This source directory is extracted from the path to the main file,
     but can be overwritten with a
     <a href="#help-variable-overrides">variable override</a>.</li>
+  </ul>
 </div>
 <div class="divider">
   <h3>Optimizations</h3>
 </div>
 <div id="h-require" class="help-section">
   <div class="title">Require</div>
+  The require options set how a module will obtain the exports from a module
+  it depends on. For example, assuming a source directory of "src", the
+  "src/a.js" module could get the exports from "src/b.js" by doing a
+  <code>var b = require('./b')</code>. Note the lack of a ".js" at the end
+  of the id string. This must be left out to work. Certain projects have only
+  one level of code, which means they can use simpler "require" functionality.
+  <ul>
+    <li><span class="key">full relative</span> - A full "require" implementation
+    that supports complex relative require's such as
+    <code>require('../../module.js')</code>. It also supports a single relative
+    or absolute id, which is why those options don't do anything when this
+    one is checked.
+    </li>
+    <li><span class="key">single relative</span> - A simple single directory
+    require of the format <code>require('./{{module}}')</code>. This means
+    a file at "src/a.js" could require "src/b.js" with <code>require('./b')</code>,
+    but it wouldn't be able to require "src/some_dir/c.js" with just this
+    option checked.
+    </li>
+    <li><span class="key">absolute id</span> - Require a module with the full
+    AMD path (which doesn't include the source directory). For example, the
+    "src/my_lib.js" file could require "src/my_lib/utils.js" with
+    <code>require('my_lib/utils')</code>. Note the lack of a "./" or "../" at
+    the beginning signifying that this is an absolute path. This option is
+    only available to the AMD format.
+    </li>
+    <li><span class="key">w/o index</span> - This means that the "/index" is
+    left off the end of requiring an "index.js" module. So, for example,
+    module "src/foo.js" must require "src/utils/index.js" with
+    <code>require('./utils')</code>. Note that the module can not also be
+    required with the "/index" at the end, so beware. This only works
+    for CommonJS format with a full relative implementation.
+    </li>
+  </ul>
 </div>
 <div id="h-exports" class="help-section">
   <div class="title">Exports</div>
