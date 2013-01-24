@@ -116,59 +116,83 @@
         <div class="close">&times;</div>
         <h2>Vaccine.js - Help - <input id="show-demo" type="button" value="Show Demo"></h2>
         <div class="content">
-          <div id="help-start" class="help-section">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce placerat dui interdum elit ullamcorper id placerat lorem dignissim. Vivamus quis sodales erat. Curabitur non sapien ipsum. Suspendisse ipsum felis, volutpat in faucibus non, pulvinar vehicula erat. Integer non felis lectus. Etiam quis massa quis quam suscipit interdum. Nunc id ante et urna ullamcorper malesuada non quis lorem. Fusce vitae justo sed metus tristique ornare. Suspendisse potenti. Donec dictum velit felis. Mauris rutrum, purus ut interdum pharetra, neque urna egestas dui, vel viverra lacus lacus ac leo. Sed sit amet dolor et quam ullamcorper consectetur. Etiam convallis molestie libero, lobortis posuere nibh ornare quis. Phasellus aliquam arcu lobortis urna sollicitudin volutpat.
 
-            Nunc consectetur commodo odio quis imperdiet. Donec et pharetra odio. Vivamus lacus libero, tincidunt et gravida at, feugiat et orci. Sed nec tempus justo. Vivamus congue enim vel risus pellentesque molestie. Nam eu nibh vel magna feugiat consectetur. Praesent dignissim accumsan lacinia. Aenean non tincidunt velit.
-          </div>
-          <div class="divider">
-            <h3>Project Settings</h3>
-          </div>
-          <div id="help-format" class="help-section">
-            <div class="title">Module Format</div>
-          </div>
-          <div id="help-supports" class="help-section">
-            <div class="title">Environments Supported</div>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce placerat dui interdum elit ullamcorper id placerat lorem dignissim. Vivamus quis sodales erat. Curabitur non sapien ipsum. Suspendisse ipsum felis, volutpat in faucibus non, pulvinar vehicula erat. Integer non felis lectus. Etiam quis massa quis quam suscipit interdum. Nunc id ante et urna ullamcorper malesuada non quis lorem. Fusce vitae justo sed metus tristique ornare. Suspendisse potenti. Donec dictum velit felis. Mauris rutrum, purus ut interdum pharetra, neque urna egestas dui, vel viverra lacus lacus ac leo. Sed sit amet dolor et quam ullamcorper consectetur. Etiam convallis molestie libero, lobortis posuere nibh ornare quis. Phasellus aliquam arcu lobortis urna sollicitudin volutpat.
+<div id="h-start" class="help-section">
+  <div class="title">Help Start</div>
+  A good introduction to Vaccine is the demo. Click the above button to see it.
+</div>
+<div class="divider">
+  <h3>Project Settings</h3>
+</div>
+<div id="h-format" class="help-section">
+  <div class="title">Module Format</div>
+  To use Vaccine, the JavaScript files must be written in one of the following
+  three module formats. Click the links for more info about each format. Set
+  the module format before any other options are set, since it will hide
+  options that don't work with the chosen format. Clicking the buttons will
+  also set all options back to the default.
+  <ul>
+    <li><a href="https://github.com/amdjs/amdjs-api/wiki/AMD">AMD</a> - The
+    module is written with a call to <code>define</code>. Currently, the
+    supported method signature is <code>define(id?, factory)</code>. The
+    dependency array is not yet supported. Instead, the factory must use the
+    <code>require</code> parameter passed in. The factory parameters are
+    <code>factory(require, exports?, module?)</code> with the last two depending
+    on the <a href="#help-exports">exports</a> configuration.
+    </li>
 
-            Nunc consectetur commodo odio quis imperdiet. Donec et pharetra odio. Vivamus lacus libero, tincidunt et gravida at, feugiat et orci. Sed nec tempus justo. Vivamus congue enim vel risus pellentesque molestie. Nam eu nibh vel magna feugiat consectetur. Praesent dignissim accumsan lacinia. Aenean non tincidunt velit.
-          </div>
-          <div id="help-variables" class="help-section">
-            <div class="title">Project Variables</div>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce placerat dui interdum elit ullamcorper id placerat lorem dignissim. Vivamus quis sodales erat. Curabitur non sapien ipsum. Suspendisse ipsum felis, volutpat in faucibus non, pulvinar vehicula erat. Integer non felis lectus. Etiam quis massa quis quam suscipit interdum. Nunc id ante et urna ullamcorper malesuada non quis lorem. Fusce vitae justo sed metus tristique ornare. Suspendisse potenti. Donec dictum velit felis. Mauris rutrum, purus ut interdum pharetra, neque urna egestas dui, vel viverra lacus lacus ac leo. Sed sit amet dolor et quam ullamcorper consectetur. Etiam convallis molestie libero, lobortis posuere nibh ornare quis. Phasellus aliquam arcu lobortis urna sollicitudin volutpat.
+    <li><a href="http://wiki.commonjs.org/wiki/Modules/1.1">CommonJS</a> - The
+    module is very similar to the inside of the <code>factory</code> of an
+    AMD module.
+    </li>
+  </ul>
+(<a href="http://nodejs.org/api/modules.html">Node.js</a>) or
+<p>Use the <a href="https://github.com/umdjs/umd">UMD</a> <signal>format</signal>
+</div>
+<div id="h-supports" class="help-section">
+  <div class="title">Environments Supported</div>
+  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce placerat dui interdum elit ullamcorper id placerat lorem dignissim. Vivamus quis sodales erat. Curabitur non sapien ipsum. Suspendisse ipsum felis, volutpat in faucibus non, pulvinar vehicula erat. Integer non felis lectus. Etiam quis massa quis quam suscipit interdum. Nunc id ante et urna ullamcorper malesuada non quis lorem. Fusce vitae justo sed metus tristique ornare. Suspendisse potenti. Donec dictum velit felis. Mauris rutrum, purus ut interdum pharetra, neque urna egestas dui, vel viverra lacus lacus ac leo. Sed sit amet dolor et quam ullamcorper consectetur. Etiam convallis molestie libero, lobortis posuere nibh ornare quis. Phasellus aliquam arcu lobortis urna sollicitudin volutpat.
 
-            Nunc consectetur commodo odio quis imperdiet. Donec et pharetra odio. Vivamus lacus libero, tincidunt et gravida at, feugiat et orci. Sed nec tempus justo. Vivamus congue enim vel risus pellentesque molestie. Nam eu nibh vel magna feugiat consectetur. Praesent dignissim accumsan lacinia. Aenean non tincidunt velit.
-          </div>
-          <div class="divider">
-            <h3>Optimizations</h3>
-          </div>
-          <div id="help-require" class="help-section">
-            <div class="title">Require</div>
-          </div>
-          <div id="help-exports" class="help-section">
-            <div class="title">Exports</div>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce placerat dui interdum elit ullamcorper id placerat lorem dignissim. Vivamus quis sodales erat. Curabitur non sapien ipsum. Suspendisse ipsum felis, volutpat in faucibus non, pulvinar vehicula erat. Integer non felis lectus. Etiam quis massa quis quam suscipit interdum. Nunc id ante et urna ullamcorper malesuada non quis lorem. Fusce vitae justo sed metus tristique ornare. Suspendisse potenti. Donec dictum velit felis. Mauris rutrum, purus ut interdum pharetra, neque urna egestas dui, vel viverra lacus lacus ac leo. Sed sit amet dolor et quam ullamcorper consectetur. Etiam convallis molestie libero, lobortis posuere nibh ornare quis. Phasellus aliquam arcu lobortis urna sollicitudin volutpat.
+  Nunc consectetur commodo odio quis imperdiet. Donec et pharetra odio. Vivamus lacus libero, tincidunt et gravida at, feugiat et orci. Sed nec tempus justo. Vivamus congue enim vel risus pellentesque molestie. Nam eu nibh vel magna feugiat consectetur. Praesent dignissim accumsan lacinia. Aenean non tincidunt velit.
+</div>
+<div id="h-variables" class="help-section">
+  <div class="title">Project Variables</div>
+  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce placerat dui interdum elit ullamcorper id placerat lorem dignissim. Vivamus quis sodales erat. Curabitur non sapien ipsum. Suspendisse ipsum felis, volutpat in faucibus non, pulvinar vehicula erat. Integer non felis lectus. Etiam quis massa quis quam suscipit interdum. Nunc id ante et urna ullamcorper malesuada non quis lorem. Fusce vitae justo sed metus tristique ornare. Suspendisse potenti. Donec dictum velit felis. Mauris rutrum, purus ut interdum pharetra, neque urna egestas dui, vel viverra lacus lacus ac leo. Sed sit amet dolor et quam ullamcorper consectetur. Etiam convallis molestie libero, lobortis posuere nibh ornare quis. Phasellus aliquam arcu lobortis urna sollicitudin volutpat.
 
-            Nunc consectetur commodo odio quis imperdiet. Donec et pharetra odio. Vivamus lacus libero, tincidunt et gravida at, feugiat et orci. Sed nec tempus justo. Vivamus congue enim vel risus pellentesque molestie. Nam eu nibh vel magna feugiat consectetur. Praesent dignissim accumsan lacinia. Aenean non tincidunt velit.
-          </div>
-          <div id="help-define" class="help-section">
-            <div class="title">Define</div>
-          </div>
-          <div class="divider">
-            <h3>Miscellaneous</h3>
-          </div>
-          <div id="help-debugging" class="help-section">
-            <div class="title">Debugging</div>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce placerat dui interdum elit ullamcorper id placerat lorem dignissim. Vivamus quis sodales erat. Curabitur non sapien ipsum. Suspendisse ipsum felis, volutpat in faucibus non, pulvinar vehicula erat. Integer non felis lectus. Etiam quis massa quis quam suscipit interdum. Nunc id ante et urna ullamcorper malesuada non quis lorem. Fusce vitae justo sed metus tristique ornare. Suspendisse potenti. Donec dictum velit felis. Mauris rutrum, purus ut interdum pharetra, neque urna egestas dui, vel viverra lacus lacus ac leo. Sed sit amet dolor et quam ullamcorper consectetur. Etiam convallis molestie libero, lobortis posuere nibh ornare quis. Phasellus aliquam arcu lobortis urna sollicitudin volutpat.
+  Nunc consectetur commodo odio quis imperdiet. Donec et pharetra odio. Vivamus lacus libero, tincidunt et gravida at, feugiat et orci. Sed nec tempus justo. Vivamus congue enim vel risus pellentesque molestie. Nam eu nibh vel magna feugiat consectetur. Praesent dignissim accumsan lacinia. Aenean non tincidunt velit.
+</div>
+<div class="divider">
+  <h3>Optimizations</h3>
+</div>
+<div id="h-require" class="help-section">
+  <div class="title">Require</div>
+</div>
+<div id="h-exports" class="help-section">
+  <div class="title">Exports</div>
+  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce placerat dui interdum elit ullamcorper id placerat lorem dignissim. Vivamus quis sodales erat. Curabitur non sapien ipsum. Suspendisse ipsum felis, volutpat in faucibus non, pulvinar vehicula erat. Integer non felis lectus. Etiam quis massa quis quam suscipit interdum. Nunc id ante et urna ullamcorper malesuada non quis lorem. Fusce vitae justo sed metus tristique ornare. Suspendisse potenti. Donec dictum velit felis. Mauris rutrum, purus ut interdum pharetra, neque urna egestas dui, vel viverra lacus lacus ac leo. Sed sit amet dolor et quam ullamcorper consectetur. Etiam convallis molestie libero, lobortis posuere nibh ornare quis. Phasellus aliquam arcu lobortis urna sollicitudin volutpat.
 
-            Nunc consectetur commodo odio quis imperdiet. Donec et pharetra odio. Vivamus lacus libero, tincidunt et gravida at, feugiat et orci. Sed nec tempus justo. Vivamus congue enim vel risus pellentesque molestie. Nam eu nibh vel magna feugiat consectetur. Praesent dignissim accumsan lacinia. Aenean non tincidunt velit.
-          </div>
-          <div id="help-variable-overrides" class="help-section">
-            <div class="title">Variable Overrides</div>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce placerat dui interdum elit ullamcorper id placerat lorem dignissim. Vivamus quis sodales erat. Curabitur non sapien ipsum. Suspendisse ipsum felis, volutpat in faucibus non, pulvinar vehicula erat. Integer non felis lectus. Etiam quis massa quis quam suscipit interdum. Nunc id ante et urna ullamcorper malesuada non quis lorem. Fusce vitae justo sed metus tristique ornare. Suspendisse potenti. Donec dictum velit felis. Mauris rutrum, purus ut interdum pharetra, neque urna egestas dui, vel viverra lacus lacus ac leo. Sed sit amet dolor et quam ullamcorper consectetur. Etiam convallis molestie libero, lobortis posuere nibh ornare quis. Phasellus aliquam arcu lobortis urna sollicitudin volutpat.
+  Nunc consectetur commodo odio quis imperdiet. Donec et pharetra odio. Vivamus lacus libero, tincidunt et gravida at, feugiat et orci. Sed nec tempus justo. Vivamus congue enim vel risus pellentesque molestie. Nam eu nibh vel magna feugiat consectetur. Praesent dignissim accumsan lacinia. Aenean non tincidunt velit.
+</div>
+<div id="h-define" class="help-section">
+  <div class="title">Define</div>
+</div>
+<div class="divider">
+  <h3>Miscellaneous</h3>
+</div>
+<div id="h-debugging" class="help-section">
+  <div class="title">Debugging</div>
+  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce placerat dui interdum elit ullamcorper id placerat lorem dignissim. Vivamus quis sodales erat. Curabitur non sapien ipsum. Suspendisse ipsum felis, volutpat in faucibus non, pulvinar vehicula erat. Integer non felis lectus. Etiam quis massa quis quam suscipit interdum. Nunc id ante et urna ullamcorper malesuada non quis lorem. Fusce vitae justo sed metus tristique ornare. Suspendisse potenti. Donec dictum velit felis. Mauris rutrum, purus ut interdum pharetra, neque urna egestas dui, vel viverra lacus lacus ac leo. Sed sit amet dolor et quam ullamcorper consectetur. Etiam convallis molestie libero, lobortis posuere nibh ornare quis. Phasellus aliquam arcu lobortis urna sollicitudin volutpat.
 
-            Nunc consectetur commodo odio quis imperdiet. Donec et pharetra odio. Vivamus lacus libero, tincidunt et gravida at, feugiat et orci. Sed nec tempus justo. Vivamus congue enim vel risus pellentesque molestie. Nam eu nibh vel magna feugiat consectetur. Praesent dignissim accumsan lacinia. Aenean non tincidunt velit.
-          </div>
+  Nunc consectetur commodo odio quis imperdiet. Donec et pharetra odio. Vivamus lacus libero, tincidunt et gravida at, feugiat et orci. Sed nec tempus justo. Vivamus congue enim vel risus pellentesque molestie. Nam eu nibh vel magna feugiat consectetur. Praesent dignissim accumsan lacinia. Aenean non tincidunt velit.
+</div>
+<div id="h-variable-overrides" class="help-section">
+  <div class="title">Variable Overrides</div>
+  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce placerat dui interdum elit ullamcorper id placerat lorem dignissim. Vivamus quis sodales erat. Curabitur non sapien ipsum. Suspendisse ipsum felis, volutpat in faucibus non, pulvinar vehicula erat. Integer non felis lectus. Etiam quis massa quis quam suscipit interdum. Nunc id ante et urna ullamcorper malesuada non quis lorem. Fusce vitae justo sed metus tristique ornare. Suspendisse potenti. Donec dictum velit felis. Mauris rutrum, purus ut interdum pharetra, neque urna egestas dui, vel viverra lacus lacus ac leo. Sed sit amet dolor et quam ullamcorper consectetur. Etiam convallis molestie libero, lobortis posuere nibh ornare quis. Phasellus aliquam arcu lobortis urna sollicitudin volutpat.
+
+  Nunc consectetur commodo odio quis imperdiet. Donec et pharetra odio. Vivamus lacus libero, tincidunt et gravida at, feugiat et orci. Sed nec tempus justo. Vivamus congue enim vel risus pellentesque molestie. Nam eu nibh vel magna feugiat consectetur. Praesent dignissim accumsan lacinia. Aenean non tincidunt velit.
+</div>
+
+
         </div>
       </div>
 

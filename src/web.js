@@ -372,6 +372,7 @@ var changeFormat = function() {
 };
 
 var openHelp = function(helpId) {
+  window.history.replaceState({}, '', '#help-' + helpId);
   d3.select('#dim-background')
       .style('display', 'block')
       .on('click', closeHelp);
@@ -392,13 +393,22 @@ var openHelp = function(helpId) {
   var content = help.select('.content')
       .style('height', helpHeight + 'px');
 
-  var section = help.select('#help-' + helpId);
+  var section = help.select('#h-' + helpId);
   section.select('.title').classed('focused', true);
   var scrollTo = section.property('offsetTop') - scrollHelpOffset;
   content.node().scrollTop = scrollTo;
 };
 
+var hashChange = function() {
+  var hash = window.location.hash;
+  if (/^#help-/.test(hash)) {
+    openHelp(hash.slice(6));
+  }
+};
+window.onhashchange = hashChange;
+
 var closeHelp = function() {
+  window.history.replaceState({}, '', '#');
   d3.select('#dim-background')
       .style('display', null);
   d3.select('#help-document')
@@ -426,3 +436,4 @@ saveCurrent();
 firstUpdate = true;
 
 demo(web);
+hashChange();
