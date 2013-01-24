@@ -242,6 +242,10 @@ h1 {
   background-color: #eee;
 }
 
+#help-document .key {
+  font-style: italic;
+}
+
 
 #dim-background {
   display: none;

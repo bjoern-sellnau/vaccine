@@ -132,34 +132,59 @@
   options that don't work with the chosen format. Clicking the buttons will
   also set all options back to the default.
   <ul>
-    <li><a href="https://github.com/amdjs/amdjs-api/wiki/AMD">AMD</a> - The
-    module is written with a call to <code>define</code>. Currently, the
+    <li><span class="key"><a href="https://github.com/amdjs/amdjs-api/wiki/AMD">AMD</a></span>
+    - AMD requires a build step with <code>sh build.sh &gt; library.js</code>.
+    An AMD module is written with a call to <code>define</code>. Currently, the
     supported method signature is <code>define(id?, factory)</code>. The
-    dependency array is not yet supported. Instead, the factory must use the
-    <code>require</code> parameter passed in. The factory parameters are
-    <code>factory(require, exports?, module?)</code> with the last two depending
-    on the <a href="#help-exports">exports</a> configuration.
+    factory parameters are <code>factory(require, exports?, module?)</code>
+    with the last two depending on the <a href="#help-exports">exports</a>
+    configuration.</li>
+
+    <li><span class="key"><a href="http://wiki.commonjs.org/wiki/Modules/1.1">CommonJS</a></span>
+    - CommonJS requires a build step with <code>sh build.sh &gt; library.js</code>.
+    The format is very similar to the inside of the <code>factory</code> of an
+    AMD module. There are three free variables: <code>require, exports, and
+    module</code>.
     </li>
 
-    <li><a href="http://wiki.commonjs.org/wiki/Modules/1.1">CommonJS</a> - The
-    module is very similar to the inside of the <code>factory</code> of an
-    AMD module.
+    <li><span class="key"><a href="https://github.com/umdjs/umd">UMD</a></span>
+    - UMD is a pattern for a single file to support multiple environments, such
+    as CommonJS, AMD, or a regular browser global. It does not need a build.
     </li>
-  </ul>
-(<a href="http://nodejs.org/api/modules.html">Node.js</a>) or
-<p>Use the <a href="https://github.com/umdjs/umd">UMD</a> <signal>format</signal>
 </div>
 <div id="h-supports" class="help-section">
   <div class="title">Environments Supported</div>
-  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce placerat dui interdum elit ullamcorper id placerat lorem dignissim. Vivamus quis sodales erat. Curabitur non sapien ipsum. Suspendisse ipsum felis, volutpat in faucibus non, pulvinar vehicula erat. Integer non felis lectus. Etiam quis massa quis quam suscipit interdum. Nunc id ante et urna ullamcorper malesuada non quis lorem. Fusce vitae justo sed metus tristique ornare. Suspendisse potenti. Donec dictum velit felis. Mauris rutrum, purus ut interdum pharetra, neque urna egestas dui, vel viverra lacus lacus ac leo. Sed sit amet dolor et quam ullamcorper consectetur. Etiam convallis molestie libero, lobortis posuere nibh ornare quis. Phasellus aliquam arcu lobortis urna sollicitudin volutpat.
-
-  Nunc consectetur commodo odio quis imperdiet. Donec et pharetra odio. Vivamus lacus libero, tincidunt et gravida at, feugiat et orci. Sed nec tempus justo. Vivamus congue enim vel risus pellentesque molestie. Nam eu nibh vel magna feugiat consectetur. Praesent dignissim accumsan lacinia. Aenean non tincidunt velit.
+  These options determine what environments the project will be used in.
+  Some formats cannot work in some environments, so they will be marked in red.
+  <ul>
+    <li><span class="key">Global (window)</span> - This is the standard method
+    of creating a single global variable for a library (or application). Then,
+    any code that uses this library will have access via the global
+    variable.</li>
+    <li><span class="key">AMD</span> - This option means that the library will
+    work in any application that uses an AMD module loader, such as RequireJS.
+    That is, this option adds a <code>define('library_name', factory)</code> if
+    AMD is detected.</li>
+    <li><span class="key">CommonJS</span> - This option means that the project
+    will support CommonJS environments, such as
+    <a href="http://nodejs.org">Node.js</a>.</li>
+  </ul>
 </div>
 <div id="h-variables" class="help-section">
   <div class="title">Project Variables</div>
-  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce placerat dui interdum elit ullamcorper id placerat lorem dignissim. Vivamus quis sodales erat. Curabitur non sapien ipsum. Suspendisse ipsum felis, volutpat in faucibus non, pulvinar vehicula erat. Integer non felis lectus. Etiam quis massa quis quam suscipit interdum. Nunc id ante et urna ullamcorper malesuada non quis lorem. Fusce vitae justo sed metus tristique ornare. Suspendisse potenti. Donec dictum velit felis. Mauris rutrum, purus ut interdum pharetra, neque urna egestas dui, vel viverra lacus lacus ac leo. Sed sit amet dolor et quam ullamcorper consectetur. Etiam convallis molestie libero, lobortis posuere nibh ornare quis. Phasellus aliquam arcu lobortis urna sollicitudin volutpat.
-
-  Nunc consectetur commodo odio quis imperdiet. Donec et pharetra odio. Vivamus lacus libero, tincidunt et gravida at, feugiat et orci. Sed nec tempus justo. Vivamus congue enim vel risus pellentesque molestie. Nam eu nibh vel magna feugiat consectetur. Praesent dignissim accumsan lacinia. Aenean non tincidunt velit.
+  These variables are used to configure the shim to work for the project.
+  <ul>
+    <li><span class="key">Name</span> - The name of the project. The global
+    variable as well as the AMD module id will be set to this.</li>
+    <li><span class="key">Dependencies</span> - The names of the library's
+    dependencies. This will be used if supporting an AMD environment, with the
+    <code>define</code> call.</li>
+    <li><span class="key">Main (entry file)</span> - The relative path of the
+    main file from the project's root directory. For built libraries (AMD,
+    CommonJS), all the source files must be in a separate directory with only
+    sources. This source directory is extracted from the path to the main file,
+    but can be overwritten with a
+    <a href="#help-variable-overrides">variable override</a>.</li>
 </div>
 <div class="divider">
   <h3>Optimizations</h3>
