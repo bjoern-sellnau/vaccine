@@ -375,7 +375,7 @@ var openHelp = function(helpId) {
       .style('display', 'block')
       .on('click', closeHelp);
 
-  var help = d3.select('#help-text')
+  var help = d3.select('#help-document')
       .style('display', 'block');
   help.select('.close')
       .on('click', closeHelp);
@@ -384,12 +384,22 @@ var openHelp = function(helpId) {
         closeHelp();
         demo.show();
       });
+
+  help.selectAll('.focused').classed('focused', false);
+
+  var helpHeight = Math.floor(0.6 * window.innerHeight);
+  help.select('.content')
+      .style('height', helpHeight + 'px');
+
+  var section = help.select('#help-' + helpId);
+  section.node().scrollIntoView();
+  section.select('.title').classed('focused', true);
 };
 
 var closeHelp = function() {
   d3.select('#dim-background')
       .style('display', null);
-  d3.select('#help-text')
+  d3.select('#help-document')
       .style('display', null);
 };
 

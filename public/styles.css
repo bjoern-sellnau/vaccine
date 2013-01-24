@@ -182,10 +182,9 @@ h1 {
   display: none;
 }
 
-#help-text {
+#help-document {
   display: none;
   position: fixed;
-  overflow-y: auto;
   z-index: 5;
   background-color: white;
   -moz-box-shadow: 2px 2px 8px 3px #222;
@@ -193,13 +192,13 @@ h1 {
   -o-box-shadow: 2px 2px 8px 3px #222;
   -ms-box-shadow: 2px 2px 8px 3px #222;
   box-shadow: 2px 2px 8px 3px #222;
-  padding: 20px 30px;
   width: 600px;
   left: 50%;
-  margin-left: -330px;
+  top: 15%;
+  margin-left: -300px;
 }
 
-#help-text .close {
+#help-document .close {
   position: absolute;
   right: 0;
   top: 0;
@@ -218,8 +217,13 @@ h1 {
   user-select: none;
 }
 
-#help-text .close:hover {
+#help-document .close:hover {
   color: #777;
+}
+
+#help-document .content {
+  overflow-y: auto;
+  padding: 20px 30px;
 }
 
 
@@ -234,9 +238,27 @@ h1 {
 }
 
 h2 {
+  margin: 10px;
   font-size: 22px;
   font-weight: bold;
+  padding-left: 20px;
 }
+
+#help-document .title {
+  font-weight: bold;
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+#help-document .title.focused {
+  background-color: yellow;
+}
+
+.help-section {
+  margin-bottom: 20px;
+}
+
+
 
 #easydemo code {
   display: inline-block;
