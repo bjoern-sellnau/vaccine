@@ -370,6 +370,35 @@ var changeFormat = function() {
   setOptions(options);
 };
 
+var openHelp = function(helpId) {
+  d3.select('#dim-background')
+      .style('display', 'block')
+      .on('click', closeHelp);
+
+  var help = d3.select('#help-text')
+      .style('display', 'block');
+  help.select('.close')
+      .on('click', closeHelp);
+  help.select('#show-demo')
+      .on('click', function() {
+        closeHelp();
+        demo.show();
+      });
+};
+
+var closeHelp = function() {
+  d3.select('#dim-background')
+      .style('display', null);
+  d3.select('#help-text')
+      .style('display', null);
+};
+
+d3.selectAll('.open-help')
+    .on('click', function() {
+      openHelp(this.parentNode.id);
+    });
+
+
 d3.selectAll('#format input[type=button]').on('click', changeFormat);
 
 d3.selectAll('.configuration')

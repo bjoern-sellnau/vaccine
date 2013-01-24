@@ -2,10 +2,12 @@ var d3 = require('d3'),
     easydemo = require('./easydemo'),
     web;
 
-module.exports = function(w) {
+module.exports = exports = function(w) {
   web = w;
   easydemo.start('Vaccine.js', states);
 };
+
+exports.show = easydemo.show;
 
 var updateWith = function(options) {
   return function(finished) {
