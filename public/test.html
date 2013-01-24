@@ -155,7 +155,7 @@
 </div>
 <div id="h-supports" class="help-section">
   <div class="title">Environments Supported</div>
-  These options determine what environments the project will be used in.
+  These options determine what environments the project will support.
   Some formats cannot work in some environments, so they will be marked in red.
   <ul>
     <li><span class="key">Global (window)</span> - This is the standard method
@@ -230,27 +230,72 @@
 </div>
 <div id="h-exports" class="help-section">
   <div class="title">Exports</div>
-  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce placerat dui interdum elit ullamcorper id placerat lorem dignissim. Vivamus quis sodales erat. Curabitur non sapien ipsum. Suspendisse ipsum felis, volutpat in faucibus non, pulvinar vehicula erat. Integer non felis lectus. Etiam quis massa quis quam suscipit interdum. Nunc id ante et urna ullamcorper malesuada non quis lorem. Fusce vitae justo sed metus tristique ornare. Suspendisse potenti. Donec dictum velit felis. Mauris rutrum, purus ut interdum pharetra, neque urna egestas dui, vel viverra lacus lacus ac leo. Sed sit amet dolor et quam ullamcorper consectetur. Etiam convallis molestie libero, lobortis posuere nibh ornare quis. Phasellus aliquam arcu lobortis urna sollicitudin volutpat.
-
-  Nunc consectetur commodo odio quis imperdiet. Donec et pharetra odio. Vivamus lacus libero, tincidunt et gravida at, feugiat et orci. Sed nec tempus justo. Vivamus congue enim vel risus pellentesque molestie. Nam eu nibh vel magna feugiat consectetur. Praesent dignissim accumsan lacinia. Aenean non tincidunt velit.
+  The export options decide how a module can export its API.
+  <ul>
+    <li><span class="key">exports</span> - Export via attaching properties to
+    the exports object (free variable for CommonJS; second factory parameter
+    for AMD). A module can export a "foo" method via <code>exports.foo = ...
+    </code>. The exports object becomes the module's API.
+    </li>
+    <li><span class="key">module.exports</span> - Export via setting
+    module.exports with the module's API. If, for example, "bar.js" wanted to
+    have a function as the API, it could
+    <code>module.exports = function() ...</code>. Then, another module could
+    <code>var bar = require('./bar'); ... bar()</code> to run the function.
+    </li>
+    <li><span class="key">return</span> - Export the API via returning an
+    object from the AMD factory. This only works for AMD.
+    </li>
+  </ul>
 </div>
 <div id="h-define" class="help-section">
   <div class="title">Define</div>
+  This section is AMD only. It sets how the "define" call operates.
+  <ul>
+    <li><span class="key">optional id</span> - This option makes it possible
+    to leave out the module id in the "define" call, so:
+    <code>define(factory)</code>. It makes the build step (build.sh) slightly
+    more complex, but saves some typing. When unchecked, the module id must
+    be included: <code>define(id, factory)</code>.
+    </li>
+    <li><span class="key">array</span> - This option hasn't been implemented
+    yet, but is there to signify that the dependency array in the "define"
+    call is not supported.
+    </li>
+  </ul>
 </div>
 <div class="divider">
   <h3>Miscellaneous</h3>
 </div>
 <div id="h-debugging" class="help-section">
   <div class="title">Debugging</div>
-  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce placerat dui interdum elit ullamcorper id placerat lorem dignissim. Vivamus quis sodales erat. Curabitur non sapien ipsum. Suspendisse ipsum felis, volutpat in faucibus non, pulvinar vehicula erat. Integer non felis lectus. Etiam quis massa quis quam suscipit interdum. Nunc id ante et urna ullamcorper malesuada non quis lorem. Fusce vitae justo sed metus tristique ornare. Suspendisse potenti. Donec dictum velit felis. Mauris rutrum, purus ut interdum pharetra, neque urna egestas dui, vel viverra lacus lacus ac leo. Sed sit amet dolor et quam ullamcorper consectetur. Etiam convallis molestie libero, lobortis posuere nibh ornare quis. Phasellus aliquam arcu lobortis urna sollicitudin volutpat.
-
-  Nunc consectetur commodo odio quis imperdiet. Donec et pharetra odio. Vivamus lacus libero, tincidunt et gravida at, feugiat et orci. Sed nec tempus justo. Vivamus congue enim vel risus pellentesque molestie. Nam eu nibh vel magna feugiat consectetur. Praesent dignissim accumsan lacinia. Aenean non tincidunt velit.
+  These options add some helpful debugging.
+  <ul>
+    <li><span class="key">debug</span> - Logs different actions to the
+    console, such as when a module is defined or required. It also throws
+    an error if a module is redefined, or required but never defined.
+    </li>
+    <li><span class="key">performance</span> - Calculates the time it takes
+    to define all the modules and run their factories.
+    </li>
+    <li><span class="key">"use strict";</span> - Adds a "use strict" into
+    the built library to enable strict mode.
+    </li>
+  </ul>
 </div>
 <div id="h-variable-overrides" class="help-section">
   <div class="title">Variable Overrides</div>
-  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce placerat dui interdum elit ullamcorper id placerat lorem dignissim. Vivamus quis sodales erat. Curabitur non sapien ipsum. Suspendisse ipsum felis, volutpat in faucibus non, pulvinar vehicula erat. Integer non felis lectus. Etiam quis massa quis quam suscipit interdum. Nunc id ante et urna ullamcorper malesuada non quis lorem. Fusce vitae justo sed metus tristique ornare. Suspendisse potenti. Donec dictum velit felis. Mauris rutrum, purus ut interdum pharetra, neque urna egestas dui, vel viverra lacus lacus ac leo. Sed sit amet dolor et quam ullamcorper consectetur. Etiam convallis molestie libero, lobortis posuere nibh ornare quis. Phasellus aliquam arcu lobortis urna sollicitudin volutpat.
-
-  Nunc consectetur commodo odio quis imperdiet. Donec et pharetra odio. Vivamus lacus libero, tincidunt et gravida at, feugiat et orci. Sed nec tempus justo. Vivamus congue enim vel risus pellentesque molestie. Nam eu nibh vel magna feugiat consectetur. Praesent dignissim accumsan lacinia. Aenean non tincidunt velit.
+  These options override the settings derived from the
+  <a href="#help-variables">project variables</a>.
+  <ul>
+    <li><span class="key">Source directory</span> - Sets the source directory
+    used in "build.sh".
+    </li>
+    <li><span class="key">Global variable name</span> - Sets the name of
+    the global variable when supporting that
+    <a href="#help-supports">environment</a>.
+    </li>
+  </ul>
 </div>
 
 
