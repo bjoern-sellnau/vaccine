@@ -4,7 +4,7 @@ var d3 = require('d3'),
 
 module.exports = exports = function(w) {
   web = w;
-  easydemo.start('Vaccine.js', states);
+  easydemo.start('Vaccine.js - Demo', states);
 };
 
 exports.show = easydemo.show;
@@ -93,9 +93,6 @@ var states = [
   },
   {
     enter: updateWith({
-      format: 'commonjs',
-      require: ['absolute', 'single'],
-      exports: ['exports', 'module'],
       supports: ['window', 'amd', 'commonjs'],
     }),
     exit: updateWith({}),
@@ -106,19 +103,8 @@ var states = [
   {
     enter: updateWith({}),
     signals: [
-      {under: '#defaults', top: 0, left: 0}
-    ],
-  },
-  {
-    enter: enterDiffWith({
-      require: ['absolute'],
-      dependencies: 'dep_one',
-    }),
-    exit: exitDiff,
-    signals: [
-      {under: '#diff', top: -5, left: -5},
-      {under: '#controls', top: 8, left: 9},
-      sizeSignal,
+      {under: '#format', top: 0, left: 0},
+      {under: '#supports', top: 0, left: 0}
     ],
   },
   {
@@ -137,6 +123,24 @@ var states = [
   {
     enter: updateWith({}),
     signals: [
+      {under: '#require, #exports', top: 0, left: 0}
+    ],
+  },
+  {
+    enter: enterDiffWith({
+      require: ['absolute'],
+      dependencies: 'dep_one',
+    }),
+    exit: exitDiff,
+    signals: [
+      {under: '#diff', top: -5, left: -5},
+      {under: '#controls', top: 8, left: 9},
+      sizeSignal,
+    ],
+  },
+  {
+    enter: updateWith({}),
+    signals: [
       {under: '#sources .source:first-child', top: 1, left: 1},
       {under: '#sources .source:nth-child(2)', top: 1, left: 1},
     ],
@@ -149,6 +153,9 @@ var states = [
       supports: ['window', 'commonjs', 'amd'],
       targets: ['umd.js'],
     }),
+    signals: [
+      {under: '#umd', top: 0, left: 0},
+    ],
   },
   {
     enter: updateWith({
@@ -160,6 +167,10 @@ var states = [
   },
   {
     enter: updateWith({}),
+  },
+  {
+    enter: updateWith({}),
+    signals: [{under: '.open-help', top: -4, left: -4}],
   },
 ];
 

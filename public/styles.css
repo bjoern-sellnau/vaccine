@@ -87,7 +87,7 @@ header {
   user-select: none;
 }
 
-.open-help div {
+.open-help div:first-child {
   width: 8px;
   height: 15px;
   font-weight: bold;
@@ -172,6 +172,11 @@ h1 {
 
 #easydemo {
   z-index: 3;
+}
+
+#easydemo .info {
+  width: 550px;
+  height: 200px;
 }
 
 .easydemo-signal {
