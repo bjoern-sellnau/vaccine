@@ -85,12 +85,25 @@ header {
 
 #size-info .open-help {
   background-color: #A5E6F3;
+  border-color: #aaa;
+  top: 12px;
+}
+#size-info .open-help:hover {
+  border-color: #666;
 }
 
 #controls .open-help {
   top: auto;
   bottom: -25px;
   right: -13px;
+}
+
+#sources .open-help {
+  display: inline-block;
+  position: relative;
+  top: -2px;
+  right: auto;
+  margin-left: 15px;
 }
 
 .open-help {
@@ -327,6 +340,7 @@ h2 {
   font-size: 24px;
   margin-bottom: 20px;
   width: 250px;
+  position: relative;
 }
 
 .source .code-container {

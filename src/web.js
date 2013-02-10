@@ -243,12 +243,17 @@ var updateSources = function() {
       .attr('class', 'source')
       .each(function(d) {
         source = d3.select(this);
-        source.append('div')
+        var title = source.append('div')
+            .attr('id', d.name.replace('.', '-'))
             .attr('class', 'title')
             .text(d.name);
         source.append('div')
             .attr('class', 'code-container')
             .append('code');
+        title.append('div')
+            .attr('class', 'open-help')
+            .call(function(h) { h.append('div').text('?'); })
+            .call(enableHelp);
       });
 
   sources.exit().remove();
@@ -413,10 +418,12 @@ var closeHelp = function() {
       .style('display', null);
 };
 
-d3.selectAll('.open-help')
-    .on('click', function() {
-      openHelp(this.parentNode.id);
-    });
+var enableHelp = function(selection) {
+  selection.on('click', function() {
+    openHelp(this.parentNode.id);
+  });
+};
+d3.selectAll('.open-help').call(enableHelp);
 
 
 d3.selectAll('#format input[type=button]').on('click', changeFormat);
