@@ -306,25 +306,23 @@
       <div id="demo-text">
 
 
-<p>Vaccine lets JavaScript libraries use a
+<p>Vaccine helps improve modularity by enabling JavaScript libraries to use a
 <a href="http://wiki.commonjs.org/wiki/Modules/1.1">CommonJS</a>
 (<a href="http://nodejs.org/api/modules.html">Node.js</a>) or
 <a href="https://github.com/amdjs/amdjs-api/wiki/AMD">AMD</a> module format and
-work in the browser. It works by generating small shims that won't bloat the
-library's size. It is similar to
-<a href="https://github.com/sstephenson/stitch">Stitch</a>, or a subset of
-<a href="https://github.com/substack/node-browserify">Browserify</a> and
-<a href="https://github.com/jrburke/almond">Almond</a>, except that Vaccine
-is configurable.</p>
+work in both browser and server. (These formats try to remedy JavaScript's lack
+of modules, so using them produces more modular code.) Vaccine works by
+generating a small shim that gets built with the project's code to make it
+function in a single script tag.</p>
 
-<p>Configurability enables the shims to be <signal>small</signal> by including
-only the required functionality. While Vaccine works for applications, its
-small size is most important to libraries.</p>
+<p>The shim is configurable, which decreases its <signal>size</signal> by
+including only the required functionality. Many libraries need to work in both
+server and client, and Vaccine makes it easy for them to do so. Now the library
+can be written in the server's native CommonJS format and still work in the
+browser. The tiny size of the shim makes this feasible for the many small
+JavaScript libraries.</p>
 
-<p>Larger projects may not be as concerned about size, but
-instead need more functionality.</p>
-
-<p>The canonical example of reducing size via configuration is for projects
+<p>The best example of reducing size via configuration is for projects
 that have only one directory of source files (no subdirectories). Having one
 level of sources simplifies the require implementation considerably.</p>
 

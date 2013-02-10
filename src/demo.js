@@ -63,14 +63,6 @@ var states = [
     ],
   },
   {
-    enter: updateWith({
-      format: 'amd',
-      require: ['full'],
-      exports: ['exports', 'module', 'return'],
-      supports: ['amd', 'window'],
-    }),
-  },
-  {
     enter: enterDiffWith({
       format: 'commonjs',
       require: ['single'],
