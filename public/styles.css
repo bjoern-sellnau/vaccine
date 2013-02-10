@@ -39,6 +39,7 @@ header {
 }
 
 #controls {
+  position: relative;
   float: right;
   padding: 10px;
   margin-right: 10px;
@@ -76,9 +77,26 @@ header {
   margin-top: 10px;
 }
 
+#targets .open-help {
+  left: -8px;
+  top: -5px;
+  right: auto;
+}
+
+#size-info .open-help {
+  background-color: #A5E6F3;
+}
+
+#controls .open-help {
+  top: auto;
+  bottom: -25px;
+  right: -13px;
+}
+
 .open-help {
   position: absolute;
   right: 4px;
+  top: 4px;
   border-style: solid;
   border-width: 1px;
   border-radius: 11px;
@@ -140,8 +158,8 @@ h1 {
   text-align: right;
 }
 
-#sizes .asterisk {
-  margin-left: 2px;
+#size-info {
+  position: relative;
 }
 
 #sizes .shot-container {
@@ -250,6 +268,7 @@ h1 {
 
 #help-document .key {
   font-style: italic;
+  color: #070;
 }
 
 
@@ -276,7 +295,8 @@ h2 {
   margin-bottom: 10px;
 }
 
-#help-document .title.focused {
+.focused .title,
+#help-document .focused h3 {
   background-color: yellow;
 }
 
@@ -348,7 +368,7 @@ code .number {
   color: black;
 }
 code .keyword {
-  color: #00AED1;
+  color: #008CA8;
   font-weight: bold;
 }
 code .special {
@@ -372,6 +392,10 @@ h3 {
   color: #A542F0;
   margin: 0;
   padding: 0 6px;
+}
+
+#help-document h3 {
+  background-color: white;
 }
 
 .group {

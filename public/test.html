@@ -17,7 +17,9 @@
           <div class="shot current"></div>
           <div class="shot saved"></div>
         </div>
-        <div class="info">
+        <div id="size-info" class="info">
+          <div class="variable-sizes"></div>
+          <div class="open-help"><div>?</div></div>
         </div>
       </div>
     </div>
@@ -104,11 +106,6 @@
             <label>Global variable name<input type="text" name="global"></label>
           </div>
         </div>
-        <div class="group">
-          <div class="title">*Note</div>
-          <div class="inputs">Gzipped size calculated by gzipping various
-            vaccine.js versions with a 4.8k sized library.</div>
-        </div>
       </div>
 
 
@@ -120,6 +117,11 @@
 <div id="h-start" class="help-section">
   <div class="title">Help Start</div>
   A good introduction to Vaccine is the demo. Click the above button to see it.
+</div>
+<div id="h-size-info" class="help-section">
+  <div class="title">Size Info</div>
+  Gzipped size calculated by gzipping various vaccine.js versions with a 4.8k
+  sized library.
 </div>
 <div class="divider">
   <h3>Project Settings</h3>
@@ -297,7 +299,40 @@
     </li>
   </ul>
 </div>
-
+<div id="h-controls" class="help-section">
+  <div class="title">Controls</div>
+  These controls add the ability to save or compare different shim
+  configurations.
+  <ul>
+    <li><span class="key">Save</span>
+    </li>
+    <li><span class="key">Swap</span>
+    </li>
+    <li><span class="key">Diff with saved</span>
+    </li>
+  </ul>
+</div>
+<div id="h-targets" class="divider">
+  <h3>Targets</h3>
+</div>
+<div id="h-vaccine-js" class="help-section">
+  <div class="title">vaccine.js</div>
+</div>
+<div id="h-build-sh" class="help-section">
+  <div class="title">build.sh</div>
+</div>
+<div id="h-vaccine_dev-js" class="help-section">
+  <div class="title">vaccine_dev.js</div>
+</div>
+<div id="h-dev_server-js" class="help-section">
+  <div class="title">dev_server.js</div>
+</div>
+<div id="h-Makefile" class="help-section">
+  <div class="title">Makefile</div>
+</div>
+<div id="h-umd-js" class="help-section">
+  <div class="title">umd.js</div>
+</div>
 
         </div>
       </div>
@@ -377,6 +412,7 @@ a temporary treatment until the
             <input id="save" type="button" value="Save">
             <input id="swap" type="button" value="Swap">
             <div class="button" id="diff"><em>Diff</em> with saved</div>
+            <div class="open-help"><div>?</div></div>
           </div>
           <div id="targets" class="group">
             <div class="inputs">
@@ -388,6 +424,7 @@ a temporary treatment until the
               <label class="target-non-umd"><input type="checkbox" name="targets" value="Makefile">Makefile</label>
             </div>
             <div class="title"></div>
+            <div class="open-help"><div>?</div></div>
           </div>
         </div>
         <div id="sources"></div>

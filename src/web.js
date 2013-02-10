@@ -284,8 +284,7 @@ var updateSources = function() {
     }
     var sizeHtml = numberSpan(min) + ' bytes minified';
     sizeHtml += numberSpan(gzip, true) + ' bytes gzipped';
-    sizeHtml += '<span class="asterisk">*</span>';
-    d3.select('#sizes .info').html(sizeHtml);
+    d3.select('#size-info .variable-sizes').html(sizeHtml);
   }
 };
 
@@ -393,8 +392,7 @@ var openHelp = function(helpId) {
   var content = help.select('.content')
       .style('height', helpHeight + 'px');
 
-  var section = help.select('#h-' + helpId);
-  section.select('.title').classed('focused', true);
+  var section = help.select('#h-' + helpId).classed('focused', true);
   var scrollTo = section.property('offsetTop') - scrollHelpOffset;
   content.node().scrollTop = scrollTo;
 };
