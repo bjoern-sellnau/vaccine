@@ -339,7 +339,7 @@ code .comment {
   color: green;
 }
 code .string {
-  color: red;
+  color: #FF1F6D;
 }
 code .regexp {
   color: orange;
@@ -348,7 +348,8 @@ code .number {
   color: black;
 }
 code .keyword {
-  color: blue;
+  color: #00AED1;
+  font-weight: bold;
 }
 code .special {
   color: purple;
