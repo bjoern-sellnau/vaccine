@@ -108,6 +108,8 @@ header {
 
 .open-help {
   position: absolute;
+  display: block;
+  text-decoration: none;
   right: 4px;
   top: 4px;
   border-style: solid;

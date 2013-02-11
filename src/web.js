@@ -244,16 +244,15 @@ var updateSources = function() {
       .each(function(d) {
         source = d3.select(this);
         var title = source.append('div')
-            .attr('id', d.name.replace('.', '-'))
             .attr('class', 'title')
             .text(d.name);
         source.append('div')
             .attr('class', 'code-container')
             .append('code');
-        title.append('div')
+        title.append('a')
             .attr('class', 'open-help')
-            .call(function(h) { h.append('div').text('?'); })
-            .call(enableHelp);
+            .attr('href', helpLink(d.name.replace('.', '-')))
+            .append('div').text('?');
       });
 
   sources.exit().remove();
@@ -375,8 +374,12 @@ var changeFormat = function() {
   setOptions(options);
 };
 
+var helpLink = function(helpId) {
+  return '#help-' + helpId;
+};
+
 var openHelp = function(helpId) {
-  window.history.replaceState({}, '', '#help-' + helpId);
+  window.history.replaceState({}, '', helpLink(helpId));
   d3.select('#dim-background')
       .style('display', 'block')
       .on('click', closeHelp);
@@ -418,12 +421,9 @@ var closeHelp = function() {
       .style('display', null);
 };
 
-var enableHelp = function(selection) {
-  selection.on('click', function() {
-    openHelp(this.parentNode.id);
-  });
-};
-d3.selectAll('.open-help').call(enableHelp);
+d3.selectAll('.open-help').each(function() {
+  this.href = helpLink(this.parentNode.id);
+});
 
 
 d3.selectAll('#format input[type=button]').on('click', changeFormat);
