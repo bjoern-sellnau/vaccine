@@ -391,12 +391,33 @@
 &lt;script&gt;var _ = requireDev();&lt;/script&gt;
 </code></pre>
 
+  <p>Note that in order for the script tags to work with CommonJS, a
+  <a href="#help-dev_server-js">development server</a> is needed to wrap the
+  modules in "define" calls. AMD does not have this problem.</p>
+
 </div>
 <div id="h-dev_server-js" class="help-section">
   <div class="title">dev_server.js</div>
+  <p>dev_server.js is a simple development server that serves up static files
+  from the project's root directory. It will also wrap CommonJS modules under
+  the source directory so that they can work in a script tag.</p>
+
+  <p>To use the dev server, copy down dev_serve.js to your project. This
+  server uses <a href="http://expressjs.com/">Express</a> on top of
+  <a href="http://nodejs.org/">Node.js</a>. With Node.js installed, install
+  express with: <code>npm install express</code>.</p>
+
+  <p>Run the server with <code>$ node dev_server.js</code></p>
+
+  <p>The other functionality in the server is being able to run build.sh
+  and having the results used in a script tag with href set to "build.sh". In
+  fact any file with a path that starts with "build" will be executed before
+  returning the results.</p>
 </div>
 <div id="h-Makefile" class="help-section">
   <div class="title">Makefile</div>
+  A barebones makefile that saves a bit of typing so that
+  <code>sh build.sh &gt; my_library.js</code> can just be <code>make</code>.
 </div>
 <div id="h-umd-js" class="help-section">
   <div class="title">umd.js</div>

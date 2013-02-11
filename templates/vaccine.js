@@ -154,7 +154,7 @@
 
     var vaccineOptionalId = function() {
       var loc = window.location,
-          href = loc.protocol + '//' + loc.host;
+          href = loc.protocol + '//' + loc.host,
           sourceDirRe = new RegExp('^' + href + '/$-- sourceDir --$/'),
           scripts = document.getElementsByTagName('script');
       var idFromScript = function(script) {
