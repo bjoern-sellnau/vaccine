@@ -336,12 +336,61 @@
 </div>
 <div id="h-vaccine-js" class="help-section">
   <div class="title">vaccine.js</div>
+  <p>vaccine.js is the shim that makes CommonJS or AMD modules work in the
+  browser. It includes a function to define module factories. It also
+  implements the "require" functionality that lets a module obtain the exports
+  from another module. Finally it provides the library as either an AMD module
+  or a "window" global. If it defines an AMD module, it also lists
+  dependencies.</p>
+
+  <p>This shim will be bundled with the rest of the modules inside an
+  immediately invoked function. This prevents leaking any unwanted globals.
+  </p>
 </div>
 <div id="h-build-sh" class="help-section">
   <div class="title">build.sh</div>
+  <p>build.sh wraps all source files including vaccine.js (at the end) inside
+  an immediately invoked function. In the case of CommonJS, it also wraps
+  each module individually in a "define" call, which turns each module into
+  a factory function (closure). If it is AMD with an optional id, build.sh will
+  also give each module an id (if one wasn't specified).</p>
+
+  <p>Run build.sh on the command line to produce the built file:</p>
+
+  <p><code>$ sh build.sh &gt; my_library.js</code></p>
+
+  <p>The sources must be in a separate directory, which includes only source
+  files. Of course, build.sh is very small, so you can extend it to fit your
+  need.</p>
 </div>
 <div id="h-vaccine_dev-js" class="help-section">
   <div class="title">vaccine_dev.js</div>
+  <p>vaccine_dev.js is useful when doing development. Developing with a single
+  built file (from build.sh) is difficult, especially as libraries grow to
+  many files. This dev version of Vaccine separates out each module in its
+  own script tag, so finding things is easier.</p>
+
+  <p>vaccine_dev.js provides a <code>requireDev</code> function that by default
+  will give the exports of the main (entry) file. Specifying a module id as
+  the only parameter will give the exports of that module.</p>
+
+  <p>Below is an example of how vaccine_dev.js is used</p>
+<pre><code>&lt;!-- Must be before sources --&gt;
+&lt;script src="/vaccine_dev.js"&gt;&lt;/script&gt;
+
+&lt;!-- Sources can be in any order --&gt;
+&lt;script src="/src/underscore.js"&gt;&lt;/script&gt;
+&lt;script src="/src/underscore/arrays.js"&gt;&lt;/script&gt;
+&lt;script src="/src/underscore/collections.js"&gt;&lt;/script&gt;
+&lt;script src="/src/underscore/each.js"&gt;&lt;/script&gt;
+&lt;script src="/src/underscore/functions.js"&gt;&lt;/script&gt;
+&lt;script src="/src/underscore/objects.js"&gt;&lt;/script&gt;
+&lt;script src="/src/underscore/utils.js"&gt;&lt;/script&gt;
+
+&lt;!-- Get the main exports with "requireDev()" --&gt;
+&lt;script&gt;var _ = requireDev();&lt;/script&gt;
+</code></pre>
+
 </div>
 <div id="h-dev_server-js" class="help-section">
   <div class="title">dev_server.js</div>

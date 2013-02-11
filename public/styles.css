@@ -277,7 +277,8 @@ h1 {
   margin-bottom: 12px;
 }
 
-#help-document code {
+#help-document code,
+#help-document pre {
   background-color: #eee;
 }
 
