@@ -120,8 +120,20 @@
 </div>
 <div id="h-size-info" class="help-section">
   <div class="title">Size Info</div>
-  Gzipped size calculated by gzipping various vaccine.js versions with a 4.8k
-  sized library.
+  <p>When in Diff mode, the numbers are the difference between the configurations
+  under comparison. When red, the current configuration is smaller (showing
+  bytes removed). When green, the current configuration is larger (showing
+  bytes added).</p>
+
+  <p>The bytes minified are calculated by running
+  <a href="https://github.com/mishoo/UglifyJS">UglifyJS</a> on the text of
+  <code>vaccine.js</code> wrapped in an immediately evaluated function
+  <code>(function() { ... }())</code>.</p>
+
+  <p>Gzipped size was calculated by gzipping various vaccine.js versions with a
+  4.8k sized library. A linear regression fit the resulting gzipped sizes
+  with a 0.997 correlation coefficient. Note that when compressing with
+  smaller libraries, the amount added tends to be more.</p>
 </div>
 <div class="divider">
   <h3>Project Settings</h3>
