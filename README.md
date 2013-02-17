@@ -22,11 +22,15 @@ significant.
 
 ### Why a new tool for libraries? ###
 
-Currently libraries are mostly developed as single large file, or multiple
+Currently, libraries are mostly developed as a single large file, or multiple
 files that are concatenated in a manually defined order. Few libraries
 use a modular format such as CommonJS or AMD, instead using weaker
-JavaScript idioms. Vaccine lets libraries be developed in these better
+JavaScript idioms. Vaccine lets libraries use these better
 formats and still work in the browser as a script tag.
+
+### What are the CommonJS, AMD, and UMD module formats? ###
+
+See below: [CommonJS](#commonjs), [AMD](#amd), [UMD](#umd).
 
 ### What needs do libraries have? ###
 
@@ -44,13 +48,24 @@ build process. An opaque build tool makes this more difficult. Libraries
 may need to extend the build process. Issues may come up with a build tool
 or how they are using it.
 
+Some libraries need to be developed in the browser. Using a single built
+file makes it harder for debugging. Splitting out each module into separate
+script tags is easier.
+
 ### How does Vaccine meet these needs? ###
 
 The Vaccine GUI creates a shim and a tiny build script. In combination they
 make a library written in AMD or CommonJS work in a single browser script
-tag. The shim is configured to be as small as possible, so that the tradeoff
+tag.
+
+The shim is configured to be as small as possible, so that the tradeoff
 between size added and better modularity tips in favor of better modularity.
-Lastly, the tiny build script is easy to comprehend, and easy to modify.
+
+The tiny build script is easy to comprehend, and easy to modify.
+
+A special version of the shim can be used during development along with
+a development server so that testing in the browser is done with each module
+as a separate script tag.
 
 ### Why is Vaccine a GUI instead of a tool? ###
 
@@ -59,6 +74,48 @@ was done initially for the transparency in how Vaccine works. It is easy
 to compare configurations to see how the shim is generated. It is also very
 quick to use, so the added convenience from a tool will not be that
 substantial.
+
+### Why does Vaccine support more than one module format? ###
+
+The JavaScript community is split between different module formats. Some
+people prefer one format to another. This way they can choose the format
+they like best. Also, CommonJS is needed for libraries that can be used
+on the server. AMD is generally considered to be better for the browser.
+
+### Why doesn't Vaccine do package management? ###
+
+Vaccine helps with the development of a JS library and building it into
+a single file. It does not come with or tie itself to a specific package
+management system. This is purposeful. If Vaccine only worked with a
+certain package manager, it would limit the number of possible users of a
+library. Therefore, Vaccine is package manager agnostic.
+
+A library can use Vaccine and be distributed in any number of the
+available package managers ([Bower](http://twitter.github.com/bower/),
+[component](https://github.com/component/component),
+[npm](https://npmjs.org/)), as well as providing a single built file that
+users can grab.
+
+Module Format Introductions
+---------------------------
+- [CommonJS](#commonjs)
+- [AMD](#amd)
+- [UMD](#umd)
+
+CommonJS
+--------
+See the [CommonJS wiki](http://wiki.commonjs.org/wiki/Modules/1.1) for more
+info. The below gives a brief introduction.
+
+AMD
+---
+See the [AMD wiki](https://github.com/amdjs/amdjs-api/wiki/AMD) for more
+info. The below gives a brief introduction.
+
+UMD
+---
+See the [UMD Github](https://github.com/umdjs/umd)
+
 
 LICENSE
 -------

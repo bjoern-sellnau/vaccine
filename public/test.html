@@ -141,28 +141,30 @@
 <div id="h-format" class="help-section">
   <div class="title">Module Format</div>
   To use Vaccine, the JavaScript files must be written in one of the following
-  three module formats. Click the links for more info about each format. Set
-  the module format before any other options are set, since it will hide
-  options that don't work with the chosen format. Clicking the buttons will
-  also set all options back to the default.
+  three module formats. Set the module format before any other options are set,
+  since it will hide options that don't work with the chosen format. Clicking
+  the buttons will also set all options back to the default.
   <ul>
-    <li><span class="key"><a href="https://github.com/amdjs/amdjs-api/wiki/AMD">AMD</a></span>
-    - AMD requires a build step with <code>sh build.sh &gt; library.js</code>.
+    <li><span class="key">AMD</span>
+    - <a href="https://github.com/jakesandlund/vaccine#amd">How AMD works</a>.
+    AMD requires a build step with <code>sh build.sh &gt; library.js</code>.
     An AMD module is written with a call to <code>define</code>. Currently, the
     supported method signature is <code>define(id?, factory)</code>. The
     factory parameters are <code>factory(require, exports?, module?)</code>
     with the last two depending on the <a href="#help-exports">exports</a>
     configuration.</li>
 
-    <li><span class="key"><a href="http://wiki.commonjs.org/wiki/Modules/1.1">CommonJS</a></span>
-    - CommonJS requires a build step with <code>sh build.sh &gt; library.js</code>.
+    <li><span class="key">CommonJS</span>
+    - <a href="https://github.com/jakesandlund/vaccine#commonjs">How CommonJS works</a>.
+    CommonJS requires a build step with <code>sh build.sh &gt; library.js</code>.
     The format is very similar to the inside of the <code>factory</code> of an
     AMD module. There are three free variables: <code>require, exports, and
     module</code>.
     </li>
 
-    <li><span class="key"><a href="https://github.com/umdjs/umd">UMD</a></span>
-    - UMD is a pattern for a single file to support multiple environments, such
+    <li><span class="key">UMD</span>
+    - <a href="https://github.com/jakesandlund/vaccine#umd">How UMD works</a>.
+    UMD is a pattern for a single file to support multiple environments, such
     as CommonJS, AMD, or a regular browser global. It does not need a build.
     </li>
   </ul>
