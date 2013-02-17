@@ -84,12 +84,13 @@ header {
 }
 
 #size-info .open-help {
-  background-color: #A5E6F3;
-  border-color: #aaa;
+  /*border-color: #999;
+  color: #888;*/
   top: 12px;
 }
 #size-info .open-help:hover {
-  border-color: #666;
+  /*border-color: #777;
+  color: #555;*/
 }
 
 #controls .open-help {
@@ -98,9 +99,25 @@ header {
   right: -13px;
 }
 
-#sources .open-help {
+#sources .open-help,
+h1 .open-help {
   display: inline-block;
   position: relative;
+}
+
+h1 .open-help {
+  top: -8px;
+  right: -50px;
+  margin-left: -20px;
+  font-family: Arial, sans-serif;
+  /*border-color: #aaa;
+}
+h1 .open-help:hover {
+  border-color: #666;*/
+}
+
+
+#sources .open-help {
   top: -2px;
   right: auto;
   margin-left: 15px;
@@ -115,9 +132,10 @@ header {
   border-style: solid;
   border-width: 1px;
   border-radius: 11px;
-  border-color: #bfbfbf;
   cursor: pointer;
-  color: #aaa;
+  border-color: #555;
+  color: #333;
+  opacity: 0.4;
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   -khtml-user-select: none;
@@ -135,8 +153,7 @@ header {
 }
 
 .open-help:hover {
-  border-color: #888;
-  color: #666;
+  opacity: 0.8;
 }
 
 h1 {

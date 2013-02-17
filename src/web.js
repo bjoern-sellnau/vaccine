@@ -422,7 +422,7 @@ var closeHelp = function() {
 };
 
 d3.selectAll('.open-help').each(function() {
-  this.href = helpLink(this.parentNode.id);
+  this.href = this.href || helpLink(this.parentNode.id);
 });
 
 
