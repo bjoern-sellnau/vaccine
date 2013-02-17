@@ -105,16 +105,22 @@ Module Format Introductions
 CommonJS
 --------
 See the [CommonJS wiki](http://wiki.commonjs.org/wiki/Modules/1.1) for more
-info. The below gives a brief introduction.
+info.
+
+Intro coming soon.
 
 AMD
 ---
 See the [AMD wiki](https://github.com/amdjs/amdjs-api/wiki/AMD) for more
-info. The below gives a brief introduction.
+info.
+
+Intro coming soon.
 
 UMD
 ---
-See the [UMD Github](https://github.com/umdjs/umd)
+See the [UMD Github](https://github.com/umdjs/umd).
+
+Intro coming soon.
 
 
 LICENSE
