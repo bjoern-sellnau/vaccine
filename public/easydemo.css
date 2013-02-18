@@ -1,19 +1,48 @@
 #easydemo {
   position: fixed;
-  background-color: #444;
+  background-color: #666;
   font-size: 16px;
   font-family: Tahoma, sans-serif;
-  line-height: 150%;
+  line-height: 170%;
   color: #222;
   -moz-box-shadow: 2px 2px 8px 3px #888;
   -webkit-box-shadow: 2px 2px 8px 3px #888;
   -o-box-shadow: 2px 2px 8px 3px #888;
   -ms-box-shadow: 2px 2px 8px 3px #888;
   box-shadow: 2px 2px 8px 3px #888;
+  left: 50%;
+  top: 50%;
+  margin-left: -300px;
+  margin-top: -220px;
 }
 
 #easydemo.unfocused {
   opacity: 0.6;
+}
+
+#easydemo.attention {
+  -moz-box-shadow: 0px 0px 15px 7px #0a0;
+  -webkit-box-shadow: 0px 0px 15px 7px #0a0;
+  -o-box-shadow: 0px 0px 15px 7px #0a0;
+  -ms-box-shadow: 0px 0px 15px 7px #0a0;
+  box-shadow: 0px 0px 15px 7px #0a0;
+}
+
+#easydemo .attention-grab {
+  position: fixed;
+  border: solid 7px #0a0;
+  background-color: transparent;
+  margin-left: -7px;
+  margin-top: -7px;
+  opacity: 0.9;
+  pointer-events: none;
+}
+
+#easydemo a {
+  text-decoration: none;
+}
+#easydemo a:hover {
+  text-decoration: underline;
 }
 
 #easydemo .header {
@@ -25,7 +54,7 @@
   background-image: -moz-linear-gradient(top, #555, #222);
   background-image: linear-gradient(top, #555, #222);
   color: white;
-  padding: 6px;
+  padding: 15px;
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   -moz-user-select: none;
@@ -34,8 +63,8 @@
 }
 
 #easydemo .header .title {
-  font-size: 20px;
-  margin-left: 4px;
+  font-size: 24px;
+  margin-left: 12px;
 }
 
 #easydemo .header .controls {
@@ -45,18 +74,19 @@
 #easydemo .control {
   float: left;
   cursor: pointer;
+  margin-top: -1px;
 }
 
 #easydemo .sprite {
-  margin: 7px;
+  margin: 8px;
   background-image: url("easydemo.png");
 }
 
 #easydemo .right-arrow, #easydemo .left-arrow {
-  height: 14px;
-  width: 7px;
-  margin-right: 10px;
-  margin-left: 11px;
+  height: 16px;
+  width: 8px;
+  margin-right: 12px;
+  margin-left: 12px;
   background-position: 0px 0px;
 }
 
@@ -65,32 +95,32 @@
 }
 
 #easydemo .left-arrow {
-  height: 14px;
-  width: 7px;
-  background-position: -7px 0px;
+  height: 16px;
+  width: 8px;
+  background-position: -8px 0px;
 }
 
 #easydemo .down-arrow {
-  height: 7px;
-  width: 14px;
+  height: 8px;
+  width: 16px;
   margin-top: 10px;
   margin-bottom: 11px;
-  background-position: -14px 0px;
+  background-position: -16px 0px;
 }
 
 #easydemo .cross {
-  height: 14px;
-  width: 14px;
-  background-position: -28px 0px;
+  height: 16px;
+  width: 16px;
+  background-position: -32px 0px;
 }
 
 #easydemo .close {
-  margin-left: 15px;
+  margin-left: 30px;
 }
 
 #easydemo .previous {
-  margin-right: 3px;
-  margin-left: 10px;
+  margin-right: 10px;
+  margin-left: 12px;
 }
 
 
@@ -100,21 +130,22 @@
 }
 
 #easydemo .info {
-  width: 500px;
-  height: 325px;
+  width: 600px;
+  height: 375px;
   overflow-y: scroll;
+  cursor: move;
 }
 
 #easydemo p.state {
   cursor: pointer;
-  margin: 6px;
+  margin: 10px 15px;
   margin-top: 0;
   border-style: solid;
   border-width: 5px;
-  border-radius: 8px;
+  border-radius: 20px;
   background-color: #777;
   border-color: #777;
-  padding: 3px;
+  padding: 10px 20px;
 }
 
 #easydemo p.state:hover {
@@ -172,12 +203,13 @@
 
 
 signal {
-  display: inline;
+  display: inline-block;
   border-style: solid;
   border-width: 1px;
   border-color: #555;
   border-radius: 8px;
-  padding: 0 4px;
+  padding: 0 7px;
+  line-height: 150%;
 }
 
 p.state:hover signal {

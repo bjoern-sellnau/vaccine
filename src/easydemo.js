@@ -1,5 +1,7 @@
 var easydemo = exports;
 
+  "use strict";
+
   var createDiv = function() { return document.createElement('div'); };
 
   var createControl = function(spriteType, className) {
@@ -22,6 +24,7 @@ var easydemo = exports;
       infoBoxContainer = createDiv(),
       header = createDiv(),
       controls = createDiv(),
+      attentionGrabber = createDiv(),
       title = document.createElement('span'),
       previousArrow = createControl('left-arrow', 'previous'),
       nextArrow = createControl('right-arrow'),
@@ -39,6 +42,7 @@ var easydemo = exports;
       width = null,
       minHeight = 40,
       minWidth = null,
+      attentionInTime = 1200,
       activeState = {p: {}},
       currentState = {p: {}},
       infoEnds = [createDiv(), createDiv()],
@@ -47,6 +51,8 @@ var easydemo = exports;
       states,
       sameStateTimer,
       scrollEndTimer;
+
+  attentionGrabber.className = 'attention-grab';
 
   easydemo.delay = 0;
   easydemo.sameDelay = 3000;
@@ -127,7 +133,7 @@ var easydemo = exports;
       };
       changeActive('add');
       active = true;
-      setTimeout(function() {
+      window.setTimeout(function() {
         changeActive('remove');
         active = false;
       }, easydemo.activeSignalDelay);
@@ -159,6 +165,7 @@ var easydemo = exports;
     var active = activeState;
     activeState = currentState;
     changingStates = true;
+    demoBox.classList.remove('attention');
     active.p.className = 'state';
     currentState.p.className = 'state active';
     removeSignals(active);
@@ -266,10 +273,20 @@ var easydemo = exports;
     focus();
     if (demoBox.parentNode) return;
     document.body.appendChild(demoBox);
-    if (x === null) x = window.innerWidth / 2 - demoBox.offsetWidth / 2;
-    if (y === null) y = window.innerHeight / 2 - demoBox.offsetHeight / 2;
-    if (height === null) height = infoBox.clientHeight;
-    if (width === null) width = infoBox.clientWidth;
+    if (x === null) {
+      x = demoBox.offsetLeft;
+      y = demoBox.offsetTop;
+      height = infoBox.clientHeight;
+      width = infoBox.clientWidth;
+      height = infoBox.clientHeight;
+      width = infoBox.clientWidth;
+
+      // Margins may have been set to get the original position.
+      // no longer needed.
+      demoBox.style.margin = '0';
+      demoBox.style.bottom = 'auto';
+      demoBox.style.right = 'auto';
+    }
     toggleInfoBox();
     if (minWidth === null) minWidth = demoBox.offsetWidth;
     toggleInfoBox();
@@ -279,9 +296,63 @@ var easydemo = exports;
       pMargin = +pStyle.marginBottom.replace(/px$/, '');
     }
     updatePositions();
+    drawAttention();
     setScroll(currentState);
   };
   easydemo.show = show;
+
+  var drawAttention = function() {
+    var attention = attentionGrabber;
+    if (attention.parentNode) return;
+    demoBox.appendChild(attention);
+    var time = attentionInTime;
+    var now = +Date.now();
+    var dimensions = ['top', 'left', 'width', 'height'];
+    var current = {
+      top: 0,
+      left: 0,
+      width: window.innerWidth,
+      height: window.innerHeight,
+    };
+    var target = {
+      top: y,
+      left: x,
+      width: demoBox.offsetWidth,
+      height: demoBox.offsetHeight,
+    };
+
+    var update = function() {
+      var lastNow = now;
+      now = +Date.now();
+      var diff = now - lastNow;
+      var weight = 1;
+      if (time > 0) {
+        weight = diff / time;
+        if (weight > 1) weight = 1;
+      }
+      dimensions.forEach(function(dim) {
+        current[dim] = weight * target[dim] + (1 - weight) * current[dim];
+        attention.style[dim] = Math.round(current[dim]) + 'px';
+      });
+      time -= diff;
+      if (time > 0) reqAnimationFrame(update);
+      else stop();
+    };
+
+    update();
+
+    var stop = function() {
+      demoBox.removeChild(attention);
+      demoBox.classList.add('attention');
+    };
+  };
+
+  var reqAnimationFrame = window.requestAnimationFrame
+      || window.webkitRequestAnimationFrame
+      || window.mozRequestAnimationFrame
+      || window.oRequestAnimationFrame
+      || window.msRequestAnimationFrame
+      || function(callback) { window.setTimeout(callback, 17); };
 
   var close = function() {
     if (!demoBox.parentNode) return;
@@ -338,7 +409,7 @@ var easydemo = exports;
     return function(e) {
       var downCoords = mouseCoords(e),
           downX = x,
-          downY = y
+          downY = y,
           downWidth = width,
           downHeight = height;
 
@@ -405,7 +476,7 @@ var easydemo = exports;
     demoBox.classList.remove('unfocused');
   };
 
-  header.onmousedown = updateBoxBy({x: 1, y: 1});
+  header.onmousedown = infoBox.onmousedown = updateBoxBy({x: 1, y: 1});
   leftResize.onmousedown = updateBoxBy({x: 1, width: -1});
   rightResize.onmousedown = updateBoxBy({width: 1});
   bottomResize.onmousedown = updateBoxBy({height: 1});
