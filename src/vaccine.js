@@ -113,21 +113,21 @@ var defaultForFormat = function(format) {
   var defaults = {
     amd: {
       supports: ['amd', 'window'],
-      exports: ['return'],
+      exports: ['exports', 'module', 'return'],
       targets: ['vaccine.js', 'build.sh'],
-      require: ['absolute', 'single'],
-      define: [],
+      require: ['full', 'single', 'absolute'],
+      define: ['optional_id'],
     },
     commonjs: {
       supports: ['amd', 'window', 'commonjs'],
       exports: ['module', 'exports'],
       targets: ['vaccine.js', 'build.sh'],
-      require: ['single'],
+      require: ['full', 'index'],
       define: [],
     },
     umd: {
       supports: ['amd', 'window', 'commonjs'],
-      exports: ['exports'],
+      exports: ['exports', 'module'],
       targets: ['umd.js'],
       require: [],
       define: [],

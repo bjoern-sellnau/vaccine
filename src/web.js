@@ -374,6 +374,14 @@ var changeFormat = function() {
   setOptions(options);
 };
 
+var uncheckAll = function() {
+  var options = copyCurrentOptions();
+  options.require = [];
+  options.exports = [];
+  options.define = [];
+  setOptions(options);
+};
+
 var helpLink = function(helpId) {
   return '#help-' + helpId;
 };
@@ -425,6 +433,7 @@ d3.selectAll('.open-help').each(function() {
   this.href = this.href || helpLink(this.parentNode.id);
 });
 
+d3.select('#uncheck-all input').on('click', uncheckAll);
 
 d3.selectAll('#format input[type=button]').on('click', changeFormat);
 

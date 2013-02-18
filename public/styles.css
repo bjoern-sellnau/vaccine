@@ -56,11 +56,11 @@ header {
   border-color: #aaa;
   border-radius: 15px;
   background-color: #f9f9f9;
-  -moz-box-shadow: 0px 0px 8px 1px #aaa;
-  -webkit-box-shadow: 0px 0px 8px 1px #aaa;
-  -o-box-shadow: 0px 0px 8px 1px #aaa;
-  -ms-box-shadow: 0px 0px 8px 1px #aaa;
-  box-shadow: 0px 0px 8px 1px #aaa;
+  -moz-box-shadow: 1px 1px 8px 1px #aaa;
+  -webkit-box-shadow: 1px 1px 8px 1px #aaa;
+  -o-box-shadow: 1px 1px 8px 1px #aaa;
+  -ms-box-shadow: 1px 1px 8px 1px #aaa;
+  box-shadow: 1px 1px 8px 1px #aaa;
 }
 
 #targets {
@@ -228,14 +228,14 @@ h1 {
 
 #easydemo {
   z-index: 3;
+  top: auto;
+  left: auto;
+  bottom: 50px;
+  right: 30px;
 }
 
-#easydemo .info {
-  width: 550px;
-  height: 200px;
-}
-
-.easydemo-signal {
+.easydemo-signal,
+.easydemo-attention-grabber {
   z-index: 3;
 }
 
@@ -493,6 +493,14 @@ h3 {
 #targets label.format-hide,
 .format-hide {
   display: none;
+}
+
+#uncheck-all {
+  padding-left: 12px;
+}
+#uncheck-all input {
+  font-size: 12px;
+  padding: 2px 5px;
 }
 
 .fix {

@@ -59,6 +59,7 @@
         <div class="divider">
           <h3>Optimizations</h3>
         </div>
+        <div id="uncheck-all"><input type="button" value="Uncheck All"></div>
         <div id="require" class="group">
           <a class="open-help"><div>?</div></a>
           <div class="title">Require <span class="hint">other modules</span></div>
@@ -437,9 +438,9 @@
 
 
 <p>Vaccine helps improve modularity by enabling JavaScript libraries to use a
-<a href="http://wiki.commonjs.org/wiki/Modules/1.1">CommonJS</a>
+<a href="https://github.com/jakesandlund/vaccine#commonjs">CommonJS</a>
 (<a href="http://nodejs.org/api/modules.html">Node.js</a>) or
-<a href="https://github.com/amdjs/amdjs-api/wiki/AMD">AMD</a> module format and
+<a href="https://github.com/jakesandlund/vaccine#amd">AMD</a> module format and
 work in both browser and server. (These formats try to remedy JavaScript's lack
 of modules, so using them produces more modular code.) Vaccine works by
 generating a small shim that gets built with the project's code to make it
@@ -484,8 +485,8 @@ build, run <code>sh build.sh &gt; my_built_file.js</code>. Note that all
 source code, and only source code, must be in a separate directory for the
 tiny build script to work.</p>
 
-<p>Use the <a href="https://github.com/umdjs/umd">UMD</a> <signal>format</signal>
-for single file projects&mdash;no build required.</p>
+<p>Use the <a href="https://github.com/jakesandlund/vaccine#umd">UMD</a>
+<signal>format</signal> for single file projects&mdash;no build required.</p>
 
 <p>For development, the <signal>vaccine_dev.js</signal> version can be placed
 before script tags for all the modules (in any order). Call
