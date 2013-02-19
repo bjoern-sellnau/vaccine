@@ -96,8 +96,8 @@ available package managers ([Bower](http://twitter.github.com/bower/),
 [npm](https://npmjs.org/)), as well as providing a single built file that
 users can grab.
 
-Module Format Introductions
----------------------------
+Module Formats
+--------------
 - [CommonJS](#commonjs)
 - [AMD](#amd)
 - [UMD](#umd)

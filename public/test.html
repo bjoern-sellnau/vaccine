@@ -437,17 +437,20 @@
       <div id="demo-text">
 
 
-<p>Vaccine helps improve modularity by enabling JavaScript libraries to use a
+<p>Vaccine makes it easier to develop JavaScript libraries. Specifically, it
+permits a library to use
 <a href="https://github.com/jakesandlund/vaccine#commonjs">CommonJS</a>
 (<a href="http://nodejs.org/api/modules.html">Node.js</a>) or
-<a href="https://github.com/jakesandlund/vaccine#amd">AMD</a> module format and
-work in both browser and server. (These formats try to remedy JavaScript's lack
-of modules, so using them produces more modular code.) Vaccine works by
-generating a small shim that gets built with the project's code to make it
-function in a single script tag.</p>
+<a href="https://github.com/jakesandlund/vaccine#amd">AMD</a> module formats
+and still work in both browser and server. (These formats try to remedy
+JavaScript's lack of modules, so using them produces more modular code. Read
+more about these formats
+<a href="https://github.com/jakesandlund/vaccine#module-formats">here</a>.)
+Vaccine works by generating a small shim that gets built with the project's
+code into a single file that works in a script tag.</p>
 
 <p>The shim is configurable, which decreases its <signal>size</signal> by
-including only the required functionality. Many libraries need to work in both
+including only the required functionality. Some libraries need to work in both
 server and client, and Vaccine makes it easy for them to do so. Now the library
 can be written in the server's native CommonJS format and still work in the
 browser. The tiny size of the shim makes this feasible for the many small
