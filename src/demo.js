@@ -9,19 +9,27 @@ module.exports = exports = function(w) {
 
 exports.show = easydemo.show;
 
-var updateWith = function(options) {
+var updateWith = function(format, options) {
   return function(finished) {
-    update(options);
+    update(format, options);
     finished();
   };
 };
 
-var update = function(options) {
+var update = function(format, options) {
+  format = format || 'amd';
+  options = options || {};
+  options.format = format;
   var i;
+  var formatOptions = web.defaultForFormat(format);
   for (i in web.defaultOptions) {
     if (web.defaultOptions.hasOwnProperty(i)) {
       if (typeof options[i] === 'undefined') {
-        options[i] = web.defaultOptions[i];
+        if (typeof formatOptions[i] !== 'undefined') {
+          options[i] = formatOptions[i];
+        } else {
+          options[i] = web.defaultOptions[i];
+        }
       }
     }
   }
@@ -31,10 +39,10 @@ var update = function(options) {
 var enterDiffWith = function(options, savedOpts) {
   savedOpts = savedOpts || {};
   return function(finished) {
-    update(savedOpts);
+    update(savedOpts.format, savedOpts);
     web.saveCurrent();
     web.setDiff(true);
-    update(options);
+    update(options.format, options);
     finished();
   };
 };
@@ -49,11 +57,10 @@ var sizeSignal = {under: '#sizes .number', top: 0, right: -7};
 
 var states = [
   {
-    enter: updateWith({}),    // All default
+    enter: updateWith(),    // All default
   },
   {
-    enter: updateWith({
-      format: 'commonjs',
+    enter: updateWith('commonjs', {
       require: ['single'],
       exports: ['exports'],
       supports: ['commonjs', 'window'],
@@ -67,33 +74,31 @@ var states = [
       format: 'commonjs',
       require: ['single'],
       exports: ['exports', 'module'],
-      supports: ['commonjs', 'window', 'amd'],
     }, {
       format: 'commonjs',
       require: ['full'],
       exports: ['exports', 'module'],
-      supports: ['commonjs', 'window', 'amd'],
     }),
     exit: exitDiff,
   },
   {
-    enter: updateWith({}),
+    enter: updateWith(),
     signals: [
       {under: '#config', top: -4, left: -4},
       {under: '#sources .source', top: 1, left: 1},
     ],
   },
   {
-    enter: updateWith({
+    enter: updateWith('amd', {
       supports: ['window', 'amd', 'commonjs'],
     }),
-    exit: updateWith({}),
+    exit: updateWith(),
     signals: [
       {under: '.fix', top: 0, right: -7},
     ],
   },
   {
-    enter: updateWith({}),
+    enter: updateWith(),
     signals: [
       {under: '#format', top: 0, left: 0},
       {under: '#supports', top: 0, left: 0}
@@ -113,7 +118,7 @@ var states = [
     ],
   },
   {
-    enter: updateWith({}),
+    enter: updateWith(),
     signals: [
       {under: '#require, #exports', top: 0, left: 0}
     ],
@@ -131,15 +136,14 @@ var states = [
     ],
   },
   {
-    enter: updateWith({}),
+    enter: updateWith(),
     signals: [
       {under: '#sources .source:first-child', top: 1, left: 1},
       {under: '#sources .source:nth-child(2)', top: 1, left: 1},
     ],
   },
   {
-    enter: updateWith({
-      format: 'umd',
+    enter: updateWith('umd', {
       require: [],
       exports: ['exports'],
       supports: ['window', 'commonjs', 'amd'],
@@ -150,7 +154,7 @@ var states = [
     ],
   },
   {
-    enter: updateWith({
+    enter: updateWith('amd', {
       targets: ['vaccine_dev.js'],
     }),
     signals: [
@@ -158,10 +162,10 @@ var states = [
     ],
   },
   {
-    enter: updateWith({}),
+    enter: updateWith(),
   },
   {
-    enter: updateWith({}),
+    enter: updateWith(),
     signals: [{under: '.open-help', top: -4, left: -4}],
   },
 ];

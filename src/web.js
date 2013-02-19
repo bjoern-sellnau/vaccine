@@ -57,7 +57,6 @@ var defaultOptions = {
   name: 'my_project_name',
   main: 'src/index.js',
   dependencies: ['dep_one', 'dep_two'],
-  dirs: '1',
   targets: amdFmtDefault.targets,
   exports: amdFmtDefault.exports,
   supports: amdFmtDefault.supports,
@@ -68,6 +67,7 @@ var defaultOptions = {
   global: '',
 };
 web.defaultOptions = defaultOptions;
+web.defaultForFormat = vaccine.defaultForFormat;
 
 var updateWithOptions = function(options) {
   setOptions(options);
