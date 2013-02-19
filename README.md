@@ -5,7 +5,8 @@ Check out Vaccine at [www.vaccinejs.com](http://www.vaccinejs.com)!
 
 The help is also [online](http://www.vaccinejs.com#help-start).
 
-Some things that the intro doesn't cover:
+Tool
+----
 
 You can also install vaccine with npm with `npm install -g vaccine`. That way
 you don't need to copy from the website. Run `vaccine --help` for info on
