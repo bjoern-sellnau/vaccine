@@ -8,9 +8,46 @@ The help is also [online](http://www.vaccinejs.com#help-start).
 Tool
 ----
 
-You can also install vaccine with npm with `npm install -g vaccine`. That way
-you don't need to copy from the website. Run `vaccine --help` for info on
-the options.
+Vaccine will have a command line tool in addition to the
+[GUI](http://www.vaccinejs.com).
+
+### Installation ###
+
+With [Node.js](http://nodejs.org/) installed:
+
+```
+$ npm install -g vaccine
+```
+
+### component.json ###
+
+Vaccine uses `component.json` for some info. This is the same file
+used by [Bower](http://twitter.github.com/bower/). Some settings Bower uses
+Vaccine does not need, and some settings are Vaccine only.
+
+### Commands ###
+
+Some of these commands can be shortened.
+
+```
+$ vaccine component.json
+```
+
+Initializes an example component.json.
+
+```
+$ vaccine server
+```
+
+Starts a development server to serve local files. This is functionally
+equivalent to using
+[dev_server.js](http://www.vaccinejs.com/#help-dev_server-js).
+
+```
+$ vaccine <target-names>   # e.g. $ vaccine vaccine.js build.sh
+```
+
+Constructs the targets given.
 
 FAQ
 ---
