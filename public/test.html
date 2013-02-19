@@ -123,22 +123,96 @@
   particularly the
   <a href="https://github.com/jakesandlund/vaccine#faq">FAQ</a>, for more info.
 </div>
-<div id="h-size-info" class="help-section">
-  <div class="title">Size Info</div>
-  <p>When in Diff mode, the numbers are the difference between the configurations
-  under comparison. When red, the current configuration is smaller (showing
-  bytes removed). When green, the current configuration is larger (showing
-  bytes added).</p>
+<div id="h-targets" class="divider">
+  <h3>Targets</h3>
+</div>
+<div id="h-vaccine-js" class="help-section">
+  <div class="title">vaccine.js</div>
+  <p>vaccine.js is the shim that makes CommonJS or AMD modules work in the
+  browser. It includes a function to define module factories. It also
+  implements the "require" functionality that lets a module obtain the exports
+  from another module. Finally it provides the library as either an AMD module
+  or a "window" global. If it defines an AMD module, it also lists
+  dependencies.</p>
 
-  <p>The bytes minified are calculated by running
-  <a href="https://github.com/mishoo/UglifyJS">UglifyJS</a> on the text of
-  <code>vaccine.js</code> wrapped in an immediately evaluated function
-  <code>(function() { ... }())</code>.</p>
+  <p>This shim will be bundled with the rest of the modules inside an
+  immediately invoked function. This prevents leaking any unwanted globals.
+  </p>
+</div>
+<div id="h-build-sh" class="help-section">
+  <div class="title">build.sh</div>
+  <p>build.sh wraps all source files including vaccine.js (at the end) inside
+  an immediately invoked function. In the case of CommonJS, it also wraps
+  each module individually in a "define" call, which turns each module into
+  a factory function (closure). If it is AMD with an optional id, build.sh will
+  also give each module an id (if one wasn't specified).</p>
 
-  <p>Gzipped size was calculated by gzipping various vaccine.js versions with a
-  4.8k sized library. A linear regression fit the resulting gzipped sizes
-  with a 0.997 correlation coefficient. Note that when compressing with
-  smaller libraries, the amount added tends to be more.</p>
+  <p>Run build.sh on the command line to produce the built file:</p>
+
+  <p><code>$ sh build.sh &gt; my_library.js</code></p>
+
+  <p>The sources must be in a separate directory, which includes only source
+  files. Of course, build.sh is very small, so you can extend it to fit your
+  need.</p>
+</div>
+<div id="h-vaccine_dev-js" class="help-section">
+  <div class="title">vaccine_dev.js</div>
+  <p>vaccine_dev.js is useful when doing development. Developing with a single
+  built file (from build.sh) is difficult, especially as libraries grow to
+  many files. This dev version of Vaccine separates out each module in its
+  own script tag, so finding things is easier.</p>
+
+  <p>vaccine_dev.js provides a <code>requireDev</code> function that by default
+  will give the exports of the main (entry) file. Specifying a module id as
+  the only parameter will give the exports of that module.</p>
+
+  <p>Below is an example of how vaccine_dev.js is used</p>
+<pre><code>&lt;!-- Must be before sources --&gt;
+&lt;script src="/vaccine_dev.js"&gt;&lt;/script&gt;
+
+&lt;!-- Sources can be in any order --&gt;
+&lt;script src="/src/underscore.js"&gt;&lt;/script&gt;
+&lt;script src="/src/underscore/arrays.js"&gt;&lt;/script&gt;
+&lt;script src="/src/underscore/collections.js"&gt;&lt;/script&gt;
+&lt;script src="/src/underscore/each.js"&gt;&lt;/script&gt;
+&lt;script src="/src/underscore/functions.js"&gt;&lt;/script&gt;
+&lt;script src="/src/underscore/objects.js"&gt;&lt;/script&gt;
+&lt;script src="/src/underscore/utils.js"&gt;&lt;/script&gt;
+
+&lt;!-- Get the main exports with "requireDev()" --&gt;
+&lt;script&gt;var _ = requireDev();&lt;/script&gt;
+</code></pre>
+
+  <p>Note that in order for the script tags to work with CommonJS, a
+  <a href="#help-dev_server-js">development server</a> is needed to wrap the
+  modules in "define" calls. AMD does not have this problem.</p>
+
+</div>
+<div id="h-dev_server-js" class="help-section">
+  <div class="title">dev_server.js</div>
+  <p>dev_server.js is a simple development server that serves up static files
+  from the project's root directory. It will also wrap CommonJS modules under
+  the source directory so that they can work in a script tag.</p>
+
+  <p>To use the dev server, copy down dev_serve.js to your project. This
+  server uses <a href="http://expressjs.com/">Express</a> on top of
+  <a href="http://nodejs.org/">Node.js</a>. With Node.js installed, install
+  express with: <code>npm install express</code>.</p>
+
+  <p>Run the server with <code>$ node dev_server.js</code></p>
+
+  <p>The other functionality in the server is being able to run build.sh
+  and having the results used in a script tag with href set to "build.sh". In
+  fact any file with a path that starts with "build" will be executed before
+  returning the results.</p>
+</div>
+<div id="h-Makefile" class="help-section">
+  <div class="title">Makefile</div>
+  A barebones makefile that saves a bit of typing so that
+  <code>sh build.sh &gt; my_library.js</code> can just be <code>make</code>.
+</div>
+<div id="h-umd-js" class="help-section">
+  <div class="title">umd.js</div>
 </div>
 <div class="divider">
   <h3>Project Settings</h3>
@@ -338,96 +412,22 @@
     </li>
   </ul>
 </div>
-<div id="h-targets" class="divider">
-  <h3>Targets</h3>
-</div>
-<div id="h-vaccine-js" class="help-section">
-  <div class="title">vaccine.js</div>
-  <p>vaccine.js is the shim that makes CommonJS or AMD modules work in the
-  browser. It includes a function to define module factories. It also
-  implements the "require" functionality that lets a module obtain the exports
-  from another module. Finally it provides the library as either an AMD module
-  or a "window" global. If it defines an AMD module, it also lists
-  dependencies.</p>
+<div id="h-size-info" class="help-section">
+  <div class="title">Size Info</div>
+  <p>When in Diff mode, the numbers are the difference between the configurations
+  under comparison. When red, the current configuration is smaller (showing
+  bytes removed). When green, the current configuration is larger (showing
+  bytes added).</p>
 
-  <p>This shim will be bundled with the rest of the modules inside an
-  immediately invoked function. This prevents leaking any unwanted globals.
-  </p>
-</div>
-<div id="h-build-sh" class="help-section">
-  <div class="title">build.sh</div>
-  <p>build.sh wraps all source files including vaccine.js (at the end) inside
-  an immediately invoked function. In the case of CommonJS, it also wraps
-  each module individually in a "define" call, which turns each module into
-  a factory function (closure). If it is AMD with an optional id, build.sh will
-  also give each module an id (if one wasn't specified).</p>
+  <p>The bytes minified are calculated by running
+  <a href="https://github.com/mishoo/UglifyJS">UglifyJS</a> on the text of
+  <code>vaccine.js</code> wrapped in an immediately evaluated function
+  <code>(function() { ... }())</code>.</p>
 
-  <p>Run build.sh on the command line to produce the built file:</p>
-
-  <p><code>$ sh build.sh &gt; my_library.js</code></p>
-
-  <p>The sources must be in a separate directory, which includes only source
-  files. Of course, build.sh is very small, so you can extend it to fit your
-  need.</p>
-</div>
-<div id="h-vaccine_dev-js" class="help-section">
-  <div class="title">vaccine_dev.js</div>
-  <p>vaccine_dev.js is useful when doing development. Developing with a single
-  built file (from build.sh) is difficult, especially as libraries grow to
-  many files. This dev version of Vaccine separates out each module in its
-  own script tag, so finding things is easier.</p>
-
-  <p>vaccine_dev.js provides a <code>requireDev</code> function that by default
-  will give the exports of the main (entry) file. Specifying a module id as
-  the only parameter will give the exports of that module.</p>
-
-  <p>Below is an example of how vaccine_dev.js is used</p>
-<pre><code>&lt;!-- Must be before sources --&gt;
-&lt;script src="/vaccine_dev.js"&gt;&lt;/script&gt;
-
-&lt;!-- Sources can be in any order --&gt;
-&lt;script src="/src/underscore.js"&gt;&lt;/script&gt;
-&lt;script src="/src/underscore/arrays.js"&gt;&lt;/script&gt;
-&lt;script src="/src/underscore/collections.js"&gt;&lt;/script&gt;
-&lt;script src="/src/underscore/each.js"&gt;&lt;/script&gt;
-&lt;script src="/src/underscore/functions.js"&gt;&lt;/script&gt;
-&lt;script src="/src/underscore/objects.js"&gt;&lt;/script&gt;
-&lt;script src="/src/underscore/utils.js"&gt;&lt;/script&gt;
-
-&lt;!-- Get the main exports with "requireDev()" --&gt;
-&lt;script&gt;var _ = requireDev();&lt;/script&gt;
-</code></pre>
-
-  <p>Note that in order for the script tags to work with CommonJS, a
-  <a href="#help-dev_server-js">development server</a> is needed to wrap the
-  modules in "define" calls. AMD does not have this problem.</p>
-
-</div>
-<div id="h-dev_server-js" class="help-section">
-  <div class="title">dev_server.js</div>
-  <p>dev_server.js is a simple development server that serves up static files
-  from the project's root directory. It will also wrap CommonJS modules under
-  the source directory so that they can work in a script tag.</p>
-
-  <p>To use the dev server, copy down dev_serve.js to your project. This
-  server uses <a href="http://expressjs.com/">Express</a> on top of
-  <a href="http://nodejs.org/">Node.js</a>. With Node.js installed, install
-  express with: <code>npm install express</code>.</p>
-
-  <p>Run the server with <code>$ node dev_server.js</code></p>
-
-  <p>The other functionality in the server is being able to run build.sh
-  and having the results used in a script tag with href set to "build.sh". In
-  fact any file with a path that starts with "build" will be executed before
-  returning the results.</p>
-</div>
-<div id="h-Makefile" class="help-section">
-  <div class="title">Makefile</div>
-  A barebones makefile that saves a bit of typing so that
-  <code>sh build.sh &gt; my_library.js</code> can just be <code>make</code>.
-</div>
-<div id="h-umd-js" class="help-section">
-  <div class="title">umd.js</div>
+  <p>Gzipped size was calculated by gzipping various vaccine.js versions with a
+  4.8k sized library. A linear regression fit the resulting gzipped sizes
+  with a 0.997 correlation coefficient. Note that when compressing with
+  smaller libraries, the amount added tends to be more.</p>
 </div>
 
         </div>
