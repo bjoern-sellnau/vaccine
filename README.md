@@ -91,8 +91,9 @@ certain package manager, it would limit the number of possible users of a
 library. Therefore, Vaccine is package manager agnostic.
 
 A library can use Vaccine and be distributed in any number of the
-available package managers ([Bower](http://twitter.github.com/bower/),
+available package managers (there are a lot: [Bower](http://twitter.github.com/bower/),
 [component](https://github.com/component/component),
+[volo](http://volojs.org/), [Jam](http://jamjs.org/),
 [npm](https://npmjs.org/)), as well as providing a single built file that
 users can grab.
 
