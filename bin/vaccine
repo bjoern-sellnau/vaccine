@@ -3,118 +3,124 @@
 var fs = require('fs'),
     vaccine = require('..');
 
-var usage = 'Generate shims to make CommonJS or AMD work in the browser.\n' +
-            'Usage: vaccine --name <name> --main <main> [options]\n\n' +
-            '[m] means it is intended to be called multiple times.';
+var fail = function(message, num) {
+  console.error(message);
+  process.exit(num || 1);
+};
 
-var optimist = require('optimist')
-    .usage(usage)
-    .wrap(80)
+var description = "Develop JavaScript libraries in CommonJS or AMD";
 
-    .describe('name', "Your library's name.")
-    .describe('main', "Your library's entry file.")
-    .describe('format', 'The format your library is writen in: "commonjs", ' +
-                        '"amd", or "umd"')
-
-    .describe('require', 'The way to require external modules. Choices are: ' +
-                         "'absolute', 'single' (e. g. `./module`), " +
-                         "'full'")
-    .describe('dep', "[m] Your library's dependencies.")
-    .describe('support', "[m] Choose between supporting AMD, attaching to " +
-                         "'window', or both (default both).")
-    .describe('export', "[m] How a module provides exports. Options are " +
-                        "'return', 'module' (for module.exports), and " +
-                        "'exports'.")
-    .describe('target', "[m] Which files to configure. Options are: " +
-                         "vaccine.js, umd.js, build.sh, Makefile, " +
-                         "vaccine_dev.js, and dev_server.js. vaccine.js and " +
-                         "build.sh are default.")
-    .describe('define', 'Choose how the define wrap works in AMD. Only choice ' +
-                        "is 'optional_id' or not")
-
-    .describe('stdout', 'Write to stdout instead of to files.')
-    .describe('debug', 'Add debugging logs for development.')
-    .describe('performance', 'Measure the load-time performance of your library.')
-    .describe('src', 'The directory your sources are under. Derived from --main.')
-    .describe('global', 'The global variable name (defaults to --name).')
-    .describe('use-strict', 'Enable strict mode in built file.')
-    .describe('lib', 'The directory for your libraries.')
-
-    .alias('name', 'n')
-    .alias('main', 'm')
-    .alias('format', 'f')
-    .alias('dep', 'd')
-    .alias('define', 'def')
-    .alias('support', 's')
-    .alias('export', 'e')
-    .alias('require', 'r')
-    .alias('target', 't')
-    .alias('stdout', 'c')
-    .alias('help', 'h')
-
-    .demand('name')
-    .demand('main')
-    .demand('format')
-
-    .boolean('stdout')
-    .boolean('debug')
-    .boolean('performance')
-    .boolean('use-strict')
-
-    .default('lib', 'lib')
-;
+var commands = {
+  help: {
+    desc: "Display this help",
+  },
+  build: {
+    args: '[file name]',
+    desc: "Build the output file from the sources and shim",
+  },
+  targets: {
+    args: '[target names]*',
+    desc: "Construct the targets listed or in component.json",
+  },
+  server: {
+    desc: "Run a development server (same as dev_server.js)",
+  },
+  create: {
+    args: '<library name>',
+    desc: "Create a skeleton library of the given name",
+  },
+  init: {
+    args: '<library name>',
+    desc: "Initialize a skeleton lib in the current directory",
+  },
+  "component.json": {
+    desc: "Create an example component.json",
+  },
+};
+commands['-h'] = commands['--help'] = commands.help;
+var commandNames = Object.keys(commands);
 
 
-var argv = optimist.argv;
-
-if (argv.h) {
-  optimist.showHelp();
-  process.exit(0);
-}
-
-argv.use_strict = argv['use-strict'];
-
-var ensureArray = function(key) {
-  if (typeof argv[key] !== 'undefined' && !Array.isArray(argv[key])) {
-    return [argv[key]];
-  } else {
-    return argv[key];
-  }
-}
-argv.dependencies = ensureArray('dep');
-argv.targets = ensureArray('target');
-argv.supports = ensureArray('support');
-argv.exports = ensureArray('export');
-argv.require = ensureArray('require');
-argv.define = ensureArray('define');
-
-vaccine.loadFiles();
-var problems = vaccine.validateOptions(argv);
-problems.forEach(function(problem) {
-  problem.fix(argv);
-});
-
-var targets = vaccine(argv);
-
-if (argv.stdout) {
-  targets.forEach(function(target) {
-    if (targets.length > 1) {
-      console.log('--------------- ' + target.name + ' ---------------');
-    }
-    console.log(target.compiled);
-  });
-} else {
-  targets.forEach(function(target) {
-    var name = target.name;
-    if (name === 'Makefile') {
-      if (fs.existsSync('Makefile')) name = 'Makefile.example';
-    }
-    fs.writeFile(name, target.compiled, 'utf8', function(err) {
-      if (err) throw err;
-      if (name === 'build.sh') {
-        fs.chmod('build.sh', '755', function(err) { if (err) throw err; });
+var actions = {
+  targets: function(targets) {
+    targets.forEach(function(target) {
+      var name = target.name;
+      if (name === 'Makefile') {
+        if (fs.existsSync('Makefile')) name = 'Makefile.example';
       }
-      console.log('Completed... ' + name);
+      fs.writeFile(name, target.compiled, 'utf8', function(err) {
+        if (err) throw err;
+        if (name === 'build.sh') {
+          fs.chmod('build.sh', '755', function(err) { if (err) throw err; });
+        }
+        console.log('Completed... ' + name);
+      });
     });
-  });
+  },
 }
+//
+//if (argv.h) {
+//  optimist.showHelp();
+//  process.exit(0);
+//}
+//
+//argv.use_strict = argv['use-strict'];
+//
+//var ensureArray = function(key) {
+//  if (typeof argv[key] !== 'undefined' && !Array.isArray(argv[key])) {
+//    return [argv[key]];
+//  } else {
+//    return argv[key];
+//  }
+//}
+//argv.dependencies = ensureArray('dep');
+//argv.targets = ensureArray('target');
+//argv.supports = ensureArray('support');
+//argv.exports = ensureArray('export');
+//argv.require = ensureArray('require');
+//argv.define = ensureArray('define');
+//
+//vaccine.loadFiles();
+//var problems = vaccine.validateOptions(argv);
+//problems.forEach(function(problem) {
+//  problem.fix(argv);
+//});
+//
+//var targets = vaccine(argv);
+
+var run = function() {
+  var command = process.argv[2];
+  if (!command) command = 'help';
+
+  var matching = commandNames.filter(function(c) {
+    return command === c.slice(0, command.length);
+  });
+  if (!matching.length) fail("Unknown command: " + command);
+  if (matching.length > 1) {
+    var didYouMean = "Did you mean any of: " + matching.join(', ');
+    fail("Ambiguous command: " + command + "\n" + didYouMean);
+  }
+  command = matching[0];
+  var definition = commands[command];
+  var defArgs = definition.args;
+  var args = process.argv.slice(3);
+  var err;
+  if (defArgs) {
+    var multi = defArgs[defArgs.length] === '*'
+    var optional = defArgs[0] === '[';
+    if (!args.length && !optional)
+      err = "Missing required arguments";
+    if (args.length > 1 && !multi)
+      err = "Too many arguments given";
+  } else {
+    if (args.length && !defArgs)
+      err = "Unexpected arguments: " + args.join(' ');
+  }
+  if (err) {
+    console.error(err);
+    process.exit(1);
+  }
+  console.log(command);
+};
+
+run();

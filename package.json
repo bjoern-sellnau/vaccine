@@ -1,14 +1,13 @@
 {
   "name": "vaccine",
   "main": "src/vaccine.js",
-  "description": "CommonJS and AMD for libraries.",
+  "description": "Develop JavaScript libraries in CommonJS or AMD",
   "bin": "./bin/vaccine",
   "dependencies": {
     "asset_store": "0.0.13",
     "express": "3.0.x"
   },
   "devDependencies": {
-    "optimist": "0.3.x",
     "uglify-js": "1.3.x"
   },
   "engines": {

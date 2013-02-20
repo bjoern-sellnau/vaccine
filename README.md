@@ -120,7 +120,7 @@ To construct a specific [target](http://www.vaccinejs.com/#help-targets),
 name the target(s):
 
 ```
-$ vaccine <target-names>   # e.g. $ vaccine vaccine.js build.sh
+$ vaccine target[s] [<target-names>]   # e.g. $ vaccine vaccine.js build.sh
 ```
 
 If `component.vaccine.targets` is set, then running `vaccine targets` will
