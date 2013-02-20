@@ -37,11 +37,23 @@ var commands = {
     desc: "Create an example component.json",
   },
 };
-commands['-h'] = commands['--help'] = commands.help;
 var commandNames = Object.keys(commands);
+commands['-h'] = commands['--help'] = commands.help;
+
+var commandHelp = function(command) {
+  var args = commands[command].args || '';
+  console.log('$ vaccine ' + command + ' ' + args);
+  console.log('           # ' + commands[command].desc);
+};
 
 
 var actions = {
+  help: function() {
+    commandNames.forEach(function(c) {
+      commandHelp(c);
+      console.log('');
+    });
+  },
   targets: function(targets) {
     targets.forEach(function(target) {
       var name = target.name;
@@ -118,9 +130,10 @@ var run = function() {
   }
   if (err) {
     console.error(err);
+    commandHelp(command);
     process.exit(1);
   }
-  console.log(command);
+  actions[command](args);
 };
 
 run();
