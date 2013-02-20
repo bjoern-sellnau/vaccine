@@ -23,7 +23,9 @@ $ npm install -g vaccine
 
 Vaccine uses `component.json` for some info. This is the same file
 used by [Bower](http://twitter.github.com/bower/). Some settings Bower uses
-Vaccine does not need, and some settings are Vaccine only.
+Vaccine does not need, and some settings are Vaccine only. If you are using
+Vaccine as an application, it is a better idea to use a `vaccine.json`
+name instead.
 
 Here is an example `component.json`:
 
@@ -93,6 +95,9 @@ For example, it will be possible to decide `vaccine.format`,
 `vaccine.require`, `vaccine.exports`, and `vaccine.define`. When this
 happens, all `vaccine.*` options will be optional.
 
+If the file is a `vaccine.json`, then the `vaccine.*` settings can be
+top level.
+
 ### Building ###
 
 In addition to creating a `vaccine.js` shim and `build.sh` script, Vaccine can
@@ -103,8 +108,8 @@ $ vaccine build [file name]
 ```
 
 The file name in the above command is the name of the output file. It is
-optional and defaults to `<component.name>.js`. `--stdout` or `-c` outputs
-the built file to stdout.
+optional and defaults to `component.vaccine.output` or `<component.name>.js`.
+`--stdout` or `-c` outputs the built file to stdout.
 
 The method of building is nearly identical to creating a `vaccine.js` and
 a `build.sh` and then running `$ sh build.sh > my_library_name.js`.
