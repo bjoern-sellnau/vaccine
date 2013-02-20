@@ -42,7 +42,7 @@ Here is an example `component.json`:
   "devDependencies": {
     "qunit": "~1"
   },
-  "support": ["window", "amd", "commonjs"],
+  "supports": ["window", "amd", "commonjs"],
   "vaccine": {
     "require": ["single"],
     "exports": ["exports", "module"]
@@ -64,7 +64,7 @@ Here is an example `component.json`:
 - `devDependencies`: A list of dependencies that aren't needed to use the
   project, but might be needed in development for things like testing and
   documentation.
-- `support`: (also `supports`) A list of environments the project supports.
+- `supports`: A list of environments the project supports.
   The possibilites are `window`, `amd`, and `commonjs`.
 - `vaccine`: Vaccine specific settings.
 - `vaccine.format`: The module format used in the project: `amd`, `commonjs`,
