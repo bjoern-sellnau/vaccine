@@ -9,7 +9,7 @@ Tool
 ----
 
 Vaccine will have a command line tool in addition to the
-[GUI](http://www.vaccinejs.com).
+[GUI](http://www.vaccinejs.com). The tool is not built yet.
 
 ### Installation ###
 
@@ -81,10 +81,17 @@ Here is an example `component.json`:
 - `vaccine.debugging`: An array of "debugging" functionality. Options are:
   `debug`, `performance`, and `use-strict`.
   See [help](http://www.vaccinejs.com/#help-debugging).
+- `vaccine.output`: The name/path of the output filename for `$ vaccine build`.
+  This defaults to `<name>.js`.
 - `vaccine.source_dir`: A way to override the source directory parsed from
   `entry`.
 - `vaccine.global`: A way to override the global variable name, if `name`
   is not right.
+
+Eventually, some of the above options will be intelligently determined.
+For example, it will be possible to decide `vaccine.format`,
+`vaccine.require`, `vaccine.exports`, and `vaccine.define`. When this
+happens, all `vaccine.*` options will be optional.
 
 ### Building ###
 
@@ -126,6 +133,20 @@ equivalent to using
 [dev_server.js](http://www.vaccinejs.com/#help-dev_server-js).
 
 ### Helpful commands ###
+
+Create a skeleton library of the given name. Creates a new directory
+of the given name.
+
+```
+$ vaccine create <project-name>
+```
+
+Initializes a skeleton library in the current directory of the given
+name. Same as above except it doesn't create a new directory.
+
+```
+$ vaccine init <project-name>
+```
 
 Initializes an example component.json:
 
