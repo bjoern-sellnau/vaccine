@@ -25,15 +25,97 @@ Vaccine uses `component.json` for some info. This is the same file
 used by [Bower](http://twitter.github.com/bower/). Some settings Bower uses
 Vaccine does not need, and some settings are Vaccine only.
 
-### Commands ###
-
-Some of these commands can be shortened.
+Here is an example `component.json`:
 
 ```
-$ vaccine component.json
+{
+  "name": "my_library",
+  "version": "1.0.1",
+  "main": ["./my_library.js", "./my_library.css"],
+  "entry": "src/index.js",
+  "dependencies": {
+    "jquery": "~1.9.1",
+    "underscore": "~1.4.4"
+  },
+  "devDependencies": {
+    "qunit": "~1"
+  },
+  "support": ["window", "amd", "commonjs"],
+  "vaccine": {
+    "require": ["single"],
+    "exports": ["exports", "module"]
+  }
+}
 ```
 
-Initializes an example component.json.
+- `name`: The name of the project. Also used as the global defined on window,
+  or the AMD module id.
+- `version`: Not used by Vaccine, but sets the version number (follow
+  [semver](http://semver.org/)).
+- `main`: Used by Bower, but not Vaccine. Sets the main (built) JavaScript
+  file, stylesheet, or image sprites.
+- `entry`: The main/entry module of the JavaScript sources. The first part
+  of the path is also used to determine the directory all the source files
+  (and only source files) are in.
+- `dependencies`: A list of libraries the project depends on, with version
+  specifiers.
+- `devDependencies`: A list of dependencies that aren't needed to use the
+  project, but might be needed in development for things like testing and
+  documentation.
+- `support`: (also `supports`) A list of environments the project supports.
+  The possibilites are `window`, `amd`, and `commonjs`.
+- `vaccine`: Vaccine specific settings.
+- `vaccine.format`: The module format used in the project: `amd`, `commonjs`,
+  or `umd`.
+- `vaccine.targets`: An array of filenames of targets to build with
+  `$ vaccine targets`. Possibilities are `vaccine.js`, `build.sh`,
+  `vaccine_dev.js`, `dev_server.js`, `Makefile`, `umd.js`.
+- `vaccine.require`: An array of "require" functionality. Options are:
+  `full`, `single`, `absolute`, `w-o-index`. See
+  [help](http://www.vaccinejs.com/#help-require).
+- `vaccine.exports`: An array of methods of exporting a module's API. Options
+  are: `exports`, `module`, and `return`. See
+  [help](http://www.vaccinejs.com/#help-exports).
+- `vaccine.define`: An array of "define" functionality. Currently the only
+  option is `optional-id`. See [help](http://www.vaccinejs.com/#help-define).
+- `vaccine.debugging`: An array of "debugging" functionality. Options are:
+  `debug`, `performance`, and `use-strict`.
+  See [help](http://www.vaccinejs.com/#help-debugging).
+- `vaccine.source_dir`: A way to override the source directory parsed from
+  `entry`.
+- `vaccine.global`: A way to override the global variable name, if `name`
+  is not right.
+
+### Building ###
+
+In addition to creating a `vaccine.js` shim and `build.sh` script, Vaccine can
+directly build a library:
+
+```
+$ vaccine build [file name]
+```
+
+The file name in the above command is the name of the output file. It is
+optional and defaults to `<component.name>.js`. `--stdout` or `-c` outputs
+the built file to stdout.
+
+The method of building is nearly identical to creating a `vaccine.js` and
+a `build.sh` and then running `$ sh build.sh > my_library_name.js`.
+
+### Building targets ###
+
+To construct a specific [target](http://www.vaccinejs.com/#help-targets),
+name the target(s):
+
+```
+$ vaccine <target-names>   # e.g. $ vaccine vaccine.js build.sh
+```
+
+If `component.vaccine.targets` is set, then running `vaccine targets` will
+build the targets specified in that array. Otherwise it will build the
+default targets.
+
+### Development server ###
 
 ```
 $ vaccine server
@@ -43,11 +125,13 @@ Starts a development server to serve local files. This is functionally
 equivalent to using
 [dev_server.js](http://www.vaccinejs.com/#help-dev_server-js).
 
-```
-$ vaccine <target-names>   # e.g. $ vaccine vaccine.js build.sh
-```
+### Helpful commands ###
 
-Constructs the targets given.
+Initializes an example component.json:
+
+```
+$ vaccine component.json
+```
 
 FAQ
 ---
