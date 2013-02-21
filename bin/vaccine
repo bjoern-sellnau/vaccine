@@ -53,37 +53,6 @@ var help = function() {
   });
 };
 
-//
-//if (argv.h) {
-//  optimist.showHelp();
-//  process.exit(0);
-//}
-//
-//argv.use_strict = argv['use-strict'];
-//
-//var ensureArray = function(key) {
-//  if (typeof argv[key] !== 'undefined' && !Array.isArray(argv[key])) {
-//    return [argv[key]];
-//  } else {
-//    return argv[key];
-//  }
-//}
-//argv.dependencies = ensureArray('dep');
-//argv.targets = ensureArray('target');
-//argv.supports = ensureArray('support');
-//argv.exports = ensureArray('export');
-//argv.require = ensureArray('require');
-//argv.define = ensureArray('define');
-//
-//vaccine.loadFiles();
-//var problems = vaccine.validateOptions(options);
-//problems.forEach(function(problem) {
-//  problem.fix(options);
-//});
-
-
-//var targets = vaccine(argv);
-
 var run = function() {
   var command = process.argv[2];
   if (!command) command = 'help';
