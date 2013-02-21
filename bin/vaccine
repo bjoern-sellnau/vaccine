@@ -26,8 +26,8 @@ var commands = {
     desc: "Run a development server (same as dev_server.js)",
   },
   create: {
-    args: '[args]*',
-    desc: "Create a skeleton library (args is lib name by default)",
+    args: '<name> [args]*',
+    desc: "Create a skeleton library (args are unused by default)",
   },
   template: {
     args: '[--force]',

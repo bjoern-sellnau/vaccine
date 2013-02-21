@@ -1,6 +1,6 @@
 
 var fs = require('fs');
-var exec = require('child_process').exec;
+var child_process = require('child_process');
 var vaccine = require('./src/vaccine');
 
 var templateFiles = ['vaccine.js', 'Makefile', 'build.sh', 'dev_server.js',
@@ -55,11 +55,15 @@ var ifNoExist = function(path, action) {
   }
 };
 
+var maybeThrow = function(err) {
+  if (err) throw err;
+};
+
 var createComponent = function(filename) {
   return function() {
     ifNoExist(filename, function() {
       var copy = 'cp ' + libTemplateDir + '/component.json ' + filename;
-      exec(copy, function(err) { if (err) throw err; });
+      child_process.exec(copy, maybeThrow);
     });
   };
 };
@@ -103,6 +107,21 @@ module.exports = exports = {
 
   "component.json": createComponent('component.json'),
   "vaccine.json": createComponent('vaccine.json'),
+
+  create: function(args) {
+    var name = args[0];
+    var execFile = function(err) {
+      maybeThrow(err);
+      process.chdir(name);
+      if (fs.existsSync('post_create')) {
+        var spawn = child_process.spawn;
+        var post = spawn('./post_create', args, {stdio: 'inherit'});
+      }
+    };
+    ifNoExist(name, function() {
+      child_process.exec('cp -R ' + libTemplateDir + ' ' + name, execFile);
+    });
+  },
 };
 
 var compileTargets = function(targets, options) {

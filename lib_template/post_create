@@ -1,2 +1,13 @@
 #!/bin/sh
-echo $1
+name=$1
+
+replace() {
+  file=$1
+  key=$2
+  value=$3
+  value=$(echo "$value" | sed -e 's#/#\\/#g' -e 's/&/\\\&/g')
+  sed -i '' -e "s/{# *$key *#}/$value/g" $file
+}
+
+replace component.json name "$name"
+rm post_create
