@@ -1,0 +1,19 @@
+{
+  "name": "{#name#}",
+  "version": "1.0.1",
+  "main": ["./{#name#}.js", "./{#name#}.css"],
+  "entry": "src/index.js",
+  "dependencies": {
+    "jquery": "~1.9.1",
+    "underscore": "~1.4.4"
+  },
+  "devDependencies": {
+    "qunit": "~1"
+  },
+  "supports": ["window", "amd", "commonjs"],
+  "vaccine": {
+    "format": "commonjs",
+    "require": ["single"],
+    "exports": ["exports", "module"]
+  }
+}

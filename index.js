@@ -1,11 +1,17 @@
 
-var fs = require('fs'),
-    vaccine = require('./src/vaccine');
+var fs = require('fs');
+var exec = require('child_process').exec;
+var vaccine = require('./src/vaccine');
 
 var templateFiles = ['vaccine.js', 'Makefile', 'build.sh', 'dev_server.js',
                      'umd.js'];
 var templateText = {};
+var userTemplateDir = '~/.vaccine/template';
+var sourceTemplateDir = __dirname + '/lib_template';
+var libTemplateDir;
+
 var componentOptions;
+
 
 var fail = function(message, num) {
   console.error(message);
@@ -41,29 +47,20 @@ var optionDefaults = {
   global: '',
 };
 
+var ifNoExist = function(path, action) {
+  if (fs.existsSync(path)) {
+    console.log(path + ' already exists');
+  } else {
+    action();
+  }
+};
+
 var createComponent = function(filename) {
-  return function(name) {
-    name = name || 'my_library_name';
-    var example = {
-      name: name,
-      version: '0.1.0',
-      main: name + '.js',
-      entry: 'src/index.js',
-      dependencies: {
-        example_dep: "~1.2.3",
-      },
-      supports: ['window', 'amd', 'commonjs'],
-      vaccine: {
-        format: 'commonjs',
-        targets: ['vaccine.js', 'build.sh'],
-        require: ['full', 'index'],
-        exports: ['exports', 'module'],
-      }
-    };
-    if (fs.existsSync(filename))
-      fail(filename + ' already exists');
-    var text = JSON.stringify(example, null, 2);
-    fs.writeFileSync(filename, text, 'utf8');
+  return function() {
+    ifNoExist(filename, function() {
+      var copy = 'cp ' + libTemplateDir + '/component.json ' + filename;
+      exec(copy, function(err) { if (err) throw err; });
+    });
   };
 };
 
@@ -177,4 +174,12 @@ var determineOptions = function(component) {
   return options;
 };
 
+var whichLibTemplate = function() {
+  if (fs.existsSync(userTemplateDir))
+    libTemplateDir = userTemplateDir;
+  else
+    libTemplateDir = sourceTemplateDir;
+};
+
+whichLibTemplate();
 exports.loadTemplates();

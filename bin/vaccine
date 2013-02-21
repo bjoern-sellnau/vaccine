@@ -26,12 +26,12 @@ var commands = {
     desc: "Run a development server (same as dev_server.js)",
   },
   create: {
-    args: '<library name>',
-    desc: "Create a skeleton library of the given name",
+    args: '[args]*',
+    desc: "Create a skeleton library (args is lib name by default)",
   },
-  init: {
-    args: '<library name>',
-    desc: "Initialize a skeleton lib in the current directory",
+  template: {
+    args: '[--force]',
+    desc: "Set ~/.vaccine/template to the default library template",
   },
   "component.json": {
     desc: "Create an example component.json",
@@ -51,7 +51,6 @@ var commandHelp = function(command) {
 var help = function() {
   commandNames.forEach(function(c) {
     commandHelp(c);
-    console.log('');
   });
 };
 
