@@ -1,8 +1,6 @@
 'use strict';
 
-var templateFiles = ['vaccine.js', 'Makefile', 'build.sh', 'dev_server.js',
-                     'umd.js'],
-    templateText = {},
+var templateText = {},
     conditionals = {};
 
 var templateMap = {
@@ -402,12 +400,4 @@ var evaluate = function(string) {
 exports.templateText = function(_) {
   if (!_) return templateText;
   templateText = _;
-};
-
-// Only use outside of the browser.
-exports.loadFiles = function() {
-  var fs = require('fs');
-  templateFiles.forEach(function(file) {
-    templateText[file] = fs.readFileSync(__dirname + '/../templates/' + file, 'utf8');
-  });
 };
