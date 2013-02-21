@@ -9,5 +9,11 @@ replace() {
   sed -i '' -e "s/{# *$key *#}/$value/g" $file
 }
 
-replace component.json name "$name"
+for file in $(find . -type f)
+do
+  replace "$file" name "$name"
+done
+
+mv lib_name.css "$name.css"
+
 rm post_create
