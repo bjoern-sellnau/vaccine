@@ -30,7 +30,6 @@ var commands = {
     desc: "Create a skeleton library (args are unused by default)",
   },
   template: {
-    args: '[--force]',
     desc: "Set ~/.vaccine/template to the default library template",
   },
   "component.json": {

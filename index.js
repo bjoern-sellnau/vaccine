@@ -1,12 +1,15 @@
 
 var fs = require('fs');
 var child_process = require('child_process');
+
 var vaccine = require('./src/vaccine');
+
 
 var templateFiles = ['vaccine.js', 'Makefile', 'build.sh', 'dev_server.js',
                      'umd.js'];
 var templateText = {};
-var userTemplateDir = '~/.vaccine/template';
+var vaccineDir = process.env.HOME + '/.vaccine';
+var userTemplateDir = vaccineDir + '/template';
 var sourceTemplateDir = __dirname + '/lib_template';
 var libTemplateDir;
 
@@ -122,6 +125,16 @@ module.exports = exports = {
       child_process.exec('cp -R ' + libTemplateDir + ' ' + name, execFile);
     });
   },
+
+  template: function() {
+    if (libTemplateDir === userTemplateDir) {
+      var when = ' before calling $vaccine template';
+      console.log('Remove ~/.vaccine/template' + when);
+    } else {
+      var command = 'cp -R ' + libTemplateDir + ' ' + userTemplateDir;
+      child_process.exec(command, maybeThrow);
+    }
+  },
 };
 
 var compileTargets = function(targets, options) {
@@ -194,6 +207,8 @@ var determineOptions = function(component) {
 };
 
 var whichLibTemplate = function() {
+  if (!fs.existsSync(vaccineDir))
+    fs.mkdirSync(vaccineDir);
   if (fs.existsSync(userTemplateDir))
     libTemplateDir = userTemplateDir;
   else
