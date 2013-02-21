@@ -73,7 +73,7 @@ Here is an example `component.json`:
   `$ vaccine targets`. Possibilities are `vaccine.js`, `build.sh`,
   `vaccine_dev.js`, `dev_server.js`, `Makefile`, `umd.js`.
 - `vaccine.require`: An array of "require" functionality. Options are:
-  `full`, `single`, `absolute`, `w-o-index`. See
+  `full`, `single`, `absolute`, `index`. See
   [help](http://www.vaccinejs.com/#help-require).
 - `vaccine.exports`: An array of methods of exporting a module's API. Options
   are: `exports`, `module`, and `return`. See

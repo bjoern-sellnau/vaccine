@@ -2,7 +2,7 @@
 var fs = require('fs'),
     vaccine = require('./');
 
-vaccine.loadFiles();
+vaccine.loadTemplates();
 
 var templateText = vaccine.templateText();
 

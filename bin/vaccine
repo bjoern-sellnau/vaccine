@@ -36,14 +36,16 @@ var commands = {
   "component.json": {
     desc: "Create an example component.json",
   },
+  "vaccine.json": {
+    desc: "Create an example vaccine.json",
+  },
 };
 var commandNames = Object.keys(commands);
-commands['-h'] = commands['--help'] = commands.help;
 
 var commandHelp = function(command) {
   var args = commands[command].args || '';
   console.log('$ vaccine ' + command + ' ' + args);
-  console.log('           # ' + commands[command].desc);
+  console.log('               # ' + commands[command].desc);
 };
 
 var help = function() {
@@ -55,7 +57,7 @@ var help = function() {
 
 var run = function() {
   var command = process.argv[2];
-  if (!command) command = 'help';
+  if (!command || command === '-h' || command === '--help') command = 'help';
 
   var matching = commandNames.filter(function(c) {
     return command === c.slice(0, command.length);
@@ -71,7 +73,7 @@ var run = function() {
   var args = process.argv.slice(3);
   var err;
   if (defArgs) {
-    var multi = defArgs[defArgs.length] === '*'
+    var multi = defArgs[defArgs.length - 1] === '*'
     var optional = defArgs[0] === '[';
     if (!args.length && !optional)
       err = "Missing required arguments";

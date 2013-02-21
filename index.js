@@ -41,10 +41,44 @@ var optionDefaults = {
   global: '',
 };
 
+var createComponent = function(filename) {
+  return function(name) {
+    name = name || 'my_library_name';
+    var example = {
+      name: name,
+      version: '0.1.0',
+      main: name + '.js',
+      entry: 'src/index.js',
+      dependencies: {
+        example_dep: "~1.2.3",
+      },
+      supports: ['window', 'amd', 'commonjs'],
+      vaccine: {
+        format: 'commonjs',
+        targets: ['vaccine.js', 'build.sh'],
+        require: ['full', 'index'],
+        exports: ['exports', 'module'],
+      }
+    };
+    if (fs.existsSync(filename))
+      fail(filename + ' already exists');
+    var text = JSON.stringify(example, null, 2);
+    fs.writeFileSync(filename, text, 'utf8');
+  };
+};
+
 
 module.exports = exports = {
   defaultForFormat: vaccine.defaultForFormat,
   validateOptions: vaccine.validateOptions,
+
+  loadTemplates: function() {
+    var fs = require('fs');
+    templateFiles.forEach(function(file) {
+      templateText[file] = fs.readFileSync(__dirname + '/templates/' + file, 'utf8');
+    });
+    vaccine.templateText(templateText);
+  },
 
   templateText: function(_) {
     if (!_) return templateText;
@@ -69,6 +103,9 @@ module.exports = exports = {
       });
     });
   },
+
+  "component.json": createComponent('component.json'),
+  "vaccine.json": createComponent('vaccine.json'),
 };
 
 var compileTargets = function(targets, options) {
@@ -140,12 +177,4 @@ var determineOptions = function(component) {
   return options;
 };
 
-var loadTemplates = function() {
-  var fs = require('fs');
-  templateFiles.forEach(function(file) {
-    templateText[file] = fs.readFileSync(__dirname + '/templates/' + file, 'utf8');
-  });
-  vaccine.templateText(templateText);
-};
-
-loadTemplates();
+exports.loadTemplates();
