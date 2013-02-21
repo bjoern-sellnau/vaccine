@@ -3,6 +3,7 @@ var fs = require('fs');
 var child_process = require('child_process');
 
 var vaccine = require('./src/vaccine');
+var detect = require('./detect');
 
 
 var templateFiles = ['vaccine.js', 'Makefile', 'build.sh', 'dev_server.js',
@@ -13,7 +14,7 @@ var userTemplateDir = vaccineDir + '/template';
 var sourceTemplateDir = __dirname + '/lib_template';
 var libTemplateDir;
 
-var componentOptions;
+var projectOptions;
 
 
 var fail = function(message, num) {
@@ -76,6 +77,8 @@ module.exports = exports = {
   defaultForFormat: vaccine.defaultForFormat,
   validateOptions: vaccine.validateOptions,
 
+  projectOptions: detect,
+
   loadTemplates: function() {
     var fs = require('fs');
     templateFiles.forEach(function(file) {
@@ -91,7 +94,7 @@ module.exports = exports = {
 
   targets: function(targets) {
     if (!targets || !targets.length)
-      targets = loadOptions().targets;
+      targets = detect().targets;
     var compiled = compileTargets(targets);
     compiled.forEach(function(target) {
       var name = target.name;
@@ -138,7 +141,7 @@ module.exports = exports = {
 };
 
 var compileTargets = function(targets, options) {
-  var options = options || loadOptions();
+  var options = options || detect();
   options = clone(options);
   options.targets = targets;
   return compile(options);
@@ -146,7 +149,7 @@ var compileTargets = function(targets, options) {
 exports.compileTargets = compileTargets;
 
 var compile = function(options) {
-  var options = options || loadOptions();
+  var options = options || detect();
   var problems = vaccine.validateOptions(options);
   if (problems.length) {
     problems.forEach(function(problem) {
@@ -167,43 +170,6 @@ var clone = function(object) {
     if (object.hasOwnProperty(i))
       copy[i] = object[i];
   return copy;
-};
-
-var loadOptions = function() {
-  if (componentOptions) return componentOptions;
-  var jsonFile = 'vaccine.json';
-  if (!fs.existsSync(jsonFile)) jsonFile = 'component.json';
-  if (!fs.existsSync(jsonFile))
-    fail("Must specify options in component.json (vaccine.json for apps)");
-  var component = JSON.parse(fs.readFileSync(jsonFile));
-  componentOptions = determineOptions(component);
-  return componentOptions;
-};
-
-var determineOptions = function(component) {
-  var options = {};
-  var vac = component.vaccine;
-  Object.keys(optionLocations).forEach(function(opt) {
-    var loc = optionLocations[opt];
-    var prefix = 'vaccine.';
-    var setting;
-    if (loc.slice(0, prefix.length) === prefix) {
-      if (vac) setting = vac[loc.slice(prefix.length)];
-    } else {
-      setting = component[loc];
-    }
-    if (typeof setting === 'undefined') {
-      if (typeof optionDefaults[opt] === 'undefined')
-        fail("Missing required option: " + loc);
-      setting = optionDefaults[opt];
-      if (typeof setting === 'function')
-        setting = setting(options.format)[opt];
-    }
-    if (optionConversions[opt])
-      setting = optionConversions[opt](setting);
-    options[opt] = setting;
-  });
-  return options;
 };
 
 var whichLibTemplate = function() {
