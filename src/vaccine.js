@@ -1,5 +1,3 @@
-'use strict';
-
 var templateText = {},
     conditionals = {};
 
@@ -19,31 +17,7 @@ var macroMap = {
   ':::::': 'else',
 };
 
-var name,
-    globalName,
-    libraryDir,
-    format,
-    amd,
-    commonjs,
-    umd,
-    performance,
-    debug,
-    dev,
-    useStrict,
-    dependencies = [],
-    depString,
-    umdDepsAmd,
-    umdDepsCommonjs,
-    umdDepsWindow,
-    umdDepsFactory,
-    numDeps,
-    supportsArray,
-    exportsArray,
-    requireArray,
-    defineArray,
-    targets,
-    sourceDir,
-    main;
+var currentDerivedOptions;
 
 var has = function(array, item) {
   return array.indexOf(item) >= 0;
@@ -63,45 +37,50 @@ var maybeOnlyHas = function(array, item) {
   return onlyHas(array, item);
 };
 
-var exprts = function(exprtsType) {
-  return has(exportsArray, exprtsType);
-};
-
-var supports = function(supportsType) {
-  return has(supportsArray, supportsType);
-};
-
 var remove = function(array, item) {
   var index = array.indexOf(item);
   if (index >= 0) array.splice(index, 1);
 };
 
-var req = function(requireType) {
-  return has(requireArray, requireType);
+
+var derivedHelpers = function(derived) {
+  var d = derived;
+  d.exprts = function(exprtsType) {
+    return has(d.exportsArray, exprtsType);
+  };
+
+  d.supports = function(supportsType) {
+    return has(d.supportsArray, supportsType);
+  };
+
+  d.req = function(requireType) {
+    return has(d.requireArray, requireType);
+  };
+
+  d.onlyReq = function(requireType) {
+    return onlyHas(d.requireArray, requireType);
+  };
+
+  d.define = function(defineType) {
+    return has(d.defineArray, defineType);
+  };
 };
 
-var onlyReq = function(requireType) {
-  return onlyHas(requireArray, requireType);
-};
-
-var define = function(defineType) {
-  return has(defineArray, defineType);
-};
 
 module.exports = exports = function(options) {
-  setOptions(options);
+  var d = currentDerivedOptions = derivedOptions(options);
 
   var allCompiled = {};
-  targets.forEach(function(target) {
+  d.targets.forEach(function(target) {
     if (target === 'vaccine_dev.js') {
-      dev = true;
+      d.dev = true;
       var oldSupportsArray = supportsArray;
-      supportsArray = [];
+      d.supportsArray = [];
     }
     var compiled = compileTemplate(templateMap[target]);
     if (target === 'vaccine_dev.js') {
-      dev = false;
-      supportsArray = oldSupportsArray;
+      d.dev = false;
+      d.supportsArray = oldSupportsArray;
     }
     allCompiled[target] = compiled;
   });
@@ -281,80 +260,88 @@ exports.validateOptions = function(opts) {
   }
 
   return problems;
-}
+};
 
-var setOptions = function(options) {
-  name = options.name;
-  globalName = options.global || options.name;
-  libraryDir = options.lib;
-  format = options.format;
-  amd = format === 'amd';
-  commonjs = format === 'commonjs';
-  umd = format === 'umd';
-  performance = options.performance;
-  debug = options.debug;
-  useStrict = options.use_strict;
-  dependencies = options.dependencies || [];
-  numDeps = dependencies.length;
-  depString = "['" + dependencies.join("', '") + "']";
-  requireArray = options.require;
-  supportsArray = options.supports;
-  exportsArray = options.exports;
-  defineArray = options.define;
-  targets = options.targets;
+var derivedOptions = function(options) {
+  var d = derived = {
+    name: options.name,
+    globalName: options.global || options.name,
+    libraryDir: options.lib,
+    format: options.format,
+    amd: format === 'amd',
+    commonjs: format === 'commonjs',
+    umd: format === 'umd',
+    performance: options.performance,
+    debug: options.debug,
+    useStrict: options.use_strict,
+    dependencies: options.dependencies || [],
+    requireArray: options.require,
+    supportsArray: options.supports,
+    exportsArray: options.exports,
+    defineArray: options.define,
+    targets: options.targets,
+    dev: false,
+  };
+  d.numDeps = d.dependencies.length;
+  d.depString = "['" + d.dependencies.join("', '") + "']";
 
-  if (req('full') && req('single')) {
-    remove(requireArray, 'single');
+  derivedHelpers(d);
+
+  if (d.req('full') && d.req('single')) {
+    remove(d.requireArray, 'single');
   }
-  if (req('full') && req('absolute')) {
-    remove(requireArray, 'absolute');
+  if (d.req('full') && d.req('absolute')) {
+    remove(d.requireArray, 'absolute');
   }
 
 
   var cleanedMain = options.main.replace(/^\.\//, '').replace(/\.js$/, '');
   if (options.src) {
-    sourceDir = options.src.replace(/^\.\//, '');
+    d.sourceDir = options.src.replace(/^\.\//, '');
   } else {
     var mainSplit = cleanedMain.split('/');
     mainSplit.pop();
-    sourceDir = mainSplit.join('/') || '.';
+    d.sourceDir = mainSplit.join('/') || '.';
   }
-  main = cleanedMain.replace(new RegExp('^' + sourceDir + '/'), '');
+  d.main = cleanedMain.replace(new RegExp('^' + d.sourceDir + '/'), '');
 
-  if (onlyHas(requireArray, 'single')) {
-    main = './' + main;
+  if (onlyHas(d.requireArray, 'single')) {
+    d.main = './' + d.main;
   }
 
-  if (format === 'umd') {
+  if (d.format === 'umd') {
 
-    umdDepsAmd = '';
-    dependencies.forEach(function(dep) {
-      umdDepsAmd += ", '" + dep + "'";
+    d.umdDepsAmd = '';
+    d.dependencies.forEach(function(dep) {
+      d.umdDepsAmd += ", '" + dep + "'";
     });
 
-    umdDepsCommonjs = '';
-    dependencies.forEach(function(dep) {
-      umdDepsCommonjs += ", require('" + dep + "')";
+    d.umdDepsCommonjs = '';
+    d.dependencies.forEach(function(dep) {
+      d.umdDepsCommonjs += ", require('" + dep + "')";
     });
 
-    umdDepsWindow = '';
-    dependencies.forEach(function(dep) {
-      umdDepsWindow += ', root.' + dep;
+    d.umdDepsWindow = '';
+    d.dependencies.forEach(function(dep) {
+      d.umdDepsWindow += ', root.' + dep;
     });
 
-    umdDepsFactory = '';
-    dependencies.forEach(function(dep) {
-      umdDepsFactory += ', ' + dep;
+    d.umdDepsFactory = '';
+    d.dependencies.forEach(function(dep) {
+      d.umdDepsFactory += ', ' + dep;
     });
 
-    if (onlyHas(exportsArray, 'return')) {
-      umdDepsAmd = umdDepsAmd.slice(2);
-      umdDepsCommonjs = umdDepsCommonjs.slice(2);
-      umdDepsWindow = umdDepsWindow.slice(2);
-      umdDepsFactory = umdDepsFactory.slice(2);
+    if (onlyHas(d.exportsArray, 'return')) {
+      d.umdDepsAmd = d.umdDepsAmd.slice(2);
+      d.umdDepsCommonjs = d.umdDepsCommonjs.slice(2);
+      d.umdDepsWindow = d.umdDepsWindow.slice(2);
+      d.umdDepsFactory = d.umdDepsFactory.slice(2);
     }
   }
+
+  return d;
 };
+exports.derivedOptions = derivedOptions;
 
 
 var compileTemplate = function(templateName) {
@@ -394,7 +381,7 @@ var compileTemplate = function(templateName) {
     } else {
       if (enabled) {
         var compiledLine = line.replace(/\$--(.*?)--\$/g, function(match, group) {
-          return eval(group);
+          return evaluate(group);
         });
         compiled += compiledLine.replace(/^    /, '') + '\n';
       }
@@ -404,7 +391,8 @@ var compileTemplate = function(templateName) {
 };
 
 var evaluate = function(string) {
-  return eval(string);
+  with (currentDerivedOptions)
+    return eval(string);
 };
 
 

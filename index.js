@@ -108,6 +108,11 @@ module.exports = exports = {
   },
 };
 
+var compileSingle = function(target, options) {
+  return compileTargets([target], options)[target];
+};
+exports.compileSingle = compileSingle;
+
 var compileTargets = function(targets, options) {
   var options = options || detect();
   options = clone(options);
@@ -136,6 +141,11 @@ var clone = function(object) {
     if (object.hasOwnProperty(i))
       copy[i] = object[i];
   return copy;
+};
+
+
+var buildText = function(options) {
+  var vac = compileSingle('vaccine.js', options);
 };
 
 var whichLibTemplate = function() {
