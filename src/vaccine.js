@@ -23,18 +23,8 @@ var has = function(array, item) {
   return array.indexOf(item) >= 0;
 };
 
-var maybeHas = function(array, item) {
-  if (!array) return false;
-  return has(array, item);
-};
-
 var onlyHas = function(array, item) {
   return array.length === 1 && array[0] === item;
-};
-
-var maybeOnlyHas = function(array, item) {
-  if (!array) return false;
-  return onlyHas(array, item);
 };
 
 var remove = function(array, item) {
@@ -42,28 +32,30 @@ var remove = function(array, item) {
   if (index >= 0) array.splice(index, 1);
 };
 
+var capitalize = function(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+};
+
+var clone = function(object) {
+  var copy = {};
+  var i;
+  for (i in object)
+    if (object.hasOwnProperty(i))
+      copy[i] = object[i];
+  return copy;
+};
+
 
 var derivedHelpers = function(derived) {
-  var d = derived;
-  d.exports = function(exportsType) {
-    return has(d.exportsArray, exportsType);
-  };
-
-  d.supports = function(supportsType) {
-    return has(d.supportsArray, supportsType);
-  };
-
-  d.require = function(requireType) {
-    return has(d.requireArray, requireType);
-  };
-
-  d.onlyRequire = function(requireType) {
-    return onlyHas(d.requireArray, requireType);
-  };
-
-  d.define = function(defineType) {
-    return has(d.defineArray, defineType);
-  };
+  ['exports', 'supports', 'require', 'define'].forEach(function(group) {
+    var groupArray = group + 'Array';
+    derived[group] = function(type) {
+      return has(derived[groupArray], type);
+    };
+    derived['only' + capitalize(group)] = function(type) {
+      return onlyHas(derived[groupArray], type);
+    };
+  });
 };
 
 
@@ -86,6 +78,7 @@ module.exports = exports = function(options) {
   });
   return allCompiled;
 };
+exports.clone = clone;
 
 var defaultForFormat = function(format) {
   var defaults = {
@@ -116,8 +109,9 @@ var defaultForFormat = function(format) {
 exports.defaultForFormat = defaultForFormat;
 
 exports.validateOptions = function(opts) {
-  var problems = [],
-      format = opts.format;
+  var d = derivedOptions(opts);
+  var problems = [];
+  var format = opts.format;
 
   var setDefault = function(option, value) {
     var fix = function(options) { options[option] = value; };
@@ -140,14 +134,24 @@ exports.validateOptions = function(opts) {
     };
     problems.push({options: options, fix: fix, log: log});
   };
-  var formatMismatch = function(options, fix) {
+  var formatMismatches = function(options, fix) {
     options.push({group: 'format', parts: [format]});
     mismatch(options, fix);
+  };
+  var formatMismatch = function(group, part, fix) {
+    formatMismatches([{group: group, parts: [part]}], fix);
   };
   var removeWithDefault = function(options, option, item) {
     remove(options[option], item);
     if (!options[option].length) {
       options[option] = defaultForFormat(format)[option];
+    }
+  };
+  var removeIfHas = function(group, part) {
+    if (d[group](part)) {
+      formatMismatch(group, part, function(options) {
+        removeWithDefault(options, group, part);
+      });
     }
   };
 
@@ -161,23 +165,23 @@ exports.validateOptions = function(opts) {
   if (!opts.define) setDefault('define', fmtDefault.define);
 
   // Miscellaneous problems
-  if (maybeHas(opts.exports, 'module') && !maybeHas(opts.exports, 'exports')) {
+  if (d.exports('module') && !d.exports('exports')) {
     mismatch([{group: 'exports', parts: ['module', 'exports']}],
              function(options) {
       options.exports.push('exports');
     });
   }
-  if (maybeOnlyHas(opts.supports, 'commonjs')) {
+  if (d.onlySupports('commonjs')) {
     mismatch([{group: 'supports', parts: ['commonjs']}], function(options) {
       options.supports.push('window');
     });
   }
-  if (maybeHas(opts.require, 'index') && maybeHas(opts.require, 'single')) {
+  if (d.require('index') && d.require('single')) {
     mismatch([{group: 'require', parts: ['index', 'single']}], function(options) {
       removeWithDefault(options, 'require', 'index');
     });
   }
-  if (maybeOnlyHas(opts.require, 'index')) {
+  if (d.onlyRequire('index')) {
     mismatch([{group: 'require', parts: ['index']}], function(options) {
       options.require.push('full');
     });
@@ -185,59 +189,32 @@ exports.validateOptions = function(opts) {
 
   // AMD problems
   if (format === 'amd') {
-    if (maybeHas(opts.supports, 'commonjs')) {
-      formatMismatch([{group: 'supports', parts: ['commonjs']}],
-            function(options) {
-        remove(options.supports, 'commonjs');
-      });
-    }
-    if (maybeHas(opts.require, 'index')) {
-      mismatch([{group: 'require', parts: ['index']}], function(options) {
-        removeWithDefault(options, 'require', 'index');
-      });
-    }
+    removeIfHas('supports', 'commonjs');
+    removeIfHas('require', 'index');
   } else {
-    if (maybeHas(opts.define, 'optional_id')) {
-      formatMismatch([{group: 'define', parts: ['optional_id']}],
-          function(options) {
-        removeWithDefault(options, 'define', 'optional_id');
-      });
-    }
+    removeIfHas('define', 'optional_id');
   }
 
   // CommonJS problems
   if (format === 'commonjs') {
-    if (!maybeHas(opts.supports, 'commonjs')) {
-      formatMismatch([{group: 'supports', parts: ['commonjs']}],
-            function(options) {
+    if (!d.supports('commonjs')) {
+      formatMismatch('supports', 'commonjs', function(options) {
         options.supports.push('commonjs');
       });
     }
-    if (maybeHas(opts.exports, 'return')) {
-      formatMismatch([{group: 'exports', parts: ['return']}],
-            function(options) {
-        removeWithDefault(options, 'exports', 'return');
-      });
-    }
-    if (maybeHas(opts.require, 'absolute')) {
-      formatMismatch([{group: 'require', parts: ['absolute']}],
-          function(options) {
-        removeWithDefault(options, 'require', 'absolute');
-      });
-    }
+    removeIfHas('exports', 'return');
+    removeIfHas('require', 'absolute');
   }
 
   // UMD problems
   if (format === 'umd') {
-    if (!maybeOnlyHas(opts.targets, 'umd.js')) {
+    if (!onlyHas(d.targets, 'umd.js')) {
       var parts = (opts.targets || []).concat('umd.js');
-      formatMismatch([{group: 'targets', parts: parts}],
-          function(options) {
+      formatMismatches([{group: 'targets', parts: parts}], function(options) {
         options.targets = ['umd.js'];
       });
     }
-    if (maybeHas(opts.supports, 'commonjs') &&
-        maybeHas(opts.exports, 'return')) {
+    if (d.supports('commonjs') && d.exports('return')) {
       formatMismatch([{group: 'supports', parts: ['commonjs']},
                       {group: 'exports', parts: ['return']}],
             function(options) {
@@ -245,13 +222,13 @@ exports.validateOptions = function(opts) {
       });
     }
   } else {
-    if (maybeHas(opts.targets, 'umd.js')) {
-      formatMismatch([{group: 'targets', parts: ['umd.js']}],
-          function(options) {
-        removeWithDefault(options, 'targets', 'umd.js');
+    if (has(d.targets, 'umd.js')) {
+      formatMismatch('targets', 'umd.js', function(options) {
+        options.targets = ['umd.js'];
       });
     }
-    if (!opts.require || !opts.require.length) {
+
+    if (opts.require && !opts.require.length) {
       var defaultRequire = defaultForFormat(format).require;
       mismatch([{group: 'require', parts: defaultRequire}], function(options) {
         options.require = defaultRequire;
@@ -263,24 +240,38 @@ exports.validateOptions = function(opts) {
 };
 
 var derivedOptions = function(options) {
-  var debug = options.debug || [];
+
+  var arrayify = function(opt) {
+    if (Array.isArray(opt)) return opt.slice();
+    return [];
+  };
+
+  var stringify = function(opt) {
+    if (Object.prototype.toString.call(opt) === '[object String]')
+      return opt;
+    return '';
+  };
+
+  var debugging = arrayify(options.debugging);
+  var name = stringify(options.name);
+  var format = stringify(options.format);
   var d = {
-    name: options.name,
-    global_name: options.global_name || options.name,
-    format: options.format,
-    amd: options.format === 'amd',
-    commonjs: options.format === 'commonjs',
-    umd: options.format === 'umd',
-    debug: has(debug, 'debug'),
-    performance: has(debug, 'performance'),
-    use_strict: has(debug, 'use_strict'),
-    dependencies: options.dependencies || [],
-    requireArray: options.require,
-    supportsArray: options.supports,
-    exportsArray: options.exports,
-    defineArray: options.define,
-    targets: options.targets,
-    output: options.output || options.name + '.js',
+    name: name,
+    global_name: stringify(options.global_name) || name,
+    format: format,
+    amd: format === 'amd',
+    commonjs: format === 'commonjs',
+    umd: format === 'umd',
+    debug: has(debugging, 'debug'),
+    performance: has(debugging, 'performance'),
+    use_strict: has(debugging, 'use_strict'),
+    dependencies: arrayify(options.dependencies),
+    requireArray: arrayify(options.require),
+    supportsArray: arrayify(options.supports),
+    exportsArray: arrayify(options.exports),
+    defineArray: arrayify(options.define),
+    targets: arrayify(options.targets),
+    output: stringify(options.output) || name + '.js',
     dev: false,
   };
   d.numDeps = d.dependencies.length;
@@ -296,9 +287,11 @@ var derivedOptions = function(options) {
   }
 
 
-  var cleanedMain = options.main.replace(/^\.\//, '').replace(/\.js$/, '');
-  if (options.source_dir) {
-    d.source_dir = options.source_dir.replace(/^\.\//, '');
+  var cleanedMain = stringify(options.main).replace(/^\.\//, '');
+  cleanedMain = cleanedMain.replace(/\.js$/, '');
+  var source_dir = stringify(options.source_dir);
+  if (source_dir) {
+    d.source_dir = source_dir.replace(/^\.\//, '').replace(/\/$/, '');
   } else {
     var mainSplit = cleanedMain.split('/');
     mainSplit.pop();

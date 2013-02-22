@@ -128,7 +128,7 @@ exports.compileSingle = compileSingle;
 
 var compileTargets = function(targets, options) {
   options = options || detect();
-  options = clone(options);
+  options = vaccine.clone(options);
   options.targets = targets;
   return compile(options);
 };
@@ -147,15 +147,6 @@ var compile = function(options) {
 };
 exports.compile = compile;
 
-var clone = function(object) {
-  var copy = {};
-  var i;
-  for (i in object)
-    if (object.hasOwnProperty(i))
-      copy[i] = object[i];
-  return copy;
-};
-
 
 var buildText = function(options) {
   options = options || detect();
@@ -164,7 +155,7 @@ var buildText = function(options) {
   var files = walk(d.source_dir).sort();
 
   // The following mirrors the logic in templates/build.sh
-  var text = ';(function() {' + (d.useStrict ? '"use strict";\n' : '\n');
+  var text = ';(function() {' + (d.use_strict ? '"use strict";\n' : '\n');
 
   files.forEach(function(filename) {
     var file = fs.readFileSync(filename, 'utf8');
