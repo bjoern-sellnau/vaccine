@@ -165,6 +165,16 @@ exports.validateOptions = function(opts) {
   if (!opts.define) setDefault('define', fmtDefault.define);
 
   // Miscellaneous problems
+  var unknownTargets = d.targets.filter(function(t) {
+    return !templateMap[t];
+  });
+  if (unknownTargets.length) {
+    problems.push({log: function() {
+      return 'Unknown target(s): ' + unknownTargets.join(', ');
+    }});
+  }
+
+  // Miscellaneous mismatches
   if (d.exports('module') && !d.exports('exports')) {
     mismatch([{group: 'exports', parts: ['module', 'exports']}],
              function(options) {
@@ -187,7 +197,7 @@ exports.validateOptions = function(opts) {
     });
   }
 
-  // AMD problems
+  // AMD mismatches
   if (format === 'amd') {
     removeIfHas('supports', 'commonjs');
     removeIfHas('require', 'index');
@@ -195,7 +205,7 @@ exports.validateOptions = function(opts) {
     removeIfHas('define', 'optional_id');
   }
 
-  // CommonJS problems
+  // CommonJS mismatches
   if (format === 'commonjs') {
     if (!d.supports('commonjs')) {
       formatMismatch('supports', 'commonjs', function(options) {
@@ -206,7 +216,7 @@ exports.validateOptions = function(opts) {
     removeIfHas('require', 'absolute');
   }
 
-  // UMD problems
+  // UMD mismatches
   if (format === 'umd') {
     if (!onlyHas(d.targets, 'umd.js')) {
       var parts = (opts.targets || []).concat('umd.js');
