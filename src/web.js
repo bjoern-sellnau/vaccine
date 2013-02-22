@@ -55,15 +55,15 @@ var defaultOptions = {
   format: 'amd',
   name: 'my_project_name',
   main: 'src/index.js',
-  dependencies: ['dep_one', 'dep_two'],
+  dependencies: 'dep_one, dep_two',
   targets: amdFmtDefault.targets,
   exports: amdFmtDefault.exports,
   supports: amdFmtDefault.supports,
   define: amdFmtDefault.define,
   require: amdFmtDefault.require,
   debugging: [],
-  src: '',
-  global: '',
+  source_dir: '',
+  global_name: '',
 };
 web.defaultOptions = defaultOptions;
 web.defaultForFormat = vaccine.defaultForFormat;
@@ -172,11 +172,6 @@ var compile = function() {
     if (dep) deps.push(dep);
   });
   options.dependencies = deps;
-
-  var debugging = options.debugging;
-  options.debug = debugging.indexOf('debug') >= 0;
-  options.performance = debugging.indexOf('performance') >= 0;
-  options.use_strict = debugging.indexOf('use_strict') >= 0;
 
   var problems = vaccine.validateOptions(options);
   d3.selectAll('.problem').classed('problem', false);

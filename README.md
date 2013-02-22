@@ -79,15 +79,15 @@ Here is an example `component.json`:
   are: `exports`, `module`, and `return`. See
   [help](http://www.vaccinejs.com/#help-exports).
 - `vaccine.define`: An array of "define" functionality. Currently the only
-  option is `optional-id`. See [help](http://www.vaccinejs.com/#help-define).
+  option is `optional_id`. See [help](http://www.vaccinejs.com/#help-define).
 - `vaccine.debugging`: An array of "debugging" functionality. Options are:
-  `debug`, `performance`, and `use-strict`.
+  `debug`, `performance`, and `use_strict`.
   See [help](http://www.vaccinejs.com/#help-debugging).
 - `vaccine.output`: The name/path of the output filename for `$ vaccine build`.
   This defaults to `<name>.js`.
 - `vaccine.source_dir`: A way to override the source directory parsed from
   `entry`.
-- `vaccine.global`: A way to override the global variable name, if `name`
+- `vaccine.global_name`: A way to override the global variable name, if `name`
   is not right.
 
 Eventually, some of the above options will be intelligently determined.

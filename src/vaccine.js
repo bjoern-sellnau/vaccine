@@ -53,11 +53,11 @@ var derivedHelpers = function(derived) {
     return has(d.supportsArray, supportsType);
   };
 
-  d.req = function(requireType) {
+  d.require = function(requireType) {
     return has(d.requireArray, requireType);
   };
 
-  d.onlyReq = function(requireType) {
+  d.onlyRequire = function(requireType) {
     return onlyHas(d.requireArray, requireType);
   };
 
@@ -263,17 +263,17 @@ exports.validateOptions = function(opts) {
 };
 
 var derivedOptions = function(options) {
+  var debug = options.debug || [];
   var d = {
     name: options.name,
-    globalName: options.global || options.name,
-    libraryDir: options.lib,
+    global_name: options.global_name || options.name,
     format: options.format,
     amd: options.format === 'amd',
     commonjs: options.format === 'commonjs',
     umd: options.format === 'umd',
-    performance: options.performance,
-    debug: options.debug,
-    useStrict: options.use_strict,
+    debug: has(debug, 'debug'),
+    performance: has(debug, 'performance'),
+    use_strict: has(debug, 'use_strict'),
     dependencies: options.dependencies || [],
     requireArray: options.require,
     supportsArray: options.supports,
@@ -287,23 +287,23 @@ var derivedOptions = function(options) {
 
   derivedHelpers(d);
 
-  if (d.req('full') && d.req('single')) {
+  if (d.require('full') && d.require('single')) {
     remove(d.requireArray, 'single');
   }
-  if (d.req('full') && d.req('absolute')) {
+  if (d.require('full') && d.require('absolute')) {
     remove(d.requireArray, 'absolute');
   }
 
 
   var cleanedMain = options.main.replace(/^\.\//, '').replace(/\.js$/, '');
-  if (options.src) {
-    d.sourceDir = options.src.replace(/^\.\//, '');
+  if (options.source_dir) {
+    d.source_dir = options.source_dir.replace(/^\.\//, '');
   } else {
     var mainSplit = cleanedMain.split('/');
     mainSplit.pop();
-    d.sourceDir = mainSplit.join('/') || '.';
+    d.source_dir = mainSplit.join('/') || '.';
   }
-  d.main = cleanedMain.replace(new RegExp('^' + d.sourceDir + '/'), '');
+  d.main = cleanedMain.replace(new RegExp('^' + d.source_dir + '/'), '');
 
   if (onlyHas(d.requireArray, 'single')) {
     d.main = './' + d.main;

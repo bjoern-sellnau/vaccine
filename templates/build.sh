@@ -1,10 +1,10 @@
     #!/bin/sh
     # build with: sh build.sh > $-- name --$.js
-    echo ';(function() {$-- useStrict ? '"use strict";' : '' --$'
+    echo ';(function() {$-- use_strict ? '"use strict";' : '' --$'
 
 ??????????????????????????????????????????? (commonjs || define('optional_id'))
     # vaccine.js must NOT be in the source list.
-    source_dir='$-- sourceDir --$'
+    source_dir='$-- source_dir --$'
 
 
     for file in $(find $source_dir -type f | sort)
@@ -20,7 +20,7 @@
     done
 :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
     # vaccine.js must NOT be in the source list.
-    cat $(find $-- sourceDir --$ -type f | sort)
+    cat $(find $-- source_dir --$ -type f | sort)
 ///////////////////////////////////////////////////////////////////////////////
 
     cat vaccine.js  # Must be after sources.

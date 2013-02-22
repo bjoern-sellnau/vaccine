@@ -15,8 +15,9 @@ var optionLocations = {
   define: 'vacccine.define',
   require: 'vaccine.require',
   debugging: 'vaccine.debugging',
-  src: 'vaccine.source_dir',
-  global: 'vaccine.global',
+  output: 'vaccine.output',
+  source_dir: 'vaccine.source_dir',
+  global_name: 'vaccine.global_name',
 };
 
 var optionConversions = {
@@ -29,8 +30,8 @@ var optionDefaults = {
   targets: defaultForFormat,
   define: defaultForFormat,
   debugging: [],
-  src: '',
-  global: '',
+  source_dir: '',
+  global_name: '',
 };
 
 var fail = function(message, num) {

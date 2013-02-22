@@ -157,7 +157,7 @@ var buildText = function(options) {
   options = options || detect();
   var vac = compileSingle('vaccine.js', options);
   var d = vaccine.derivedOptions(options);
-  var files = walk(d.sourceDir).sort();
+  var files = walk(d.source_dir).sort();
 
   // The following mirrors the logic in templates/build.sh
   var text = ';(function() {' + (d.useStrict ? '"use strict";\n' : '\n');
@@ -165,7 +165,7 @@ var buildText = function(options) {
   files.forEach(function(filename) {
     var file = fs.readFileSync(filename, 'utf8');
     if (d.commonjs || d.define('optional_id')) {
-      var src = new RegExp('^' + d.sourceDir + '/');
+      var src = new RegExp('^' + d.source_dir + '/');
       var name = filename.replace(src, '').replace(/\.js/, '');
       if (d.commonjs) {
         var ex = d.exports('module') ? 'exports, module' : 'exports';
