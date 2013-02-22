@@ -22,35 +22,6 @@ var fail = function(message, num) {
   process.exit(num || 1);
 };
 
-var optionLocations = {
-  format: 'vaccine.format',
-  name: 'name',
-  main: 'entry',
-  dependencies: 'dependencies',
-  targets: 'vaccine.targets',
-  exports: 'vaccine.exports',
-  supports: 'supports',
-  define: 'vacccine.define',
-  require: 'vaccine.require',
-  debugging: 'vaccine.debugging',
-  src: 'vaccine.source_dir',
-  global: 'vaccine.global',
-};
-
-var optionConversions = {
-  dependencies: function(d) { return Object.keys(d); },
-};
-
-var defaultForFormat = vaccine.defaultForFormat;
-var optionDefaults = {
-  dependencies: {},
-  targets: defaultForFormat,
-  define: defaultForFormat,
-  debugging: [],
-  src: '',
-  global: '',
-};
-
 var ifNoExist = function(path, action) {
   if (fs.existsSync(path)) {
     console.log(path + ' already exists');
@@ -153,11 +124,9 @@ var compile = function(options) {
   var problems = vaccine.validateOptions(options);
   if (problems.length) {
     problems.forEach(function(problem) {
-      // TODO: log problems.
+      console.log(problem.log());
     });
-    console.log(problems);
-    console.log(problems[0].options);
-    fail("Problem with options");
+    process.exit(1);
   }
   return vaccine(options);
 };

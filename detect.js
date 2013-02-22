@@ -1,5 +1,42 @@
+var fs = require('fs');
+
+var vaccine = require('./src/vaccine');
 
 var projectOptions;
+
+var optionLocations = {
+  format: 'vaccine.format',
+  name: 'name',
+  main: 'entry',
+  dependencies: 'dependencies',
+  targets: 'vaccine.targets',
+  exports: 'vaccine.exports',
+  supports: 'supports',
+  define: 'vacccine.define',
+  require: 'vaccine.require',
+  debugging: 'vaccine.debugging',
+  src: 'vaccine.source_dir',
+  global: 'vaccine.global',
+};
+
+var optionConversions = {
+  dependencies: function(d) { return Object.keys(d); },
+};
+
+var defaultForFormat = vaccine.defaultForFormat;
+var optionDefaults = {
+  dependencies: {},
+  targets: defaultForFormat,
+  define: defaultForFormat,
+  debugging: [],
+  src: '',
+  global: '',
+};
+
+var fail = function(message, num) {
+  console.error(message);
+  process.exit(num || 1);
+};
 
 module.exports = exports = function() {
   if (projectOptions) return projectOptions;

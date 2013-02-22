@@ -141,14 +141,24 @@ exports.validateOptions = function(opts) {
 
   var setDefault = function(option, value) {
     var fix = function(options) { options[option] = value; };
+    var log = function() {
+      return 'Setting ' + option + ' to default of ' + value;
+    };
     var options = [{group: option, parts: value}];
-    problems.push({options: options, fix: fix});
+    problems.push({options: options, fix: fix, log: log});
   };
   var maybeDefault = function(option, value) {
     if (!opts[option] || !opts[option].length) setDefault(option, value);
   };
   var mismatch = function(options, fix) {
-    problems.push({options: options, fix: fix});
+    var log = function() {
+      var msg = 'Mismatch between options';
+      options.forEach(function(opt) {
+        msg += '\n    ' + opt.group + ': ' + opt.parts.join(', ');
+      });
+      return msg;
+    };
+    problems.push({options: options, fix: fix, log: log});
   };
   var formatMismatch = function(options, fix) {
     options.push({group: 'format', parts: [format]});
