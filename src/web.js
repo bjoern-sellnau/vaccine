@@ -39,7 +39,6 @@ var currentOptions = {},
     currentSize,
     savedOptions,
     savedCompiled,
-    savedCompiledMap,
     savedSize,
     diffEnabled = false;
 
@@ -130,13 +129,11 @@ var setOptions = function(options) {
 
 var update = function() {
   d3.select('#save').attr('disabled', null);
-  currentCompiled = compile();
-  var vaccineCompiled = currentCompiled.filter(function(d) {
-    return d.name === 'vaccine.js' || d.name === 'umd.js';
-  });
-  if (vaccineCompiled.length) {
-    if (vaccineCompiled[0].name === 'vaccine.js') {
-      vaccineCompiled = '(function() {' + vaccineCompiled[0].compiled + '})()';
+  var compiled = currentCompiled = compile();
+  var vaccineCompiled = compiled['vaccine.js'] || compiled['umd.js'];
+  if (vaccineCompiled) {
+    if (compiled['vaccine.js']) {
+      vaccineCompiled = '(function() {' + vaccineCompiled + '})()';
       try {
         // substract the "(function(){...})()" (16 bytes)
         currentSize = uglifyjs(vaccineCompiled).length - 16;
@@ -145,7 +142,7 @@ var update = function() {
       }
     } else { // umd.js
       try {
-        currentSize = uglifyjs(vaccineCompiled[0].compiled).length;
+        currentSize = uglifyjs(vaccineCompiled).length;
       } catch (e) {
         currentSize = 1;
       }
@@ -229,15 +226,16 @@ var problemFixer = function(group, fix) {
 };
 
 var updateSources = function() {
-  currentCompiled.forEach(function(d) {
+  var compiledData = Object.keys(currentCompiled).map(function(name) {
     if (diffEnabled) {
-      d.html = diff(savedCompiledMap[d.name], d.compiled);
+      var html = diff(savedCompiled[name], currentCompiled[name]);
     } else {
-      d.html = hijs(d.compiled);
+      var html = hijs(currentCompiled[name]);
     }
+    return {name: name, html: html};
   });
   var sources = d3.select('#sources').selectAll('.source')
-      .data(currentCompiled, function(d) { return d.name; });
+      .data(compiledData, function(d) { return d.name; });
 
   sources.enter().append('div')
       .attr('class', 'source')
@@ -329,15 +327,8 @@ var setDiff = function(enabled) {
 };
 web.setDiff = setDiff;
 
-var makeCompiledMap = function(compiled) {
-  var map = {};
-  compiled.forEach(function(d) { map[d.name] = d.compiled; });
-  return map;
-};
-
 var saveCurrent = function() {
   savedCompiled = currentCompiled;
-  savedCompiledMap = makeCompiledMap(currentCompiled);
   savedOptions = currentOptions;
   savedSize = currentSize;
   d3.select('#save').attr('disabled', 'disabled');
@@ -355,7 +346,6 @@ var swapSaved = function() {
   currentSize = savedSize;
   savedOptions = options;
   savedCompiled = compiled;
-  savedCompiledMap = makeCompiledMap(compiled);
   savedSize = size;
   setOptions(currentOptions);
   updateSources();

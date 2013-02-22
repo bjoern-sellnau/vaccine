@@ -14,8 +14,6 @@ var userTemplateDir = vaccineDir + '/template';
 var sourceTemplateDir = __dirname + '/lib_template';
 var libTemplateDir;
 
-var projectOptions;
-
 
 var fail = function(message, num) {
   console.error(message);
@@ -67,12 +65,11 @@ module.exports = exports = {
     if (!targets || !targets.length)
       targets = detect().targets;
     var compiled = compileTargets(targets);
-    compiled.forEach(function(target) {
-      var name = target.name;
+    Object.keys(compiled).forEach(function(name) {
       if (name === 'Makefile') {
         if (fs.existsSync('Makefile')) name = 'Makefile.example';
       }
-      fs.writeFile(name, target.compiled, 'utf8', function(err) {
+      fs.writeFile(name, compiled[name], 'utf8', function(err) {
         if (err) throw err;
         if (name === 'build.sh') {
           fs.chmod('build.sh', '755', function(err) { if (err) throw err; });

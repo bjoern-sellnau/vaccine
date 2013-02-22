@@ -89,10 +89,10 @@ var define = function(defineType) {
 };
 
 module.exports = exports = function(options) {
-
   setOptions(options);
 
-  return targets.map(function(target) {
+  var allCompiled = {};
+  targets.forEach(function(target) {
     if (target === 'vaccine_dev.js') {
       dev = true;
       var oldSupportsArray = supportsArray;
@@ -103,8 +103,9 @@ module.exports = exports = function(options) {
       dev = false;
       supportsArray = oldSupportsArray;
     }
-    return {name: target, compiled: compiled};
+    allCompiled[target] = compiled;
   });
+  return allCompiled;
 };
 
 var defaultForFormat = function(format) {
