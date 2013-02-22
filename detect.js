@@ -32,6 +32,7 @@ var optionDefaults = {
   debugging: [],
   source_dir: '',
   global_name: '',
+  output: '',
 };
 
 var fail = function(message, num) {

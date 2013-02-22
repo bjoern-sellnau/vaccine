@@ -82,6 +82,8 @@ module.exports = exports = {
 
   build: function(output) {
     var options = detect();
+    output = output || vaccine.derivedOptions(options).output;
+    options.output = output;
     var text = buildText(options);
     fs.writeFile(output, text, 'utf8', function(err) {
       console.log('Completed... ' + output);

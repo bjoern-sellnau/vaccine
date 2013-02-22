@@ -280,6 +280,7 @@ var derivedOptions = function(options) {
     exportsArray: options.exports,
     defineArray: options.define,
     targets: options.targets,
+    output: options.output || options.name + '.js',
     dev: false,
   };
   d.numDeps = d.dependencies.length;

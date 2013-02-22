@@ -1,6 +1,6 @@
 .PHONY: build min
 build:
-	sh build.sh > $-- name --$.js
+	sh build.sh > $-- output --$
 
 min:
-	sh build.sh | uglifyjs > $-- name --$.js
+	sh build.sh | uglifyjs > $-- name --$.min.js
