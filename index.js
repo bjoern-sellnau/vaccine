@@ -1,7 +1,9 @@
 
 var fs = require('fs');
 var child_process = require('child_process');
+var exec = child_process.exec;
 
+var express = require('express');
 var vaccine = require('./src/vaccine');
 var detect = require('./detect');
 
@@ -36,7 +38,7 @@ var createComponent = function(filename) {
   return function() {
     ifNoExist(filename, function() {
       var copy = 'cp ' + libTemplateDir + '/component.json ' + filename;
-      child_process.exec(copy, maybeThrow);
+      exec(copy, maybeThrow);
     });
   };
 };
@@ -104,7 +106,7 @@ module.exports = exports = {
       }
     };
     ifNoExist(name, function() {
-      child_process.exec('cp -R ' + libTemplateDir + ' ' + name, execFile);
+      exec('cp -R ' + libTemplateDir + ' ' + name, execFile);
     });
   },
 
@@ -114,7 +116,7 @@ module.exports = exports = {
       console.log('Remove ~/.vaccine/template' + when);
     } else {
       var command = 'cp -R ' + libTemplateDir + ' ' + userTemplateDir;
-      child_process.exec(command, maybeThrow);
+      exec(command, maybeThrow);
     }
   },
 };
@@ -202,6 +204,66 @@ var walk = function(dir) {
     }
   });
   return results;
+};
+
+exports.server = function(options) {
+  options = options || detect();
+  var d = vaccine.derivedOptions(options);
+  var app = express();
+  var port = process.env.PORT || 5000;
+
+  var buildFile = fs.existsSync('build.sh');
+
+  app.get(/^\/build[\/\w]*\.?\w*$/, function(req, res) {
+    if (!buildFile && req.path === '/build.sh') {
+      res.type('application/javascript');
+      res.send(buildText(options));
+    } else {
+      exec('.' + req.path, {maxBuffer: 1024*1024}, function(err, stdout) {
+        if (err) return notFound(err, req.path, res);
+        res.type('application/javascript');
+        res.send(stdout);
+      });
+    }
+  });
+
+  if (!fs.existsSync('vaccine_dev.js')) {
+    var vac = compileSingle('vaccine_dev.js', options);
+    app.get(/^\/vaccine_dev\.js/, function(req, res) {
+      res.type('application/javascript');
+      res.send(vac);
+    });
+  }
+
+  if (d.commonjs) {
+    var sourceDirRe = new RegExp('^/' + d.source_dir + '/');
+    app.get(sourceDirRe, function(req, res) {
+      fs.readFile('.' + req.path, 'utf8', function(err, srcText) {
+        if (err) return notFound(err, req.path, res);
+
+        var module = req.path.replace(sourceDirRe, '').replace(/\.js$/, ''),
+            compiled = "define('" + module + "', ";
+        var ex = d.exports('module') ? 'exports, module' : 'exports';
+        compiled += 'function(require, ' + ex + ') {\n';
+        if (d.use_strict)
+          compiled += "'use strict';\n"
+        compiled += srcText;
+        compiled += '\n});';
+        res.type('application/javascript');
+        res.send(compiled);
+      });
+    });
+  }
+
+  var notFound = function(err, path, res) {
+    console.log(err);
+    res.send('404 Not Found\n', 404);
+  };
+
+  app.use(express.static('./'));
+
+  app.listen(port);
+  console.log('Serving localhost:' + port);
 };
 
 var whichLibTemplate = function() {

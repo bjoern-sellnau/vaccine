@@ -74,7 +74,7 @@ module.exports = exports = function(options) {
   d.targets.forEach(function(target) {
     if (target === 'vaccine_dev.js') {
       d.dev = true;
-      var oldSupportsArray = supportsArray;
+      var oldSupportsArray = d.supportsArray;
       d.supportsArray = [];
     }
     var compiled = compileTemplate(templateMap[target]);
