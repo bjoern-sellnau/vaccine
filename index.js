@@ -251,7 +251,7 @@ exports.server = function(options) {
     res.send('404 Not Found\n', 404);
   };
 
-  app.use(express.static('./'));
+  app.use(express.static(process.cwd()));
 
   app.listen(port);
   console.log('Serving localhost:' + port);
