@@ -87,7 +87,7 @@ var run = function() {
     process.exit(1);
   }
   if (command === 'help') help();
-  else vaccine[command](args);
+  else vaccine[command].apply(null, args);
 };
 
 run();

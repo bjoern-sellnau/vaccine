@@ -61,7 +61,8 @@ module.exports = exports = {
     templateText = _;
   },
 
-  targets: function(targets) {
+  targets: function() {
+    var targets = Array.prototype.slice.call(arguments);
     if (!targets || !targets.length)
       targets = detect().targets;
     var compiled = compileTargets(targets);
@@ -70,20 +71,28 @@ module.exports = exports = {
         if (fs.existsSync('Makefile')) name = 'Makefile.example';
       }
       fs.writeFile(name, compiled[name], 'utf8', function(err) {
-        if (err) throw err;
+        maybeThrow(err);
         if (name === 'build.sh') {
-          fs.chmod('build.sh', '755', function(err) { if (err) throw err; });
+          fs.chmod('build.sh', '755', maybeThrow);
         }
         console.log('Completed... ' + name);
       });
     });
   },
 
+  build: function(output) {
+    var options = detect();
+    var text = buildText(options);
+    fs.writeFile(output, text, 'utf8', function(err) {
+      console.log('Completed... ' + output);
+    });
+  },
+
   "component.json": createComponent('component.json'),
   "vaccine.json": createComponent('vaccine.json'),
 
-  create: function(args) {
-    var name = args[0];
+  create: function(name) {
+    var args = Array.prototype.slice.call(arguments);
     var execFile = function(err) {
       maybeThrow(err);
       process.chdir(name);
@@ -114,7 +123,7 @@ var compileSingle = function(target, options) {
 exports.compileSingle = compileSingle;
 
 var compileTargets = function(targets, options) {
-  var options = options || detect();
+  options = options || detect();
   options = clone(options);
   options.targets = targets;
   return compile(options);
@@ -122,7 +131,7 @@ var compileTargets = function(targets, options) {
 exports.compileTargets = compileTargets;
 
 var compile = function(options) {
-  var options = options || detect();
+  options = options || detect();
   var problems = vaccine.validateOptions(options);
   if (problems.length) {
     problems.forEach(function(problem) {
@@ -145,7 +154,52 @@ var clone = function(object) {
 
 
 var buildText = function(options) {
+  options = options || detect();
   var vac = compileSingle('vaccine.js', options);
+  var d = vaccine.derivedOptions(options);
+  var files = walk(d.sourceDir).sort();
+
+  // The following mirrors the logic in templates/build.sh
+  var text = ';(function() {' + (d.useStrict ? '"use strict";\n' : '\n');
+
+  files.forEach(function(filename) {
+    var file = fs.readFileSync(filename, 'utf8');
+    if (d.commonjs || d.define('optional_id')) {
+      var src = new RegExp('^' + d.sourceDir + '/');
+      var name = filename.replace(src, '').replace(/\.js/, '');
+      if (d.commonjs) {
+        var ex = d.exports('module') ? 'exports, module' : 'exports';
+        text += "define('" + name + "', function(require, " + ex + ') {';
+        text += file;
+        text += '});';
+      } else {
+        text += file.replace(/^define\(([^'"])/, "define('" + name + "', $1");
+      }
+    } else {
+      text += file;
+    }
+  });
+
+  text += vac;
+  text += '}());\n';
+  return text;
+};
+exports.buildText = buildText;
+
+var walk = function(dir) {
+  var results = [];
+  var list = fs.readdirSync(dir);
+  list.forEach(function(file) {
+    file = dir + '/' + file;
+    var stat = fs.statSync(file);
+    if (stat && stat.isDirectory()) {
+      var res = walk(file);
+      results = results.concat(res);
+    } else {
+      results.push(file);
+    }
+  });
+  return results;
 };
 
 var whichLibTemplate = function() {

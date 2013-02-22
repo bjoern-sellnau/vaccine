@@ -263,14 +263,14 @@ exports.validateOptions = function(opts) {
 };
 
 var derivedOptions = function(options) {
-  var d = derived = {
+  var d = {
     name: options.name,
     globalName: options.global || options.name,
     libraryDir: options.lib,
     format: options.format,
-    amd: format === 'amd',
-    commonjs: format === 'commonjs',
-    umd: format === 'umd',
+    amd: options.format === 'amd',
+    commonjs: options.format === 'commonjs',
+    umd: options.format === 'umd',
     performance: options.performance,
     debug: options.debug,
     useStrict: options.use_strict,

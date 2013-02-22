@@ -11,11 +11,10 @@
     do
       name=$(echo "$file" | sed -e "s#^$source_dir/##" -e 's/\.js//')
   ?????????????????????????????????????????????????????????????? (commonjs)
-      echo "define('$name', function(require, $-- exprts('module') ? 'exports, module' : 'exports' --$) {"
+      echo "define('$name', function(require, $-- exports('module') ? 'exports, module' : 'exports' --$) {"
       cat $file
       echo '});'
   :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-      module="$-- name --$/$name"
       sed "s#define(\([^'\"]\)#define('$name', \1#" $file
   /////////////////////////////////////////////////////////////////////////
     done
