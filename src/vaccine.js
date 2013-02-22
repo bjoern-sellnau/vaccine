@@ -45,8 +45,8 @@ var remove = function(array, item) {
 
 var derivedHelpers = function(derived) {
   var d = derived;
-  d.exprts = function(exprtsType) {
-    return has(d.exportsArray, exprtsType);
+  d.exports = function(exportsType) {
+    return has(d.exportsArray, exportsType);
   };
 
   d.supports = function(supportsType) {
