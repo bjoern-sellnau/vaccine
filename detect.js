@@ -4,7 +4,8 @@ var vaccine = require('./src/vaccine');
 
 var projectOptions;
 
-var requiredOptions = ['name', 'entry'];
+var requiredOptions = ['name', 'main',     // TODO: get it down to just these
+                       'format', 'require', 'exports'];
 
 var optionLocations = {
   format: 'vaccine.format',
@@ -29,8 +30,6 @@ var optionConversions = {
 var defaultForFormat = vaccine.defaultForFormat;
 var optionDefaults = {
   dependencies: {},
-  targets: defaultForFormat,
-  define: defaultForFormat,
   debugging: [],
   source_dir: '',
   global_name: '',
@@ -44,16 +43,39 @@ var fail = function(message, num) {
 
 module.exports = exports = function() {
   if (projectOptions) return projectOptions;
+  projectOptions = determineOptions();
+  return projectOptions;
+};
+
+var determineOptions = function() {
+  var options = componentOptions();
+  var missing = requiredOptions.filter(function(required) {
+    return !options[required];
+  });
+  if (missing.length)
+    fail("Missing required options: " + missing.join(', '));
+
+  var format = options.format;
+  var defaults = defaultForFormat(format);
+
+  // TODO: discover this instead
+  options.define = options.define || defaults.define;
+
+  options.targets = options.targets || defaults.targets;
+  options.supports = options.supports || defaults.supports;
+  return options;
+};
+
+var findComponentText = function() {
   var jsonFile = 'vaccine.json';
   if (!fs.existsSync(jsonFile)) jsonFile = 'component.json';
   if (!fs.existsSync(jsonFile))
     fail("Must specify options in component.json (vaccine.json for apps)");
-  var component = JSON.parse(fs.readFileSync(jsonFile));
-  projectOptions = determineOptions(component);
-  return projectOptions;
+  return JSON.parse(fs.readFileSync(jsonFile));
 };
 
-var determineOptions = function(component) {
+var componentOptions = function() {
+  var component = findComponentText();
   var options = {};
   var vac = component.vaccine;
   Object.keys(optionLocations).forEach(function(opt) {
@@ -66,13 +88,10 @@ var determineOptions = function(component) {
       setting = component[loc];
     }
     if (typeof setting === 'undefined') {
-      if (typeof optionDefaults[opt] === 'undefined')
-        fail("Missing required option: " + loc);
-      setting = optionDefaults[opt];
-      if (typeof setting === 'function')
-        setting = setting(options.format)[opt];
+      if (typeof optionDefaults[opt] !== 'undefined')
+        setting = optionDefaults[opt];
     }
-    if (optionConversions[opt])
+    if (typeof setting !== 'undefined' && optionConversions[opt])
       setting = optionConversions[opt](setting);
     options[opt] = setting;
   });
