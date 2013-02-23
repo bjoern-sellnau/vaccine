@@ -87,9 +87,13 @@ module.exports = exports = {
     output = output || vaccine.derivedOptions(options).output;
     options.output = output;
     var text = buildText(options);
-    fs.writeFile(output, text, 'utf8', function(err) {
-      console.log('Completed... ' + output);
-    });
+    if (output === '-c' || output === '--stdout') {
+      console.log(text);
+    } else {
+      fs.writeFile(output, text, 'utf8', function(err) {
+        console.log('Completed... ' + output);
+      });
+    }
   },
 
   "component.json": createComponent('component.json'),

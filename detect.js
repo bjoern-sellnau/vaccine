@@ -12,7 +12,7 @@ var optionLocations = {
   targets: 'vaccine.targets',
   exports: 'vaccine.exports',
   supports: 'supports',
-  define: 'vacccine.define',
+  define: 'vaccine.define',
   require: 'vaccine.require',
   debugging: 'vaccine.debugging',
   output: 'vaccine.output',
