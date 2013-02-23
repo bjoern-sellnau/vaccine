@@ -1,6 +1,6 @@
     #!/bin/sh
-    # build with: sh build.sh > $-- name --$.js
-    echo ';(function() {$-- use_strict ? '"use strict";' : '' --$'
+    # build with: sh build.sh > $-- output --$
+    echo ';(function(vaccineRoot) {$-- use_strict ? '"use strict";' : '' --$'
 
 ??????????????????????????????????????????? (commonjs || define('optional_id'))
     # vaccine.js must NOT be in the source list.
@@ -24,4 +24,4 @@
 ///////////////////////////////////////////////////////////////////////////////
 
     cat vaccine.js  # Must be after sources.
-    echo '}());'
+    echo '}(this));'

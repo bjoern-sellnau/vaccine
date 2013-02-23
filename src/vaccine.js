@@ -46,19 +46,6 @@ var clone = function(object) {
 };
 
 
-var derivedHelpers = function(derived) {
-  ['exports', 'supports', 'require', 'define'].forEach(function(group) {
-    var groupArray = group + 'Array';
-    derived[group] = function(type) {
-      return has(derived[groupArray], type);
-    };
-    derived['only' + capitalize(group)] = function(type) {
-      return onlyHas(derived[groupArray], type);
-    };
-  });
-};
-
-
 module.exports = exports = function(options) {
   var d = currentDerivedOptions = derivedOptions(options);
 
@@ -90,7 +77,7 @@ var defaultForFormat = function(format) {
       define: ['optional_id'],
     },
     commonjs: {
-      supports: ['amd', 'window', 'commonjs'],
+      supports: ['amd', 'window'],
       exports: ['module', 'exports'],
       targets: ['vaccine.js', 'build.sh'],
       require: ['full', 'index'],
@@ -181,11 +168,6 @@ exports.validateOptions = function(opts) {
       options.exports.push('exports');
     });
   }
-  if (d.onlySupports('commonjs')) {
-    mismatch([{group: 'supports', parts: ['commonjs']}], function(options) {
-      options.supports.push('window');
-    });
-  }
   if (d.require('index') && d.require('single')) {
     mismatch([{group: 'require', parts: ['index', 'single']}], function(options) {
       removeWithDefault(options, 'require', 'index');
@@ -199,7 +181,6 @@ exports.validateOptions = function(opts) {
 
   // AMD mismatches
   if (format === 'amd') {
-    removeIfHas('supports', 'commonjs');
     removeIfHas('require', 'index');
   } else {
     removeIfHas('define', 'optional_id');
@@ -207,11 +188,6 @@ exports.validateOptions = function(opts) {
 
   // CommonJS mismatches
   if (format === 'commonjs') {
-    if (!d.supports('commonjs')) {
-      formatMismatch('supports', 'commonjs', function(options) {
-        options.supports.push('commonjs');
-      });
-    }
     removeIfHas('exports', 'return');
     removeIfHas('require', 'absolute');
   }
@@ -313,6 +289,20 @@ var derivedOptions = function(options) {
     d.main = './' + d.main;
   }
 
+  if (isValidIdentifier(d.global_name)) {
+    d.setGlobalName = '.' + d.global_name;
+  } else {
+    d.setGlobalName = "['" + d.global_name + "']";
+  }
+  if (d.numDeps === 1) {
+    var firstDep = d.dependencies[0];
+    if (isValidIdentifier(firstDep)) {
+      d.setDependency = '.' + firstDep;
+    } else {
+      d.setDependency = "['" + firstDep + "']";
+    }
+  }
+
   if (d.format === 'umd') {
 
     d.umdDepsAmd = '';
@@ -346,6 +336,29 @@ var derivedOptions = function(options) {
   return d;
 };
 exports.derivedOptions = derivedOptions;
+
+var derivedHelpers = function(derived) {
+  ['exports', 'supports', 'require', 'define'].forEach(function(group) {
+    var groupArray = group + 'Array';
+    var cap = capitalize(group);
+    derived[group] = function(type) {
+      return has(derived[groupArray], type);
+    };
+    derived['only' + cap] = function(type) {
+      return onlyHas(derived[groupArray], type);
+    };
+    derived['num' + cap] = derived[groupArray].length;
+  });
+};
+
+var isValidIdentifier = function(id) {
+  var obj = {};
+  try {
+    eval('obj.' + id + ' = true');
+  } catch (err) {
+  }
+  return obj[id] || false;
+};
 
 
 var compileTemplate = function(templateName) {

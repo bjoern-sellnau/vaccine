@@ -9,6 +9,7 @@ var d3 = require('d3'),
     demo = require('./demo'),
     web = {},
     diffColor = '#664985',
+    maxSize = 800,
     scrollHelpOffset = 60,
     shotWidth = 161;
 
@@ -133,10 +134,9 @@ var update = function() {
   var vaccineCompiled = compiled['vaccine.js'] || compiled['umd.js'];
   if (vaccineCompiled) {
     if (compiled['vaccine.js']) {
-      vaccineCompiled = '(function() {' + vaccineCompiled + '})()';
+      vaccineCompiled = '(function(vaccineRoot) {' + vaccineCompiled + '}(this))';
       try {
-        // substract the "(function(){...})()" (16 bytes)
-        currentSize = uglifyjs(vaccineCompiled).length - 16;
+        currentSize = uglifyjs(vaccineCompiled).length;
       } catch (e) {
         currentSize = 1;
       }
@@ -168,7 +168,7 @@ var copyCurrentOptions = function() {
 var compile = function() {
   var options = copyCurrentOptions();
   var deps = [];
-  options.dependencies.split(/\W+/).forEach(function(dep) {
+  options.dependencies.split(/ *[ ,] */).forEach(function(dep) {
     if (dep) deps.push(dep);
   });
   options.dependencies = deps;
@@ -263,11 +263,11 @@ var updateSources = function() {
       var min = 'Oops!';
       var gzip = min;
     } else {
-      var currentShot = shotWidth * currentSize / 650;
+      var currentShot = shotWidth * currentSize / maxSize;
       if (diffEnabled) {
         var min = currentSize - savedSize;
         var gzip = gzipFromMin(currentSize) - gzipFromMin(savedSize);
-        var savedShot = shotWidth * savedSize / 650;
+        var savedShot = shotWidth * savedSize / maxSize;
       } else {
         var min = currentSize;
         var gzip = gzipFromMin(currentSize);
