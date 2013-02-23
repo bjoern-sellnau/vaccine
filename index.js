@@ -159,7 +159,7 @@ var buildText = function(options) {
   var files = walk(d.source_dir).sort();
 
   // The following mirrors the logic in templates/build.sh
-  var text = ';(function() {' + (d.use_strict ? '"use strict";\n' : '\n');
+  var text = ';(function(vaccineRoot) {' + (d.use_strict ? '"use strict";\n' : '\n');
 
   files.forEach(function(filename) {
     var file = fs.readFileSync(filename, 'utf8');
@@ -180,7 +180,7 @@ var buildText = function(options) {
   });
 
   text += vac;
-  text += '}());\n';
+  text += '}(this));\n';
   return text;
 };
 exports.buildText = buildText;

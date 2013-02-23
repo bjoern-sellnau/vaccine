@@ -12,7 +12,7 @@
   },
   "vaccine": {
     "format": "commonjs",
-    "supports": ["window", "amd", "commonjs"],
+    "supports": ["window", "amd"],
     "require": ["single"],
     "exports": ["exports", "module"]
   }
