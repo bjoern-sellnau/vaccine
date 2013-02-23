@@ -168,9 +168,9 @@ var buildText = function(options) {
       var name = filename.replace(src, '').replace(/\.js/, '');
       if (d.commonjs) {
         var ex = d.exports('module') ? 'exports, module' : 'exports';
-        text += "define('" + name + "', function(require, " + ex + ') {';
+        text += "define('" + name + "', function(require, " + ex + ') {\n';
         text += file;
-        text += '});';
+        text += '});\n';
       } else {
         text += file.replace(/^define\(([^'"])/, "define('" + name + "', $1");
       }

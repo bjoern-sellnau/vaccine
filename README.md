@@ -42,8 +42,8 @@ Here is an example `component.json`:
   "devDependencies": {
     "qunit": "~1"
   },
-  "supports": ["window", "amd", "commonjs"],
   "vaccine": {
+    "supports": ["window", "amd", "commonjs"],
     "require": ["single"],
     "exports": ["exports", "module"]
   }
@@ -64,11 +64,11 @@ Here is an example `component.json`:
 - `devDependencies`: A list of dependencies that aren't needed to use the
   project, but might be needed in development for things like testing and
   documentation.
-- `supports`: A list of environments the project supports.
-  The possibilites are `window`, `amd`, and `commonjs`.
 - `vaccine`: Vaccine specific settings.
 - `vaccine.format`: The module format used in the project: `amd`, `commonjs`,
   or `umd`.
+- `vaccine.supports`: A list of environments the project supports.
+  The possibilites are `window`, `amd`, and `commonjs`.
 - `vaccine.targets`: An array of filenames of targets to build with
   `$ vaccine targets`. Possibilities are `vaccine.js`, `build.sh`,
   `vaccine_dev.js`, `dev_server.js`, `Makefile`, `umd.js`.

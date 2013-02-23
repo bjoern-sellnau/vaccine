@@ -4,6 +4,8 @@ var vaccine = require('./src/vaccine');
 
 var projectOptions;
 
+var requiredOptions = ['name', 'entry'];
+
 var optionLocations = {
   format: 'vaccine.format',
   name: 'name',
@@ -11,7 +13,7 @@ var optionLocations = {
   dependencies: 'dependencies',
   targets: 'vaccine.targets',
   exports: 'vaccine.exports',
-  supports: 'supports',
+  supports: 'vaccine.supports',
   define: 'vaccine.define',
   require: 'vaccine.require',
   debugging: 'vaccine.debugging',

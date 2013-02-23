@@ -10,9 +10,9 @@
   "devDependencies": {
     "qunit": "~1"
   },
-  "supports": ["window", "amd", "commonjs"],
   "vaccine": {
     "format": "commonjs",
+    "supports": ["window", "amd", "commonjs"],
     "require": ["single"],
     "exports": ["exports", "module"]
   }
