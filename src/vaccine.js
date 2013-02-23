@@ -201,8 +201,8 @@ exports.validateOptions = function(opts) {
       });
     }
     if (d.supports('commonjs') && d.exports('return')) {
-      formatMismatch([{group: 'supports', parts: ['commonjs']},
-                      {group: 'exports', parts: ['return']}],
+      formatMismatches([{group: 'supports', parts: ['commonjs']},
+                        {group: 'exports', parts: ['return']}],
             function(options) {
         removeWithDefault(options, 'exports', 'return');
       });
