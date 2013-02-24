@@ -244,6 +244,7 @@ var derivedOptions = function(options) {
   var d = {
     name: name,
     global_name: stringify(options.global_name) || name,
+    main_file: stringify(options.main),
     format: format,
     amd: format === 'amd',
     commonjs: format === 'commonjs',
@@ -273,7 +274,7 @@ var derivedOptions = function(options) {
   }
 
 
-  var cleanedMain = stringify(options.main).replace(/^\.\//, '');
+  var cleanedMain = d.main_file.replace(/^\.\//, '');
   cleanedMain = cleanedMain.replace(/\.js$/, '');
   var source_dir = stringify(options.source_dir);
   if (source_dir) {

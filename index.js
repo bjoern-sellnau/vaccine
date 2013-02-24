@@ -156,7 +156,7 @@ var buildText = function(options) {
   options = options || detect();
   var vac = compileSingle('vaccine.js', options);
   var d = vaccine.derivedOptions(options);
-  var files = walk(d.source_dir).sort();
+  var files = detect.walk(d.source_dir).sort();
 
   // The following mirrors the logic in templates/build.sh
   var text = ';(function(vaccineRoot) {' + (d.use_strict ? '"use strict";\n' : '\n');
@@ -184,22 +184,6 @@ var buildText = function(options) {
   return text;
 };
 exports.buildText = buildText;
-
-var walk = function(dir) {
-  var results = [];
-  var list = fs.readdirSync(dir);
-  list.forEach(function(file) {
-    file = dir + '/' + file;
-    var stat = fs.statSync(file);
-    if (stat && stat.isDirectory()) {
-      var res = walk(file);
-      results = results.concat(res);
-    } else {
-      results.push(file);
-    }
-  });
-  return results;
-};
 
 exports.server = function(options) {
   options = options || detect();

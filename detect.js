@@ -5,7 +5,9 @@ var vaccine = require('./src/vaccine');
 var projectOptions;
 
 var requiredOptions = ['name', 'main',     // TODO: get it down to just these
-                       'format', 'require', 'exports'];
+                       'require', 'exports'];
+
+var detectableOptions = ['format'];
 
 var optionLocations = {
   format: 'vaccine.format',
@@ -47,6 +49,23 @@ module.exports = exports = function() {
   return projectOptions;
 };
 
+var walk = function(dir) {
+  var results = [];
+  var list = fs.readdirSync(dir);
+  list.forEach(function(file) {
+    file = dir + '/' + file;
+    var stat = fs.statSync(file);
+    if (stat && stat.isDirectory()) {
+      var res = walk(file);
+      results = results.concat(res);
+    } else {
+      results.push(file);
+    }
+  });
+  return results;
+};
+exports.walk = walk;
+
 var determineOptions = function() {
   var options = componentOptions();
   var missing = requiredOptions.filter(function(required) {
@@ -54,6 +73,23 @@ var determineOptions = function() {
   });
   if (missing.length)
     fail("Missing required options: " + missing.join(', '));
+
+  var derived = vaccine.derivedOptions(options);
+  var toDetect = detectableOptions.filter(function(detectable) {
+    return !options[detectable];
+  });
+  if (toDetect.length) {
+    if (!fs.existsSync(derived.source_dir) ||
+        !fs.existsSync(derived.main_file)) {
+      var msg = "Cannot detect options without a file at: ";
+      msg = msg + derived.main_file;
+      fail(msg);
+    }
+    var mainText = fs.readFileSync(derived.main_file, 'utf8');
+    var sourceFiles = walk(derived.source_dir).sort();
+    if (!options.format)
+      options.format = detectFormat(mainText, derived);
+  }
 
   var format = options.format;
   var defaults = defaultForFormat(format);
@@ -96,4 +132,12 @@ var componentOptions = function() {
     options[opt] = setting;
   });
   return options;
+};
+
+
+var detectFormat = function(mainText, derived) {
+  // This is a horrible way of detecting format, but it works
+  // (mosts of the time)
+  if ((/^define\(/m).test(mainText)) return 'amd';
+  return 'commonjs';
 };
