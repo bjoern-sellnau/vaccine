@@ -117,6 +117,9 @@ var states = [
       name: 'datazooka',
       main: 'src/datazooka.js',
       dependencies: 'd3, crossfilter',
+      require: ['absolute', 'single'],
+    }, {
+      require: ['absolute', 'single'],
     }),
     exit: exitDiff,
     signals: [

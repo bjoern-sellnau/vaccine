@@ -54,7 +54,7 @@ Here is an example `component.json`:
 }
 ```
 
-_Required Options (for build)_
+__Required Options (for build)__
 
 - `name`: The name of the project. Also used as the global defined on window,
   or the AMD module id.
@@ -62,7 +62,7 @@ _Required Options (for build)_
   of the path is also used to determine the directory all the source files
   (and only source files) are in.
 
-_Important Options_
+__Important Options__
 
 - `version`: Not used by Vaccine, but sets the version number (follow
   [semver](http://semver.org/)).
@@ -76,7 +76,7 @@ _Important Options_
 - `vaccine.supports`: A list of environments the project supports.
   The possibilites are `window`, `amd`, and `commonjs`.
 
-_Option Overrides_
+__Option Overrides__
 
 The following options are detected, and so not necessary. However, it still
 may be useful to override what is detected. (Especially since they are
