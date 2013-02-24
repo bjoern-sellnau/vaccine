@@ -25,7 +25,7 @@ Vaccine uses `component.json` for some info. This is the same file
 used by [Bower](http://twitter.github.com/bower/). Some settings Bower uses
 Vaccine does not need, and some settings are Vaccine only. If you are using
 Vaccine as an application, it is a better idea to use a `vaccine.json`
-name instead.
+name instead. The options are exactly the same.
 
 Here is an example `component.json`:
 
@@ -43,35 +43,41 @@ Here is an example `component.json`:
     "qunit": "~1"
   },
   "vaccine": {
-    "supports": ["window", "amd", "commonjs"],
-    "require": ["single"],
-    "exports": ["exports", "module"]
+    "supports": ["window", "amd", "commonjs"]
   }
 }
 ```
 
+#### Required Options (for build) ####
+
 - `name`: The name of the project. Also used as the global defined on window,
   or the AMD module id.
+- `entry`: The main/entry module of the JavaScript sources. The first part
+  of the path is also used to determine the directory all the source files
+  (and only source files) are in.
+
+#### Important Options ####
+
 - `version`: Not used by Vaccine, but sets the version number (follow
   [semver](http://semver.org/)).
 - `main`: Used by Bower, but not Vaccine. Sets the main (built) JavaScript
   file, stylesheet, or image sprites.
-- `entry`: The main/entry module of the JavaScript sources. The first part
-  of the path is also used to determine the directory all the source files
-  (and only source files) are in.
 - `dependencies`: A list of libraries the project depends on, with version
   specifiers.
 - `devDependencies`: A list of dependencies that aren't needed to use the
   project, but might be needed in development for things like testing and
   documentation.
-- `vaccine`: Vaccine specific settings.
-- `vaccine.format`: The module format used in the project: `amd`, `commonjs`,
-  or `umd`.
 - `vaccine.supports`: A list of environments the project supports.
   The possibilites are `window`, `amd`, and `commonjs`.
-- `vaccine.targets`: An array of filenames of targets to build with
-  `$ vaccine targets`. Possibilities are `vaccine.js`, `build.sh`,
-  `vaccine_dev.js`, `dev_server.js`, `Makefile`, `umd.js`.
+
+#### Option Overrides ####
+
+The following options are detected, and so not necessary. However, it still
+may be useful to override what is detected. (Especially since they are
+detected quite naively, currently.)
+
+- `vaccine.format`: The module format used in the project: `amd`, `commonjs`,
+  or `umd`.
 - `vaccine.require`: An array of "require" functionality. Options are:
   `full`, `single`, `absolute`, `index`. See
   [help](http://www.vaccinejs.com/#help-require).
@@ -89,14 +95,9 @@ Here is an example `component.json`:
   `entry`.
 - `vaccine.global_name`: A way to override the global variable name, if `name`
   is not right.
-
-Eventually, some of the above options will be intelligently determined.
-For example, it will be possible to decide `vaccine.format`,
-`vaccine.require`, `vaccine.exports`, and `vaccine.define`. When this
-happens, all `vaccine.*` options will be optional.
-
-If the file is a `vaccine.json`, then the `vaccine.*` settings can be
-top level.
+- `vaccine.targets`: An array of filenames of targets to build with
+  `$ vaccine targets`. Possibilities are `vaccine.js`, `build.sh`,
+  `vaccine_dev.js`, `dev_server.js`, `Makefile`, `umd.js`.
 
 ### Building ###
 

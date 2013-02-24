@@ -305,14 +305,24 @@
     require of the format <code>require('./{{module}}')</code>. This means
     a file at "src/a.js" could require "src/b.js" with <code>require('./b')</code>,
     but it wouldn't be able to require "src/some_dir/c.js" with just this
-    option checked.
+    option checked. See the extra optimization at the end of the "absolute id"
+    section.
     </li>
-    <li><span class="key">absolute id</span> - Require a module with the full
-    AMD path (which doesn't include the source directory). For example, the
-    "src/my_lib.js" file could require "src/my_lib/utils.js" with
-    <code>require('my_lib/utils')</code>. Note the lack of a "./" or "../" at
-    the beginning signifying that this is an absolute path. This option is
-    only available to the AMD format.
+    <li>
+      <p><span class="key">absolute id</span> - Require a module with the full
+      AMD path (which doesn't include the source directory). For example, the
+      "src/my_lib.js" file could require "src/my_lib/utils.js" with
+      <code>require('my_lib/utils')</code>. Note the lack of a "./" or "../" at
+      the beginning signifying that this is an absolute path. This option is
+      only available to the AMD format.
+      </p>
+      <p>An extra optimization can occur if an AMD project has "single
+      relative" requires only in files immediately under the directory of the
+      same name as the project, and "absolute" requires everywhere else. The
+      optimization is to use only "absolute" and "single relative" options, and
+      the single relative requires will be translated into absolute ones by
+      replacing the dot with the name of the project.
+      </p>
     </li>
     <li><span class="key">w/o index</span> - This means that the "/index" is
     left off the end of requiring an "index.js" module. So, for example,
