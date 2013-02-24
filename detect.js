@@ -4,10 +4,9 @@ var vaccine = require('./src/vaccine');
 
 var projectOptions;
 
-var requiredOptions = ['name', 'main',     // TODO: get it down to just these
-                       'exports'];
+var requiredOptions = ['name', 'main'];
 
-var detectableOptions = ['format', 'require'];
+var detectableOptions = ['format', 'require', 'exports'];
 
 var optionLocations = {
   format: 'vaccine.format',
@@ -88,13 +87,21 @@ var determineOptions = function() {
     }
     var mainText = fs.readFileSync(derived.main_file, 'utf8');
     var sourceFiles = walk(derived.source_dir).sort();
+    sourceFiles = sourceFiles.map(function(file) {
+      return file.slice(derived.source_dir.length + 1);
+    });
+    var fileInfo = sourceFiles.map(function(name) {
+      return determineFileInfo(name, derived);
+    });
 
     if (!options.format)
       options.format = detectFormat(mainText, derived);
     format = options.format;
     if (!options.require)
-      options.require = detectRequire(sourceFiles, format, derived);
-    console.log(options.require);
+      options.require = detectRequire(sourceFiles, format, fileInfo, derived);
+    if (!options.exports)
+      options.exports = detectExports(format, fileInfo);
+    console.log(options.exports);
     process.exit(1);
   }
 
@@ -149,29 +156,13 @@ var detectFormat = function(mainText, derived) {
   return 'commonjs';
 };
 
-var detectRequire = function(files, format, derived) {
-  files = files.map(function(file) {
-    return file.slice(derived.source_dir.length + 1);
-  });
+var detectRequire = function(files, format, fileInfo, derived) {
   var numLevels = files.reduce(function(levels, file) {
     return Math.max(levels, file.split('/').length);
   }, 1);
   var hasIndex = files.some(function(file) {
     return /\/index\.js$/.test(file);
   });
-
-  // Simple cases that can be determined by format and filenames alone
-  if (format === 'commonjs') {
-    if (numLevels === 1) return ['single'];
-    if (!hasIndex) return ['full'];
-  }
-
-  var fileInfo = files.map(function(name) {
-    var info = requireInfo(name, derived);
-    console.log(info.requires);
-    return info;
-  });
-
 
   var num = function(type) {
     return function(file) {
@@ -185,7 +176,17 @@ var detectRequire = function(files, format, derived) {
     };
   };
 
-  if (format === 'amd') {
+  if (format === 'commonjs') {
+    if (numLevels === 1) return ['single'];
+    if (!hasIndex) return ['full'];
+    var withIndex = fileInfo.some(function(file) {
+      return file.requires.some(function(req) {
+        return /\/index$/.test(req);
+      });
+    });
+    if (withIndex) return ['full'];
+    return ['full', 'index'];
+  } else {
     if (fileInfo.every(all('absolute'))) return ['absolute'];
     if (fileInfo.some(num('full'))) return ['full'];
     if (fileInfo.every(all('single'))) return ['single'];
@@ -202,18 +203,31 @@ var detectRequire = function(files, format, derived) {
     } else {
       return ['full'];
     }
-  } else {
-    var withIndex = fileInfo.some(function(file) {
-      return file.requires.some(function(req) {
-        return /\/index$/.test(req);
-      });
-    });
-    if (withIndex) return ['full'];
-    return ['full', 'index'];
   }
 };
 
-var requireInfo = function(name, derived) {
+var detectExports = function(format, fileInfo) {
+  var hasExports = fileInfo.some(function(f) {
+    return f.exports;
+  });
+  var hasModule = fileInfo.some(function(f) {
+    return f.module;
+  });
+  if (format === 'amd') {
+    // TODO: I don't know any safe way to naively determine this, so for now
+    // always include 'return'.
+    var exports = ['return'];
+  } else {
+    var exports = [];
+  }
+  if (hasExports || hasModule)
+    exports.push('exports');
+  if (hasModule)
+    exports.push('module');
+  return exports;
+};
+
+var determineFileInfo = function(name, derived) {
   var text = fs.readFileSync(derived.source_dir + '/' + name, 'utf8');
 
   // TODO: this is parsing for require's. That will need to
@@ -227,6 +241,8 @@ var requireInfo = function(name, derived) {
   });
   return {
     name: name,
+    exports: /\bexports\./.test(text),
+    module: /\bmodule\.exports/.test(text),
     requires: requires,
     absolute: requires.filter(function(req) {
       return /^[^\.]/.test(req);
