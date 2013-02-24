@@ -8,8 +8,14 @@ The help is also [online](http://www.vaccinejs.com#help-start).
 Tool
 ----
 
-Vaccine will have a command line tool in addition to the
-[GUI](http://www.vaccinejs.com). The tool is not built yet.
+Vaccine has a command line tool in addition to the
+[GUI](http://www.vaccinejs.com). The tool has the ability to build with only
+a minimal `component.json`, to run a development server, and to create a
+barebones library from a template. Some of the options that must be set when
+using the GUI can be automatically detected when using the tool.
+
+The tool is organized as several commands (like git). Each command can be
+shortened if it is unambiguous.
 
 ### Installation ###
 
@@ -48,7 +54,7 @@ Here is an example `component.json`:
 }
 ```
 
-#### Required Options (for build) ####
+_Required Options (for build)_
 
 - `name`: The name of the project. Also used as the global defined on window,
   or the AMD module id.
@@ -56,7 +62,7 @@ Here is an example `component.json`:
   of the path is also used to determine the directory all the source files
   (and only source files) are in.
 
-#### Important Options ####
+_Important Options_
 
 - `version`: Not used by Vaccine, but sets the version number (follow
   [semver](http://semver.org/)).
@@ -70,7 +76,7 @@ Here is an example `component.json`:
 - `vaccine.supports`: A list of environments the project supports.
   The possibilites are `window`, `amd`, and `commonjs`.
 
-#### Option Overrides ####
+_Option Overrides_
 
 The following options are detected, and so not necessary. However, it still
 may be useful to override what is detected. (Especially since they are
@@ -118,10 +124,10 @@ a `build.sh` and then running `$ sh build.sh > my_library_name.js`.
 ### Building targets ###
 
 To construct a specific [target](http://www.vaccinejs.com/#help-targets),
-name the target(s):
+use the "targets" command, optionally followed by the name of the target(s):
 
 ```
-$ vaccine target[s] [<target-names>]   # e.g. $ vaccine vaccine.js build.sh
+$ vaccine targets [<target-names>]   # e.g. $ vaccine vaccine.js build.sh
 ```
 
 If `component.vaccine.targets` is set, then running `vaccine targets` will
@@ -134,11 +140,15 @@ default targets.
 $ vaccine server
 ```
 
-Starts a development server to serve local files. This is functionally
+Starts a development server to serve local files. This is roughly
 equivalent to using
 [dev_server.js](http://www.vaccinejs.com/#help-dev_server-js).
 
-### Helpful commands ###
+The one added benefit is that if `build.sh` or `vaccine_dev.js` don't exist,
+and they are requested, it will respond with the result of the build or the
+contents of `vaccine_dev.js`, respectively.
+
+### Create a new project from a template ###
 
 Create a skeleton library of the given name. Creates a new directory
 of the given name.
@@ -147,17 +157,33 @@ of the given name.
 $ vaccine create <project-name>
 ```
 
-Initializes a skeleton library in the current directory of the given
-name. Same as above except it doesn't create a new directory.
+The template used can be overriden by having a directory at
+`~/.vaccine/template`. Then that directory will be copied as the new project.
+
+If an executalbe exists at `~/.vaccine/template/post_create`, it will be called
+after the copy takes place. The current directory is the new project's
+directory.
+
+### Copy the basic template to ~/.vaccine/template ###
+
+The template being used if `~/.vaccine/template` does not exist can be copied
+into that location with this command:
 
 ```
-$ vaccine init <project-name>
+$ vaccine template
 ```
 
-Initializes an example component.json:
+As described above, this template will be copied into a new project's
+directory, and then `post_create` will be executed (if it exists).
+
+### Create minimal component.json ###
+
+Initializes an example component.json. This is taken from the same template
+as used in `$ vaccine create`.
 
 ```
-$ vaccine component.json
+$ vaccine component.json    # or:
+$ vaccine vaccine.json
 ```
 
 FAQ
