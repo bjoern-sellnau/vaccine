@@ -272,6 +272,12 @@ See the [UMD Github](https://github.com/umdjs/umd).
 
 Intro coming soon.
 
+TODO
+----
+
+- Fill out remaining documentation.
+- TESTS! Need to test the resulting shims for every possible option
+  combination. Then need to make tests for detecting options.
 
 LICENSE
 -------
