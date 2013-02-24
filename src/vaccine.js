@@ -74,6 +74,8 @@ var defaultForFormat = function(format) {
       exports: ['exports', 'module', 'return'],
       targets: ['vaccine.js', 'build.sh'],
       require: ['full', 'single', 'absolute'],
+
+      // TODO: support dependency array
       define: ['optional_id'],
     },
     commonjs: {

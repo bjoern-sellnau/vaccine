@@ -6,7 +6,7 @@ var projectOptions;
 
 var requiredOptions = ['name', 'main'];
 
-var detectableOptions = ['format', 'require', 'exports'];
+var detectableOptions = ['format', 'require', 'exports', 'define'];
 
 var optionLocations = {
   format: 'vaccine.format',
@@ -101,15 +101,12 @@ var determineOptions = function() {
       options.require = detectRequire(sourceFiles, format, fileInfo, derived);
     if (!options.exports)
       options.exports = detectExports(format, fileInfo);
-    console.log(options.exports);
-    process.exit(1);
+    if (!options.define)
+      options.define = detectDefine(format, fileInfo);
   }
 
   format = options.format;
   var defaults = defaultForFormat(format);
-
-  // TODO: discover this instead
-  options.define = options.define || defaults.define;
 
   options.targets = options.targets || defaults.targets;
   options.supports = options.supports || defaults.supports;
@@ -227,6 +224,15 @@ var detectExports = function(format, fileInfo) {
   return exports;
 };
 
+var detectDefine = function(format, fileInfo) {
+  if (format !== 'amd') return [];
+  var missingId = fileInfo.some(function(f) {
+    return f.missingId;
+  });
+  if (missingId) return ['optional_id'];
+  return [];
+};
+
 var determineFileInfo = function(name, derived) {
   var text = fs.readFileSync(derived.source_dir + '/' + name, 'utf8');
 
@@ -243,6 +249,9 @@ var determineFileInfo = function(name, derived) {
     name: name,
     exports: /\bexports\./.test(text),
     module: /\bmodule\.exports/.test(text),
+
+    // TODO: need to change regex when dependency array is supported.
+    missingId: /\bdefine\(function/.test(text),
     requires: requires,
     absolute: requires.filter(function(req) {
       return /^[^\.]/.test(req);
