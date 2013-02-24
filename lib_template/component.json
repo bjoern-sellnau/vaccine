@@ -1,19 +1,16 @@
 {
   "name": "{#name#}",
-  "version": "1.0.1",
-  "main": ["./{#name#}.js", "./{#name#}.css"],
+  "version": "0.1.0",
+  "main": "./{#name#}.js",
   "entry": "src/index.js",
   "dependencies": {
-    "jquery": "~1.9.1",
-    "underscore": "~1.4.4"
+    "dep_one": "~1.2.3",
+    "dep_two": "~3.2.1"
   },
   "devDependencies": {
-    "qunit": "~1"
+    "dev_dep": "~1"
   },
   "vaccine": {
-    "format": "commonjs",
-    "supports": ["window", "amd"],
-    "require": ["single"],
-    "exports": ["exports", "module"]
+    "supports": ["window", "amd"]
   }
 }
