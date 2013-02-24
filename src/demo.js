@@ -55,6 +55,13 @@ var exitDiff = function(finished) {
 
 var sizeSignal = {under: '#sizes .number', top: 0, right: -7};
 
+var helpSignals = function(ids) {
+  var under = ids.map(function(id) {
+    return id + ' .open-help';
+  });
+  return {under: under.join(', '), top: -4, left: -4};
+};
+
 var states = [
   {
     enter: updateWith(),    // All default
@@ -63,7 +70,7 @@ var states = [
     enter: updateWith('commonjs', {
       require: ['single'],
       exports: ['exports'],
-      supports: ['commonjs', 'window'],
+      supports: ['window'],
     }),
     signals: [
       sizeSignal,
@@ -86,11 +93,12 @@ var states = [
     signals: [
       {under: '#config', top: -4, left: -4},
       {under: '#sources .source', top: 1, left: 1},
+      helpSignals(['#supports', '#require']),
     ],
   },
   {
-    enter: updateWith('amd', {
-      supports: ['window', 'amd', 'commonjs'],
+    enter: updateWith('commonjs', {
+      require: ['single', 'index']
     }),
     exit: updateWith(),
     signals: [
@@ -136,7 +144,11 @@ var states = [
     ],
   },
   {
-    enter: updateWith(),
+    enter: updateWith('amd', {
+      supports: ['window'],
+      require: ['absolute', 'single'],
+      define: [],
+    }),
     signals: [
       {under: '#sources .source:first-child', top: 1, left: 1},
       {under: '#sources .source:nth-child(2)', top: 1, left: 1},
@@ -166,7 +178,6 @@ var states = [
   },
   {
     enter: updateWith(),
-    signals: [{under: '.open-help', top: -4, left: -4}],
   },
 ];
 

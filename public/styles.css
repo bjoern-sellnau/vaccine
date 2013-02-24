@@ -84,13 +84,7 @@ header {
 }
 
 #size-info .open-help {
-  /*border-color: #999;
-  color: #888;*/
   top: 12px;
-}
-#size-info .open-help:hover {
-  /*border-color: #777;
-  color: #555;*/
 }
 
 #controls .open-help {
@@ -110,10 +104,6 @@ h1 .open-help {
   right: -50px;
   margin-left: -20px;
   font-family: Arial, sans-serif;
-  /*border-color: #aaa;
-}
-h1 .open-help:hover {
-  border-color: #666;*/
 }
 
 
