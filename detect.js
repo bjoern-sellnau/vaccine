@@ -5,9 +5,9 @@ var vaccine = require('./src/vaccine');
 var projectOptions;
 
 var requiredOptions = ['name', 'main',     // TODO: get it down to just these
-                       'require', 'exports'];
+                       'exports'];
 
-var detectableOptions = ['format'];
+var detectableOptions = ['format', 'require'];
 
 var optionLocations = {
   format: 'vaccine.format',
@@ -74,6 +74,7 @@ var determineOptions = function() {
   if (missing.length)
     fail("Missing required options: " + missing.join(', '));
 
+  var format;
   var derived = vaccine.derivedOptions(options);
   var toDetect = detectableOptions.filter(function(detectable) {
     return !options[detectable];
@@ -87,11 +88,17 @@ var determineOptions = function() {
     }
     var mainText = fs.readFileSync(derived.main_file, 'utf8');
     var sourceFiles = walk(derived.source_dir).sort();
+
     if (!options.format)
       options.format = detectFormat(mainText, derived);
+    format = options.format;
+    if (!options.require)
+      options.require = detectRequire(sourceFiles, format, derived);
+    console.log(options.require);
+    process.exit(1);
   }
 
-  var format = options.format;
+  format = options.format;
   var defaults = defaultForFormat(format);
 
   // TODO: discover this instead
@@ -140,4 +147,96 @@ var detectFormat = function(mainText, derived) {
   // (mosts of the time)
   if ((/^define\(/m).test(mainText)) return 'amd';
   return 'commonjs';
+};
+
+var detectRequire = function(files, format, derived) {
+  files = files.map(function(file) {
+    return file.slice(derived.source_dir.length + 1);
+  });
+  var numLevels = files.reduce(function(levels, file) {
+    return Math.max(levels, file.split('/').length);
+  }, 1);
+  var hasIndex = files.some(function(file) {
+    return /\/index\.js$/.test(file);
+  });
+
+  // Simple cases that can be determined by format and filenames alone
+  if (format === 'commonjs') {
+    if (numLevels === 1) return ['single'];
+    if (!hasIndex) return ['full'];
+  }
+
+  var fileInfo = files.map(function(name) {
+    var info = requireInfo(name, derived);
+    console.log(info.requires);
+    return info;
+  });
+
+
+  var num = function(type) {
+    return function(file) {
+      return file[type].length;
+    };
+  };
+
+  var all = function(type) {
+    return function(file) {
+      return file[type].length === file.requires.length;
+    };
+  };
+
+  if (format === 'amd') {
+    if (fileInfo.every(all('absolute'))) return ['absolute'];
+    if (fileInfo.some(num('full'))) return ['full'];
+    if (fileInfo.every(all('single'))) return ['single'];
+
+    // must be a mix of absolute and single
+
+    var outsideNameDir = fileInfo.filter(function(file) {
+      var parts = file.name.split('/');
+      if (parts[0] !== derived.name) return true;
+      return parts.length !== 2;
+    });
+    if (outsideNameDir.every(all('absolute'))) {
+      return ['absolute', 'single'];
+    } else {
+      return ['full'];
+    }
+  } else {
+    var withIndex = fileInfo.some(function(file) {
+      return file.requires.some(function(req) {
+        return /\/index$/.test(req);
+      });
+    });
+    if (withIndex) return ['full'];
+    return ['full', 'index'];
+  }
+};
+
+var requireInfo = function(name, derived) {
+  var text = fs.readFileSync(derived.source_dir + '/' + name, 'utf8');
+
+  // TODO: this is parsing for require's. That will need to
+  // change when AMD supports the dependency array.
+  var requires = text.match(/\brequire\(['"][^'"]*['"]\)/g) || [];
+  requires = requires.map(function(req) {
+    return /require\(['"]([^'"]*)['"]\)/.exec(req)[1];
+  });
+  requires = requires.filter(function(req) {
+    return derived.dependencies.indexOf(req) === -1;
+  });
+  return {
+    name: name,
+    requires: requires,
+    absolute: requires.filter(function(req) {
+      return /^[^\.]/.test(req);
+    }),
+    single: requires.filter(function(req) {
+      return /^\.\/[^\/]*$/.test(req);
+    }),
+    full: requires.filter(function(req) {
+      if (/^\.\.\//.test(req)) return true;
+      return /^\.\/.+\/.+$/.test(req);
+    }),
+  };
 };

@@ -80,7 +80,7 @@ var defaultForFormat = function(format) {
       supports: ['amd', 'window'],
       exports: ['module', 'exports'],
       targets: ['vaccine.js', 'build.sh'],
-      require: ['full', 'index'],
+      require: ['full', 'single', 'index'],
       define: [],
     },
     umd: {
