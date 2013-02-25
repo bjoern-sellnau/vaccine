@@ -200,7 +200,10 @@ significant.
 Currently, libraries are mostly developed as a single large file, or multiple
 files that are concatenated in a manually defined order. Few libraries
 use a modular format such as CommonJS or AMD, instead using weaker
-JavaScript idioms. Vaccine lets libraries use these better
+JavaScript idioms. (Well there are a number of libraries targeted for
+[Browserify](http://browserify.org/) or
+[component](https://github.com/component/component), but they need those
+tools to run in the browser.) Vaccine lets libraries use these better
 formats and still work in the browser as a script tag.
 
 ### What are the CommonJS, AMD, and UMD module formats? ###
