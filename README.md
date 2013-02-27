@@ -33,6 +33,9 @@ Vaccine does not need, and some settings are Vaccine only. If you are using
 Vaccine as an application, it is a better idea to use a `vaccine.json`
 name instead. The options are exactly the same.
 
+Vaccine may in the future switch to using a `library.json` as described in
+[this gist](https://gist.github.com/jakesandlund/709b9697c13e967ca2e2).
+
 Here is an example `component.json`:
 
 ```
